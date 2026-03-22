@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation, useParams } from 'react-router-dom';
-import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle } from 'lucide-react';
+import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { premades } from './data/premades';
@@ -688,10 +688,10 @@ const ArchivePage = () => {
 }
 
 // ==========================================
-// PREMADE MODAL
+// PREMADE MODAL (QUICK VIEW)
 // ==========================================
 
-const PremadeModal = ({ premade, onClose }) => {
+const PremadeModal = ({ premade, onClose, onAddToCart }) => {
   const overlayRef = useRef(null);
   const contentRef = useRef(null);
 
@@ -705,48 +705,38 @@ const PremadeModal = ({ premade, onClose }) => {
   }, []);
 
   const handleOverlayClick = (e) => { if (e.target === overlayRef.current) onClose(); };
-  const stripeUrl = `${STRIPE_PAYMENT_LINK}?client_reference_id=premade-${premade.number}`;
 
   return (
     <div ref={overlayRef} onClick={handleOverlayClick} className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div ref={contentRef} className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-        {/* Close */}
         <button onClick={onClose} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm border border-black/10 flex items-center justify-center text-black/60 hover:text-black hover:bg-white transition-all">
           <X size={18} />
         </button>
 
-        {/* Image */}
         <div className="aspect-square overflow-hidden rounded-t-2xl bg-neutral-100">
           <img src={premade.imageUrl} alt={`Premade #${premade.number}`} className="w-full h-full object-cover" />
         </div>
 
-        {/* Content */}
         <div className="p-8">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-4">
             <h2 className="font-mono text-sm tracking-widest uppercase text-black/50">Premade #{premade.number}</h2>
             <span className="text-2xl font-semibold text-black">${premade.price}</span>
           </div>
 
-          <p className="font-mono text-[10px] text-black/40 mb-6 leading-relaxed uppercase tracking-wider">
-            Complete your payment via Stripe, then send us a DM on Instagram with your premade number to confirm your order.
-          </p>
-
           <div className="flex flex-col gap-3">
-            <a href={stripeUrl} target="_blank" rel="noopener noreferrer"
-               className="flex items-center justify-center gap-2 bg-black text-white px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg hover:bg-[color:var(--primary)] transition-colors">
-              <ExternalLink size={16} />
-              Pay with Stripe — ${premade.price}
-            </a>
+            <button
+              onClick={() => { onAddToCart(premade); onClose(); }}
+              className="flex items-center justify-center gap-2 bg-black text-white px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg hover:bg-[color:var(--primary)] transition-colors"
+            >
+              <ShoppingBag size={16} />
+              Add to Cart
+            </button>
             <a href={INSTAGRAM_DM_URL} target="_blank" rel="noopener noreferrer"
                className="flex items-center justify-center gap-2 bg-white text-black px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg border border-black/10 hover:border-black/30 hover:shadow-md transition-all">
               <MessageCircle size={16} />
-              Confirm via Instagram DM
+              Ask via Instagram DM
             </a>
           </div>
-
-          <p className="mt-4 text-center font-mono text-[10px] text-black/30 uppercase tracking-wider">
-            Message: "Hi! I'd like to purchase Premade #{premade.number}"
-          </p>
         </div>
       </div>
     </div>
@@ -754,67 +744,181 @@ const PremadeModal = ({ premade, onClose }) => {
 };
 
 // ==========================================
-// PREMADES GALLERY PAGE (WHITE / ART GALLERY)
+// CART SIDEBAR
+// ==========================================
+
+const CartSidebar = ({ cart, onRemove, onClose }) => {
+  const overlayRef = useRef(null);
+  const panelRef = useRef(null);
+  const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    const ctx = gsap.context(() => {
+      gsap.from(overlayRef.current, { opacity: 0, duration: 0.3, ease: 'power2.out' });
+      gsap.from(panelRef.current, { x: '100%', duration: 0.4, ease: 'power3.out' });
+    });
+    return () => { document.body.style.overflow = ''; ctx.revert(); };
+  }, []);
+
+  const handleOverlayClick = (e) => { if (e.target === overlayRef.current) onClose(); };
+
+  // Build Stripe URL with all premade numbers
+  const cartRef = cart.map(item => `premade-${item.number}`).join(',');
+  const stripeUrl = `${STRIPE_PAYMENT_LINK}?client_reference_id=${encodeURIComponent(cartRef)}`;
+  const dmNumbers = cart.map(item => `#${item.number}`).join(', ');
+
+  return (
+    <div ref={overlayRef} onClick={handleOverlayClick} className="fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm">
+      <div ref={panelRef} className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-black/10">
+          <h2 className="heading-font text-2xl tracking-widest text-black">Cart</h2>
+          <button onClick={onClose} className="w-10 h-10 rounded-full border border-black/10 flex items-center justify-center text-black/60 hover:text-black transition-colors">
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Items */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {cart.length === 0 && (
+            <p className="font-mono text-xs text-black/30 uppercase tracking-widest text-center py-12">Your cart is empty</p>
+          )}
+          {cart.map((item, idx) => (
+            <div key={idx} className="flex items-center gap-4 p-3 rounded-xl border border-black/5 group hover:border-black/10 transition-colors">
+              <div className="w-16 h-16 rounded-lg overflow-hidden bg-neutral-100 flex-shrink-0">
+                <img src={item.imageUrl} alt={`Premade #${item.number}`} className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">Premade #{item.number}</p>
+                <p className="text-sm font-semibold text-black">${item.price}</p>
+              </div>
+              <button onClick={() => onRemove(idx)} className="w-8 h-8 rounded-full flex items-center justify-center text-black/30 hover:text-[color:var(--primary)] hover:bg-black/5 transition-all">
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        {cart.length > 0 && (
+          <div className="p-6 border-t border-black/10 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs uppercase tracking-widest text-black/50">Total</span>
+              <span className="text-xl font-semibold text-black">${total}</span>
+            </div>
+
+            <a href={stripeUrl} target="_blank" rel="noopener noreferrer"
+               className="w-full flex items-center justify-center gap-2 bg-black text-white px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg hover:bg-[color:var(--primary)] transition-colors">
+              <ExternalLink size={16} />
+              Checkout — ${total}
+            </a>
+            <a href={INSTAGRAM_DM_URL} target="_blank" rel="noopener noreferrer"
+               className="w-full flex items-center justify-center gap-2 bg-white text-black px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg border border-black/10 hover:border-black/30 transition-all">
+              <MessageCircle size={16} />
+              Confirm via DM
+            </a>
+            <p className="text-center font-mono text-[10px] text-black/30 uppercase tracking-wider">
+              DM us: "I'd like premades {dmNumbers}"
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// PREMADES GALLERY PAGE
 // ==========================================
 
 const PremadesPage = () => {
   const [selected, setSelected] = useState(null);
+  const [cart, setCart] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
   const containerRef = useRef(null);
+
+  const addToCart = (premade) => {
+    if (!cart.find(item => item.id === premade.id)) {
+      setCart(prev => [...prev, premade]);
+    }
+  };
+  const removeFromCart = (idx) => setCart(prev => prev.filter((_, i) => i !== idx));
 
   useEffect(() => {
     window.scrollTo(0, 0);
     const ctx = gsap.context(() => {
-      gsap.from('.gallery-header', { y: 30, opacity: 0, duration: 1, ease: 'power3.out' });
-      gsap.from('.premade-item', { y: 40, opacity: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out', delay: 0.2 });
+      gsap.from('.premade-header', { y: 30, opacity: 0, stagger: 0.1, duration: 1.5, ease: 'power3.out' });
+      gsap.from('.premade-item', { y: 40, opacity: 0, duration: 0.8, stagger: 0.06, ease: 'power3.out', delay: 0.3 });
     }, containerRef);
     return () => ctx.revert();
   }, []);
 
   return (
-    <div ref={containerRef} className="min-h-screen relative z-10 bg-white">
-      {/* Minimal Header */}
-      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-black/5">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-xs font-mono text-black/50 hover:text-black transition-colors uppercase tracking-widest">
-            <ArrowLeft size={16} /> Back
+    <div ref={containerRef} className="min-h-screen p-6 md:p-12 flex flex-col relative z-10">
+
+      {/* TOP — Same layout as Home */}
+      <div className="flex flex-col md:flex-row justify-between items-start w-full relative z-20">
+        <div className="premade-header max-w-3xl">
+          <h1 className="heading-font text-6xl md:text-[7rem] leading-none text-black tracking-widest mb-4">
+            Altered Venganza
+          </h1>
+          <h2 className="heading-font text-3xl md:text-5xl leading-none text-[color:var(--primary)] tracking-widest mb-6">
+            Premades
+          </h2>
+          <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed max-w-lg mb-4">
+            Curated clothing renders, numbered and ready.
+            Pick your favorites, add to cart, and checkout.
+          </p>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-black/10 text-[10px] font-mono tracking-wider uppercase text-black/40">
+            <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]"></span>
+            {premades.filter(p => p.available).length} pieces available
+          </div>
+        </div>
+
+        <div className="premade-header flex flex-col items-start md:items-end gap-3 mt-8 md:mt-0 text-left md:text-right">
+          <Link to="/" className="group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
+            <span className="md:order-1">Back to Home</span>
+            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
           </Link>
-          <Link to="/" className="heading-font text-2xl text-black tracking-widest">Altered Venganza</Link>
-          <div className="w-16" />
+          <button
+            onClick={() => setCartOpen(true)}
+            className="group text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3"
+          >
+            <span className="md:order-1">Cart ({cart.length})</span>
+            <ShoppingBag size={14} className="md:order-2" />
+          </button>
         </div>
       </div>
 
-      {/* Gallery Header */}
-      <div className="gallery-header max-w-6xl mx-auto px-6 pt-20 pb-12 text-center">
-        <h1 className="serif-heading text-5xl sm:text-7xl text-black tracking-tight mb-4">Premades</h1>
-        <p className="font-mono text-xs text-black/40 max-w-md mx-auto leading-relaxed uppercase tracking-widest">
-          Curated clothing renders, numbered and ready. Click any piece to purchase.
-        </p>
-        <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 text-[10px] font-mono tracking-wider uppercase text-black/40">
-          <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]"></span>
-          {premades.length} pieces available
-        </div>
-      </div>
-
-      {/* Gallery Grid */}
-      <div className="max-w-6xl mx-auto px-6 pb-24">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* GALLERY GRID */}
+      <div className="flex-1 w-full mt-16 md:mt-12 relative z-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {premades.filter(p => p.available).map((premade) => (
-            <button
-              key={premade.id}
-              onClick={() => setSelected(premade)}
-              className="premade-item group text-left w-full bg-white border border-black/5 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary)]/30"
-            >
-              <div className="relative aspect-square overflow-hidden bg-neutral-100">
-                <img src={premade.imageUrl} alt={`Premade #${premade.number}`} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-500 flex items-center justify-center">
-                  <span className="font-mono text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-widest uppercase">View</span>
+            <div key={premade.id} className="premade-item">
+              <button
+                onClick={() => setSelected(premade)}
+                className="group text-left w-full bg-white/0 overflow-hidden transition-all duration-500 focus:outline-none"
+              >
+                <div className="relative aspect-square overflow-hidden bg-black/5 border border-black/10 rounded-xl hover:border-[color:var(--primary)] transition-colors duration-500">
+                  <img src={premade.imageUrl} alt={`Premade #${premade.number}`} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-500 flex items-center justify-center">
+                    <span className="font-mono text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-widest uppercase">View</span>
+                  </div>
                 </div>
-              </div>
-              <div className="p-4 flex items-center justify-between">
-                <span className="font-mono text-[10px] tracking-wider text-black/50 uppercase">Premade #{premade.number}</span>
-                <span className="text-sm font-semibold text-black">${premade.price}</span>
-              </div>
-            </button>
+                <div className="mt-3 flex items-center justify-between px-1">
+                  <span className="font-mono text-[10px] tracking-widest text-black/40 uppercase">#{premade.number}</span>
+                  <span className="font-mono text-xs font-semibold text-black">${premade.price}</span>
+                </div>
+              </button>
+              <button
+                onClick={() => addToCart(premade)}
+                disabled={cart.find(item => item.id === premade.id)}
+                className="mt-2 w-full py-2 text-[10px] font-mono uppercase tracking-widest border border-black/10 rounded-lg text-black/50 hover:text-white hover:bg-black hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black/50 disabled:hover:border-black/10 flex items-center justify-center gap-1.5"
+              >
+                {cart.find(item => item.id === premade.id) ? 'In Cart' : <><Plus size={12} /> Add to Cart</>}
+              </button>
+            </div>
           ))}
         </div>
 
@@ -825,16 +929,28 @@ const PremadesPage = () => {
         )}
       </div>
 
-      {/* Footer */}
-      <div className="border-t border-black/5 py-8">
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-          <span className="font-mono text-[10px] text-black/30 uppercase tracking-widest">&copy; {new Date().getFullYear()} Altered Venganza</span>
-          <Link to="/" className="font-mono text-[10px] text-black/30 uppercase tracking-widest hover:text-black transition-colors">Home</Link>
+      {/* BOTTOM */}
+      <div className="flex flex-col md:flex-row justify-between items-center w-full relative z-20 gap-8 mt-20">
+        <div className="premade-header text-center md:text-left">
+          <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.2em] leading-loose">
+            &copy; {new Date().getFullYear()} Altered Venganza — All rights reserved.
+          </p>
         </div>
+        {cart.length > 0 && (
+          <button
+            onClick={() => setCartOpen(true)}
+            className="group text-[color:var(--btn-tx)] hover:text-white transition-colors uppercase tracking-[0.2em] font-mono text-[10px] sm:text-xs flex items-center gap-2 border border-[color:var(--primary)] bg-[color:var(--primary)] px-6 py-3 rounded-full hover:bg-black hover:border-black"
+          >
+            <ShoppingBag size={14} />
+            View Cart ({cart.length}) — ${cart.reduce((s, i) => s + i.price, 0)}
+          </button>
+        )}
       </div>
 
       {/* Modal */}
-      {selected && <PremadeModal premade={selected} onClose={() => setSelected(null)} />}
+      {selected && <PremadeModal premade={selected} onClose={() => setSelected(null)} onAddToCart={addToCart} />}
+      {/* Cart Sidebar */}
+      {cartOpen && <CartSidebar cart={cart} onRemove={removeFromCart} onClose={() => setCartOpen(false)} />}
     </div>
   );
 };
