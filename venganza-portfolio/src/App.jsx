@@ -860,20 +860,21 @@ const PremadesPage = () => {
       {/* TOP — Same layout as Home */}
       <div className="flex flex-col md:flex-row justify-between items-start w-full relative z-20">
         <div className="premade-header max-w-3xl">
-          <h1 className="heading-font text-6xl md:text-[7rem] leading-none text-black tracking-widest mb-4">
+          <h1 className="heading-font text-6xl md:text-[7rem] leading-none text-black tracking-widest mb-6">
             Altered Venganza
           </h1>
-          <h2 className="heading-font text-3xl md:text-5xl leading-none text-[color:var(--primary)] tracking-widest mb-6">
-            Premades
-          </h2>
-          <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed max-w-lg mb-4">
-            Curated clothing renders, numbered and ready.
-            Pick your favorites, add to cart, and checkout.
-          </p>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-black/10 text-[10px] font-mono tracking-wider uppercase text-black/40">
-            <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]"></span>
-            {premades.filter(p => p.available).length} pieces available
+          <div className="space-y-1 mb-8 max-w-2xl">
+            <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed">
+              Pre-made clothing renders &bull; Numbered &amp; Ready to purchase
+            </p>
+            <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed pt-1">
+              Pick your favorites, add to cart, and checkout.
+            </p>
           </div>
+          <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex flex-wrap items-center gap-2 mb-6">
+            <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]"></span>
+            {premades.filter(p => p.available).length} Pieces Available
+          </p>
         </div>
 
         <div className="premade-header flex flex-col items-start md:items-end gap-3 mt-8 md:mt-0 text-left md:text-right">
