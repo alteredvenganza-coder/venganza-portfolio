@@ -1,0 +1,701 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { BrowserRouter, Routes, Route, Link, useLocation, useParams } from 'react-router-dom';
+import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User } from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
+// ==========================================
+// DATA
+// ==========================================
+const brandIdentityData = [
+  {
+    title: "Packaging Design & Development",
+    subtitle: "After Completing Brand Identity",
+    price: "EUR €900 – €2,000",
+    delivery: "Print-Ready Files",
+    features: ["Master Packaging EUR €2,000", "Variant Packaging EUR €900"],
+    layout: "bullets"
+  },
+  {
+    title: "Clothing Brand",
+    subtitle: "Balanced identity system",
+    price: "EUR €3,500 – €5,500",
+    delivery: "3 to 4 weeks",
+    features: [
+      "Light brand strategy", "Positioning", "Tone of voice", "Logo system (main logo + variations)",
+      "Visual system (patterns / graphic elements)", "Label set (Neck, Wash, Flag)",
+      "Hangtag design", "Basic packaging design", "15 social media templates (feed + stories)"
+    ],
+    details: "Outcome: A repeatable identity system designed to support multiple drops without starting from scratch every time.",
+    layout: "bullets"
+  },
+  {
+    title: "Drop Starter",
+    subtitle: "For brands launching their first drop",
+    price: "EUR €900 – €1,800",
+    delivery: "1 to 2 weeks",
+    features: [
+      "Simple logo design or logo refresh", "Color palette", "Primary typography",
+      "10 Instagram templates (posts / stories)", "2 basic print graphics (t-shirt / hoodie / merch)"
+    ],
+    details: "Notes: This package is focused on execution.",
+    layout: "bullets"
+  },
+  {
+    title: "RETAINER",
+    subtitle: "Clothing brand — Ongoing drop support",
+    price: "EUR €600 – €2,500",
+    delivery: "Monthly",
+    features: ["Drop graphics & assets", "Social content & templates", "Drop / landing pages", "Email visuals", "Ads creative assets"],
+    details: "Includes (based on scope). Designed as creative continuity, not basic maintenance.",
+    layout: "bullets"
+  }
+];
+
+const designsData = [
+  {
+    title: "Premade Design",
+    subtitle: "Balanced identity system",
+    price: "EUR €150 – €250",
+    delivery: "4h-1 day delivery",
+    features: [
+      "Personal or commercial use",
+      "PNG/JPG/PSD/PDF",
+      "Text & color can be altered",
+      "Free mockup",
+      "High resolution 300 ppi",
+      "Size Chart if required",
+      "Factory contact based in Portugal with MOQ of 50 pcs"
+    ],
+    layout: "bullets"
+  },
+  {
+    title: "E-commerce Visual Asset",
+    subtitle: "Product Visualization for E-commerce & Social",
+    price: "EUR €45 - €140",
+    delivery: "4h - 1 day delivery",
+    layout: "options",
+    options: [
+      { price: "Single View — €45", delivery: "(4 h delivery)", features: ["High-resolution studio lighting render.", "Optimized for product page or feed."] },
+      { price: "Custom View — €60", delivery: "(6 h delivery)", features: ["Specific camera angle requested by client.", "Lighting & shadow refined."] },
+      { price: "360° — €140", delivery: "(1 day delivery)", features: ["Full rotational sequence.", "Ready for interactive e-commerce integration."] }
+    ]
+  },
+  {
+    title: "Techpack",
+    subtitle: "Specification Sheet",
+    price: "EUR €70 – €170",
+    delivery: "1-2 days delivery",
+    layout: "bullets",
+    features: ["Flat technical drawing (front / back)", "Fabric & color specifications", "Print / embroidery placement", "Essential construction notes"],
+    details: "Simplified production guide for basic garments. Full Techpack — €170 include complete measurement chart, stitching & construction details, fabric specs, and packaging notes."
+  }
+];
+
+const allData = [...brandIdentityData, ...designsData];
+
+// ==========================================
+// BACKGROUND / THEME
+// ==========================================
+
+const AnimatedBackground = () => {
+  const location = useLocation();
+  const bgRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const q1 = document.querySelector('.glow-orb-wrapper-1');
+      const q2 = document.querySelector('.glow-orb-wrapper-2');
+      const q3 = document.querySelector('.glow-orb-wrapper-3');
+
+      let xTo1, yTo1, xTo2, yTo2, xTo3, yTo3;
+      if (q1) {
+        xTo1 = gsap.quickTo('.glow-orb-wrapper-1', 'x', { duration: 3, ease: 'power3.out' });
+        yTo1 = gsap.quickTo('.glow-orb-wrapper-1', 'y', { duration: 3, ease: 'power3.out' });
+      }
+      if (q2) {
+        xTo2 = gsap.quickTo('.glow-orb-wrapper-2', 'x', { duration: 4, ease: 'power3.out' });
+        yTo2 = gsap.quickTo('.glow-orb-wrapper-2', 'y', { duration: 4, ease: 'power3.out' });
+      }
+      if (q3) {
+        xTo3 = gsap.quickTo('.glow-orb-wrapper-3', 'x', { duration: 5, ease: 'power3.out' });
+        yTo3 = gsap.quickTo('.glow-orb-wrapper-3', 'y', { duration: 5, ease: 'power3.out' });
+      }
+
+      const onMouseMove = (e) => {
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+
+        if (xTo1) { xTo1(dx * 0.15); yTo1(dy * 0.15); }
+        if (xTo2) { xTo2(dx * 0.2); yTo2(dy * 0.2); }
+        if (xTo3) { xTo3(dx * 0.1); yTo3(dy * 0.1); }
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      return () => window.removeEventListener('mousemove', onMouseMove);
+    }, bgRef);
+    return () => ctx.revert();
+  }, [location.pathname]);
+
+  const path = location.pathname;
+  const isLightMode = path === '/' || path === '/archive';
+
+  return (
+    <div ref={bgRef} className="fixed inset-0 pointer-events-none z-[0] overflow-hidden">
+      {!isLightMode && (
+        <svg className="noise-overlay" xmlns="http://www.w3.org/2000/svg">
+          <filter id="noiseFilter" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.72 0.72"
+              numOctaves="4"
+              seed="2"
+              stitchTiles="stitch"
+              result="noise"
+            />
+            <feColorMatrix type="saturate" values="0.3" in="noise" result="coloredNoise" />
+            <feComposite in="coloredNoise" in2="SourceGraphic" operator="in" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+        </svg>
+      )}
+      {!isLightMode ? (
+        <>
+          <div className="glow-wrapper glow-orb-wrapper-1" style={{ pointerEvents: 'none' }}><div className="glow-orb-1"></div></div>
+          <div className="glow-wrapper glow-orb-wrapper-2" style={{ pointerEvents: 'none' }}><div className="glow-orb-2"></div></div>
+          <div className="glow-wrapper glow-orb-wrapper-3" style={{ pointerEvents: 'none' }}><div className="glow-orb-3"></div></div>
+        </>
+      ) : (
+        <div className="glow-wrapper glow-orb-wrapper-2" style={{ pointerEvents: 'none' }}>
+           <div className="glow-orb-2 orb-mode-light"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ThemeController = () => {
+  const location = useLocation();
+  useEffect(() => {
+    document.body.classList.remove('theme-red', 'theme-light', 'theme-dark');
+    const path = location.pathname;
+    
+    if (path === '/' || path === '/archive' || path === '/about') {
+      document.body.classList.add('theme-light');
+    } else if (path === '/designs' || decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Premade') || decodeURIComponent(path).includes('Techpack')) {
+      document.body.classList.add('theme-dark');
+    } else {
+      document.body.classList.add('theme-red');
+    }
+  }, [location.pathname]);
+  return null;
+};
+
+// ==========================================
+// HOME PAGE (LIGHT THEME)
+// ==========================================
+
+const Home = () => {
+  const containerRef = useRef();
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from('.home-element', { y: 30, opacity: 0, stagger: 0.1, duration: 1.5, ease: 'power3.out' });
+      gsap.from('.showcase-img', { scale: 0.95, opacity: 0, duration: 2, ease: 'power2.out', delay: 0.5 });
+    }, containerRef);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <div className="min-h-screen p-6 md:p-12 flex flex-col relative z-10" ref={containerRef}>
+      
+      {/* TOP TIER */}
+      <div className="flex flex-col md:flex-row justify-between items-start w-full relative z-20">
+        <div className="home-element max-w-3xl">
+           <h1 className="heading-font text-6xl md:text-[7rem] leading-none text-black tracking-widest mb-6">
+             Altered Venganza
+           </h1>
+           <div className="space-y-1 mb-8 max-w-2xl">
+             <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed">
+               Multi-disciplinary studio made for brands that builds.
+             </p>
+             <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed pt-1">
+               Premium Branding + Custom Designs &bull; Pre-mades &amp; Softwares for Fashion Designers and Creatives
+             </p>
+           </div>
+           <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex flex-wrap items-center gap-2 mb-6">
+             Trieste, Italy / by Rare Martinez
+             <Link to="/about" className="text-black/40 hover:text-black transition-colors underline underline-offset-4 md:ml-2">
+               (Who the f*ck is Rare?)
+             </Link>
+           </p>
+           <Link to="/vag" className="group text-[color:var(--btn-tx)] hover:text-white transition-colors uppercase tracking-[0.2em] font-mono text-[10px] sm:text-xs flex items-center gap-2 mt-6 inline-flex border border-[color:var(--primary)] bg-[color:var(--primary)] px-6 py-3 rounded-full hover:bg-black hover:border-black shadow-none md:shadow-[0_0_15px_rgba(123,31,36,0.3)]">
+             Shop Venganza's Art Gallery <ArrowRight size={14} className="transition-transform transform group-hover:translate-x-1" />
+           </Link>
+        </div>
+
+        <div className="home-element flex flex-col items-start md:items-end gap-3 mt-12 md:mt-0 text-left md:text-right">
+          <Link to="/brand-identity" className="group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
+            <span className="md:order-1">Brand Identity Service</span>
+            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
+          </Link>
+          <Link to="/designs" className="group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
+            <span className="md:order-1">Clothing Design Service</span>
+            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
+          </Link>
+          <Link to="/archive" className="group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
+            <span className="md:order-1">Archive</span>
+            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
+          </Link>
+          <Link to="/contact" className="group text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
+            <span className="md:order-1">Contact</span>
+            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
+          </Link>
+        </div>
+      </div>
+
+      {/* CENTER TIER */}
+      <div className="flex-1 w-full flex items-center justify-center my-16 md:my-8 relative z-10 min-h-[400px]">
+         <div className="showcase-img w-[300px] h-[400px] md:w-[420px] md:h-[550px] border border-black/10 bg-black/5 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center shadow-xl relative group overflow-hidden cursor-pointer hover:border-[color:var(--primary)] transition-colors duration-500">
+            <span className="font-mono text-[color:var(--primary)] uppercase tracking-[0.2em] text-xs absolute z-20 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 whitespace-nowrap opacity-50 group-hover:opacity-100 transition-opacity">Pre-made coming soon</span>
+         </div>
+      </div>
+
+      {/* BOTTOM TIER */}
+      <div className="flex flex-col md:flex-row justify-between items-center w-full relative z-20 gap-12 mt-auto">
+         
+         <div className="home-element flex flex-col items-center md:items-start gap-4 w-full md:w-1/3 order-3 md:order-1 text-center md:text-left">
+            <div className="flex flex-col items-center md:items-start gap-2">
+              <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.2em]">Our Software — Coming Soon</p>
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3 opacity-80 max-w-[280px] sm:max-w-none">
+                <span className="heading-font text-lg text-black tracking-widest leading-none">MAT IDEAS</span>
+                <span className="font-mono text-black/20 text-xs hidden sm:block">/</span>
+                <span className="heading-font text-lg text-black tracking-widest leading-none">MAT RENDERS</span>
+                <span className="font-mono text-black/20 text-xs hidden sm:block">/</span>
+                <span className="heading-font text-lg text-black tracking-widest leading-none">MAT TRYON</span>
+              </div>
+            </div>
+         </div>
+
+         <div className="home-element text-center w-full md:w-1/3 order-2">
+            <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.2em] leading-loose mt-4 md:mt-0">
+              &copy; {new Date().getFullYear()} Altered Venganza — All rights reserved.<br className="hidden md:block"/> VAT IT01433140322
+            </p>
+         </div>
+
+         <div className="home-element text-center md:text-right w-full md:w-1/3 order-1 md:order-3">
+         </div>
+      </div>
+
+    </div>
+  );
+};
+
+// ==========================================
+// SERVICE PAGES (DARK THEMES & EDITORIAL LAYOUT)
+// ==========================================
+
+const ServiceItem = ({ title, subtitle, price, delivery }) => {
+  return (
+    <Link
+      to={`/service/${encodeURIComponent(title)}`}
+      className="block py-10 border-b border-white/10 group last:border-0 opacity-0 translate-y-8 service-item transition-all duration-500 relative overflow-hidden text-center"
+    >
+      {/* Hover tint that sweeps in */}
+      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      <div className="flex flex-col gap-2 relative z-10 w-full max-w-xl mx-auto px-4">
+        <h2 className="serif-heading text-5xl md:text-6xl text-white mb-2 transition-colors duration-500 group-hover:text-[color:var(--primary)] text-center">
+          {title}
+        </h2>
+        <h3 className="serif-heading text-lg md:text-xl text-white/70 group-hover:text-white/90 font-light mb-6 transition-colors duration-500 text-center">
+          {subtitle}
+        </h3>
+        <div className="flex justify-center items-center gap-6 mb-4">
+          <span className="text-xl md:text-2xl text-white group-hover:text-[color:var(--primary)] font-medium transition-colors duration-500">
+            {price}
+          </span>
+          <span className="text-white/60 text-sm md:text-base font-light transition-colors">
+            ({delivery})
+          </span>
+        </div>
+        <div className="mt-2 flex items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-widest text-white/40 group-hover:text-[color:var(--primary)] opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500">
+           Explore Details <ArrowRight size={14} />
+        </div>
+      </div>
+    </Link>
+  );
+};
+
+const ServicePage = ({ title, services }) => {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    ScrollTrigger.refresh();
+    const ctx = gsap.context(() => {
+      gsap.from('.header-element', { y: 30, opacity: 0, stagger: 0.1, duration: 1.5, ease: 'power3.out' });
+      gsap.utils.toArray('.service-item').forEach(item => {
+        gsap.to(item, { y: 0, opacity: 1, duration: 1.2, ease: 'power3.out', scrollTrigger: { trigger: item, start: 'top 85%' }});
+      });
+    }, containerRef);
+    return () => ctx.revert();
+  }, [title]);
+
+  return (
+    <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center" ref={containerRef}>
+       
+       <div className="w-full max-w-2xl flex justify-between items-start mb-12 header-element relative">
+          <Link to="/" className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest mt-2 absolute right-0">
+            Back to Home <ArrowRight size={14} />
+          </Link>
+       </div>
+
+       {/* Logo Block Restored */}
+       <div className="relative mb-20 flex justify-center w-full max-w-lg header-element">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full lg:translate-x-[-120%] pr-4">
+             <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
+                2026 PRICING
+             </span>
+          </div>
+          <img src="/logo.png" className="w-[200px] md:w-[280px] object-contain filter invert opacity-90 mx-auto" alt="Alter Logo" />
+       </div>
+
+       <div className="header-element mb-16 text-center w-full max-w-2xl">
+          <p className="text-white/80 font-mono text-xs uppercase tracking-[0.2em] mb-6">{title}</p>
+          <div className="flex flex-col gap-2 items-center">
+            <p className="text-white/60 font-mono text-[10px] uppercase tracking-[0.1em] leading-relaxed max-w-lg">
+              Multi-disciplinary studio made for brands that builds.
+            </p>
+            <p className="text-white/60 font-mono text-[10px] uppercase tracking-[0.1em] leading-relaxed max-w-lg">
+              Premium Branding + Custom Designs &bull; Pre-mades &amp; Softwares for Fashion Designers and Creatives
+            </p>
+          </div>
+       </div>
+
+       <div className="w-full max-w-2xl space-y-4 mb-20 flex-1">
+          <div className="flex flex-col border-t border-white/10">
+             {services.map((item, i) => <ServiceItem key={i} {...item} />)}
+          </div>
+       </div>
+
+       <div className="w-full max-w-2xl text-center mt-auto header-element pt-8">
+          <a href="https://instagram.com" target="_blank" rel="noreferrer" className="max-w-[280px] mx-auto py-4 bg-transparent border border-white/20 text-white font-mono text-[10px] rounded-full hover:bg-white hover:text-black transition-colors duration-500 flex items-center justify-center gap-2 tracking-widest uppercase mb-12">
+             <Instagram size={14} /> BOOK SERVICES
+          </a>
+          <p className="font-mono text-[8px] md:text-[10px] text-white/60 uppercase tracking-[0.2em] leading-loose max-w-md mx-auto">
+            Includes: 2 rounds of revisions. Additional revisions are available at 20% of the project total per revision.
+          </p>
+       </div>
+    </div>
+  );
+};
+
+const ServiceDetail = () => {
+  const { id } = useParams();
+  const service = allData.find(s => s.title === decodeURIComponent(id));
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from('.header-element', { y: 30, opacity: 0, stagger: 0.1, duration: 1.5, ease: 'power3.out' });
+      gsap.from('.feature-item', { x: -20, opacity: 0, stagger: 0.1, duration: 1, ease: 'power3.out', delay: 0.3 });
+    }, containerRef);
+    return () => ctx.revert();
+  }, [id]);
+
+  if (!service) return <div className="min-h-screen text-center text-white py-32 font-mono">Service not found.</div>;
+
+  return (
+    <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center w-full" ref={containerRef}>
+       
+       <div className="w-full max-w-[480px] flex justify-between items-start mb-8 header-element relative">
+          <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest mt-2 absolute right-0">
+            Back <ArrowRight size={14} />
+          </button>
+       </div>
+
+       {/* Logo Block Restored */}
+       <div className="relative mb-20 flex justify-center w-full max-w-[480px] header-element">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-4 md:-translate-x-[110%]">
+             <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
+                2026 PRICING
+             </span>
+          </div>
+          <img src="/logo.png" className="w-[200px] md:w-[260px] object-contain filter invert opacity-90 mx-auto" alt="Alter Logo" />
+       </div>
+      
+      <div className="header-element mb-16 w-full max-w-[480px] text-left">
+        <h1 className="serif-heading text-5xl md:text-6xl text-white mb-2 leading-none">{service.title}</h1>
+        <h2 className="serif-heading text-lg md:text-xl text-white/90 font-light mb-8">{service.subtitle}</h2>
+        
+        {service.layout === 'bullets' && (
+          <div className="flex flex-col md:flex-row items-baseline gap-4 md:gap-8 mb-4">
+            <span className="text-2xl md:text-3xl text-white font-medium">{service.price}</span>
+            <span className="text-white/60 text-base md:text-lg font-light">({service.delivery})</span>
+          </div>
+        )}
+      </div>
+
+      <div className="w-full max-w-[480px] flex-1 text-left">
+        {service.layout === 'bullets' ? (
+          <div className="flex flex-col items-start w-full">
+            <ul className="space-y-4 text-sm md:text-base text-white/90 w-full mb-8">
+              {service.features.map((feature, idx) => (
+                <li key={idx} className="flex items-start gap-3 feature-item">
+                  <span className="text-white mt-0.5">•</span>
+                  <span className="leading-snug font-light">{feature}</span>
+                </li>
+              ))}
+            </ul>
+            {service.details && (
+              <p className="text-white/60 font-light text-sm mt-4">{service.details}</p>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col items-start w-full space-y-12">
+            {service.options.map((opt, idx) => (
+               <div key={idx} className="w-full">
+                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-baseline gap-2 md:gap-4 mb-4">
+                    <span className="text-2xl md:text-[28px] text-white font-medium">{opt.price}</span>
+                    <span className="text-white/60 text-base font-light">{opt.delivery}</span>
+                 </div>
+                 <ul className="space-y-2 text-sm md:text-[15px] text-white/90 w-full">
+                  {opt.features.map((f, i) => (
+                    <li key={i} className="flex items-start gap-2 feature-item">
+                      <span className="text-white mt-0.5">•</span>
+                      <span className="leading-snug font-light">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+               </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Footer Details */}
+      <div className="w-full max-w-[480px] text-center pb-4 pt-24 header-element mt-auto">
+         <p className="font-mono text-[8px] md:text-[10px] text-white/60 uppercase tracking-[0.2em] leading-loose max-w-sm mx-auto mb-10">
+            Includes: 2 rounds of revisions. Additional revisions are available at 20% of the project total per revision.
+          </p>
+         <a href="https://instagram.com" target="_blank" rel="noreferrer" className="w-full py-5 bg-transparent border border-white/20 hover:bg-white hover:text-black hover:border-white transition-all duration-500 font-mono text-[10px] justify-center tracking-widest uppercase flex items-center gap-3">
+             <Instagram size={14} /> Book this service
+          </a>
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// OTHER PAGES
+// ==========================================
+
+const AboutPage = () => {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center text-center relative z-10 px-6">
+      <Link to="/" className="absolute top-10 right-10 inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-sm font-mono uppercase tracking-widest">
+          Back to Home <ArrowRight size={16} />
+      </Link>
+      <h1 className="heading-font text-6xl md:text-[8rem] text-black mb-8 leading-none mt-20">Who the f*ck is Rare?</h1>
+      <p className="max-w-xl text-black/60 font-mono leading-relaxed">
+        Placeholder for brand manifesto, history, or creator biography. <br/><br/>
+        More content coming soon.
+      </p>
+    </div>
+  );
+};
+
+const GalleryPage = () => {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center text-center relative z-10 px-6">
+      <Link to="/" className="absolute top-10 right-10 inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
+          Back to Home <ArrowRight size={16} />
+      </Link>
+      <h1 className="heading-font text-5xl md:text-[6rem] text-white mb-12 leading-none mt-20">Venganza's Art Gallery</h1>
+      
+      <div className="max-w-md w-full bg-white/5 p-8 rounded-2xl border border-white/10 backdrop-blur-sm flex flex-col items-center gap-6">
+         <p className="text-white/60 font-mono text-xs uppercase tracking-widest">Enter Password to Access</p>
+         <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
+           <input type="password" placeholder="PASSWORD" className="w-full flex-1 bg-transparent border border-white/20 rounded-lg px-4 py-3 font-mono text-sm text-white outline-none focus:border-[color:var(--primary)] transition-colors text-center uppercase tracking-widest placeholder:text-white/30" />
+           <button className="w-full sm:w-auto bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-semibold px-8 py-3 rounded-lg font-mono text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-colors">Enter</button>
+         </div>
+      </div>
+    </div>
+  );
+};
+
+const ContactPage = () => {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center relative z-10 px-6 py-20">
+      <Link to="/" className="absolute top-10 right-10 inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
+          Back to Home <ArrowRight size={16} />
+      </Link>
+      
+      <div className="max-w-2xl w-full flex flex-col items-center">
+         <h1 className="heading-font text-5xl md:text-[6rem] text-white mb-4 leading-none text-center">Contact</h1>
+         <p className="text-white/60 font-mono text-sm uppercase tracking-widest text-center mb-12">Schedule a Google Meet</p>
+         
+         <form className="w-full flex flex-col gap-6 bg-white/5 p-8 md:p-10 rounded-3xl border border-white/10 backdrop-blur-sm shadow-xl" onSubmit={(e) => { e.preventDefault(); alert("Meeting request sent! (Mock)"); }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div className="flex flex-col gap-2">
+                 <label className="font-mono text-xs text-white/60 uppercase tracking-widest ml-2">Name</label>
+                 <input type="text" className="bg-transparent border border-white/20 rounded-xl px-4 py-3 font-mono text-sm text-white outline-none focus:border-[color:var(--primary)] transition-colors" required />
+               </div>
+               <div className="flex flex-col gap-2">
+                 <label className="font-mono text-xs text-white/60 uppercase tracking-widest ml-2">Email</label>
+                 <input type="email" className="bg-transparent border border-white/20 rounded-xl px-4 py-3 font-mono text-sm text-white outline-none focus:border-[color:var(--primary)] transition-colors" required />
+               </div>
+            </div>
+            
+            <div className="flex flex-col gap-2">
+              <label className="font-mono text-xs text-white/60 uppercase tracking-widest ml-2">Preferred Date & Time</label>
+              <input type="datetime-local" className="bg-transparent border border-white/20 rounded-xl px-4 py-3 font-mono text-sm text-white/60 outline-none focus:border-[color:var(--primary)] transition-colors" required />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="font-mono text-xs text-white/60 uppercase tracking-widest ml-2">Project Details</label>
+              <textarea rows={4} className="bg-transparent border border-white/20 rounded-xl px-4 py-3 font-mono text-sm text-white outline-none focus:border-[color:var(--primary)] transition-colors resize-none" placeholder="Tell us about your brand..." required></textarea>
+            </div>
+
+            <button type="submit" className="mt-4 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-semibold w-full py-4 rounded-xl font-mono text-sm uppercase tracking-widest hover:bg-white hover:text-black transition-colors shadow-lg">
+              Request Google Meet
+            </button>
+         </form>
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// ARCHIVE PAGE (LIGHT THEME RESTORED)
+// ==========================================
+
+const ArchivePage = () => {
+  const [path, setPath] = useState([]);
+  
+  const years = ['2026', '2025', '2024', '2023', '2022', '2021', '2020'];
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  const FolderIcon = ({ label, onClick }) => (
+    <button onClick={onClick} className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-black/5 hover:bg-[color:var(--primary)] text-black/70 hover:text-white border border-black/10 backdrop-blur-lg transition-all group outline-none shadow-sm min-w-[120px]">
+      <Folder size={48} className="text-black/40 group-hover:text-white transition-colors stroke-1" fill="currentColor" fillOpacity="0.2" />
+      <span className="font-mono text-xs font-semibold uppercase tracking-wider">{label}</span>
+    </button>
+  );
+
+  const FileIcon = ({ type, label }) => (
+    <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-black/5 hover:bg-black/10 border border-black/10 transition-all group cursor-pointer min-w-[120px]">
+      {type === 'image' ? (
+        <FileImage size={48} className="text-black/40 group-hover:text-black transition-colors stroke-1" />
+      ) : (
+        <FileVideo size={48} className="text-black/40 group-hover:text-black transition-colors stroke-1" />
+      )}
+      <span className="font-mono text-xs text-center text-black/60 group-hover:text-black break-all">{label}</span>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen relative z-10 flex flex-col py-12 px-6 lg:px-20 max-w-screen-2xl mx-auto">
+      <div className="mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 border-b border-black/10 pb-10 w-full">
+         <div className="flex flex-col items-start gap-8 w-full">
+           <div className="flex justify-between items-start w-full">
+             <h1 className="heading-font text-5xl md:text-7xl text-black tracking-widest leading-none">
+               Altered Venganza
+             </h1>
+             <Link to="/" className="inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest mt-2">
+                Back to Home <ArrowRight size={14} />
+             </Link>
+           </div>
+           <h2 className="font-mono text-sm text-black/60 uppercase tracking-[0.2em] mt-4">Client Archive</h2>
+         </div>
+      </div>
+
+      <div className="flex-1 flex flex-col bg-white border border-black/10 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden mt-4">
+        {/* Browser Top Bar */}
+        <div className="bg-[#f5f5f5] border-b border-black/10 px-4 py-3 flex items-center gap-4">
+          <button 
+            onClick={() => setPath(p => p.slice(0, -1))}
+            disabled={path.length === 0}
+            className="p-1.5 rounded text-black/50 hover:text-black hover:bg-black/10 transition-colors disabled:opacity-20"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          
+          <div className="flex items-center gap-2 font-mono text-[10px] text-black/60 uppercase tracking-widest overflow-hidden text-ellipsis whitespace-nowrap">
+            <span className="cursor-pointer hover:text-black transition-colors" onClick={() => setPath([])}>C: \ Archive</span>
+            {path.map((segment, idx) => (
+              <React.Fragment key={idx}>
+                <span className="text-black/30">\</span>
+                <span className="cursor-pointer hover:text-black transition-colors" onClick={() => setPath(path.slice(0, idx+1))}>
+                  {segment}
+                </span>
+              </React.Fragment>
+            ))}
+          </div>
+          
+          <div className="ml-auto">
+             <div className="flex items-center gap-2 text-black/50 cursor-pointer bg-black/5 p-2 rounded-full hover:bg-black/10 transition-colors">
+                <User size={18} className="stroke-1" />
+             </div>
+          </div>
+        </div>
+
+        {/* Content Explorer */}
+        <div className="flex-1 p-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 content-start auto-rows-min bg-white">
+          
+          {path.length === 0 && years.map(y => (
+            <FolderIcon key={y} label={y} onClick={() => setPath([y])} />
+          ))}
+
+          {path.length === 1 && months.map(m => (
+            <FolderIcon key={m} label={m} onClick={() => setPath([...path, m])} />
+          ))}
+
+          {path.length === 2 && (
+            <>
+              <FileIcon type="image" label={`${path[1]}_Look_1.jpg`} />
+              <FileIcon type="image" label={`${path[1]}_Look_2.jpg`} />
+              <FileIcon type="video" label={`Campaign_${path[0]}.mp4`} />
+              <FolderIcon label="Drafts" onClick={() => setPath([...path, 'Drafts'])} />
+            </>
+          )}
+
+          {path.length > 2 && (
+             <div className="col-span-full py-20 text-center font-mono text-black/30 text-xs">
+                -- Directory is empty --
+             </div>
+          )}
+
+        </div>
+      </div>
+      
+      <div className="mt-8 text-center sm:text-left w-full pb-4">
+         <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.2em]">
+           &copy; {new Date().getFullYear()} Altered Venganza — All rights reserved. VAT IT01433140322
+         </p>
+      </div>
+
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <ThemeController />
+      <AnimatedBackground />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/vag" element={<GalleryPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/archive" element={<ArchivePage />} />
+        <Route path="/service/:id" element={<ServiceDetail />} />
+        <Route path="/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
+        <Route path="/designs" element={<ServicePage title="Clothing Design Service" services={designsData} />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}

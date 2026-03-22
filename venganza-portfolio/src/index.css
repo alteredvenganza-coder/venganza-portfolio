@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --bg-color: #131313;
+  --glow-color-1: rgba(123, 31, 36, 0.15);
+  --glow-color-2: rgba(123, 31, 36, 0.12);
+  --glow-color-3: rgba(123, 31, 36, 0.15);
+  --primary: #7b1f24;
+  --btn-tx: #ffffff;
+}
+
+.theme-red {
+  --bg-color: #7b1f24;
+  --glow-color-1: rgba(0,0,0,0.6);
+  --glow-color-2: rgba(0,0,0,0.4);
+  --glow-color-3: rgba(0,0,0,0.7);
+  --primary: #ffffff;
+  --btn-tx: #7b1f24;
+}
+
+.theme-light {
+  --bg-color: #ffffff;
+  --glow-color-1: transparent;
+  --glow-color-2: rgba(123, 31, 36, 0.15);
+  --glow-color-3: transparent;
+  --primary: #7b1f24;
+  --btn-tx: #ffffff;
+}
+
+.theme-dark {
+  --bg-color: #161616;
+  --glow-color-1: rgba(0,0,0,0);
+  --glow-color-2: rgba(230, 20, 60, 0.35); /* intense crimson center glow */
+  --glow-color-3: rgba(0,0,0,0);
+  --primary: #ffffff;
+  --btn-tx: #161616;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: #d4d4d4;
+  -webkit-font-smoothing: antialiased;
+  font-family: 'Inter', sans-serif;
+  transition: background-color 0.8s ease;
+  overflow-x: hidden;
+}
+
+.text-btn-tx {
+  color: var(--btn-tx);
+}
+
+/* Background Noise Overlay */
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.18;
+  mix-blend-mode: screen;
+}
+
+/* Centered & Smooth Animated Glow Orbs wrapper */
+.glow-wrapper {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.glow-orb-1, .glow-orb-2, .glow-orb-3 {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: background 0.8s ease;
+}
+
+.glow-orb-1 {
+  width: 80vw; height: 80vw; max-width: 1000px; max-height: 1000px;
+  background: radial-gradient(circle at center, var(--glow-color-1) 0%, transparent 60%);
+  filter: blur(100px);
+}
+.glow-orb-2 {
+  width: 60vw; height: 60vw; max-width: 800px; max-height: 800px;
+  background: radial-gradient(circle at center, var(--glow-color-2) 0%, transparent 60%);
+  filter: blur(90px);
+}
+.glow-orb-3 {
+  width: 70vw; height: 70vw; max-width: 900px; max-height: 900px;
+  background: radial-gradient(circle at center, var(--glow-color-3) 0%, transparent 65%);
+  filter: blur(110px);
+}
+
+.orb-mode-light {
+  transform: translateY(35vh);
+}
+
+.heading-font {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.serif-heading {
+  font-family: 'Playfair Display', serif;
+  letter-spacing: -0.01em;
+}
+
+.mono-text {
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 0.05em;
+}
+
+/* Custom Selection */
+::selection {
+  background: rgba(230, 59, 46, 0.4);
+  color: white;
+}
