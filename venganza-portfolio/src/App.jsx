@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation, useParams } from 'react-router-dom';
-import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User } from 'lucide-react';
+import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { premades } from './data/premades';
+import { STRIPE_PAYMENT_LINK, INSTAGRAM_DM_URL } from './config';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -184,7 +186,7 @@ const ThemeController = () => {
     document.body.classList.remove('theme-red', 'theme-light', 'theme-dark');
     const path = location.pathname;
     
-    if (path === '/' || path === '/archive' || path === '/about') {
+    if (path === '/' || path === '/archive' || path === '/about' || path === '/premades') {
       document.body.classList.add('theme-light');
     } else if (path === '/designs' || decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Premade') || decodeURIComponent(path).includes('Techpack')) {
       document.body.classList.add('theme-dark');
@@ -244,6 +246,10 @@ const Home = () => {
           </Link>
           <Link to="/designs" className="group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
             <span className="md:order-1">Clothing Design Service</span>
+            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
+          </Link>
+          <Link to="/premades" className="group text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
+            <span className="md:order-1">Premades</span>
             <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
           </Link>
           <Link to="/archive" className="group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
@@ -681,6 +687,158 @@ const ArchivePage = () => {
   );
 }
 
+// ==========================================
+// PREMADE MODAL
+// ==========================================
+
+const PremadeModal = ({ premade, onClose }) => {
+  const overlayRef = useRef(null);
+  const contentRef = useRef(null);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    const ctx = gsap.context(() => {
+      gsap.from(overlayRef.current, { opacity: 0, duration: 0.3, ease: 'power2.out' });
+      gsap.from(contentRef.current, { scale: 0.95, opacity: 0, duration: 0.4, delay: 0.1, ease: 'power3.out' });
+    });
+    return () => { document.body.style.overflow = ''; ctx.revert(); };
+  }, []);
+
+  const handleOverlayClick = (e) => { if (e.target === overlayRef.current) onClose(); };
+  const stripeUrl = `${STRIPE_PAYMENT_LINK}?client_reference_id=premade-${premade.number}`;
+
+  return (
+    <div ref={overlayRef} onClick={handleOverlayClick} className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div ref={contentRef} className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        {/* Close */}
+        <button onClick={onClose} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm border border-black/10 flex items-center justify-center text-black/60 hover:text-black hover:bg-white transition-all">
+          <X size={18} />
+        </button>
+
+        {/* Image */}
+        <div className="aspect-square overflow-hidden rounded-t-2xl bg-neutral-100">
+          <img src={premade.imageUrl} alt={`Premade #${premade.number}`} className="w-full h-full object-cover" />
+        </div>
+
+        {/* Content */}
+        <div className="p-8">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-mono text-sm tracking-widest uppercase text-black/50">Premade #{premade.number}</h2>
+            <span className="text-2xl font-semibold text-black">${premade.price}</span>
+          </div>
+
+          <p className="font-mono text-[10px] text-black/40 mb-6 leading-relaxed uppercase tracking-wider">
+            Complete your payment via Stripe, then send us a DM on Instagram with your premade number to confirm your order.
+          </p>
+
+          <div className="flex flex-col gap-3">
+            <a href={stripeUrl} target="_blank" rel="noopener noreferrer"
+               className="flex items-center justify-center gap-2 bg-black text-white px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg hover:bg-[color:var(--primary)] transition-colors">
+              <ExternalLink size={16} />
+              Pay with Stripe — ${premade.price}
+            </a>
+            <a href={INSTAGRAM_DM_URL} target="_blank" rel="noopener noreferrer"
+               className="flex items-center justify-center gap-2 bg-white text-black px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg border border-black/10 hover:border-black/30 hover:shadow-md transition-all">
+              <MessageCircle size={16} />
+              Confirm via Instagram DM
+            </a>
+          </div>
+
+          <p className="mt-4 text-center font-mono text-[10px] text-black/30 uppercase tracking-wider">
+            Message: "Hi! I'd like to purchase Premade #{premade.number}"
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// PREMADES GALLERY PAGE (WHITE / ART GALLERY)
+// ==========================================
+
+const PremadesPage = () => {
+  const [selected, setSelected] = useState(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const ctx = gsap.context(() => {
+      gsap.from('.gallery-header', { y: 30, opacity: 0, duration: 1, ease: 'power3.out' });
+      gsap.from('.premade-item', { y: 40, opacity: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out', delay: 0.2 });
+    }, containerRef);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <div ref={containerRef} className="min-h-screen relative z-10 bg-white">
+      {/* Minimal Header */}
+      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-black/5">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 text-xs font-mono text-black/50 hover:text-black transition-colors uppercase tracking-widest">
+            <ArrowLeft size={16} /> Back
+          </Link>
+          <Link to="/" className="heading-font text-2xl text-black tracking-widest">Altered Venganza</Link>
+          <div className="w-16" />
+        </div>
+      </div>
+
+      {/* Gallery Header */}
+      <div className="gallery-header max-w-6xl mx-auto px-6 pt-20 pb-12 text-center">
+        <h1 className="serif-heading text-5xl sm:text-7xl text-black tracking-tight mb-4">Premades</h1>
+        <p className="font-mono text-xs text-black/40 max-w-md mx-auto leading-relaxed uppercase tracking-widest">
+          Curated clothing renders, numbered and ready. Click any piece to purchase.
+        </p>
+        <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 text-[10px] font-mono tracking-wider uppercase text-black/40">
+          <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]"></span>
+          {premades.length} pieces available
+        </div>
+      </div>
+
+      {/* Gallery Grid */}
+      <div className="max-w-6xl mx-auto px-6 pb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {premades.filter(p => p.available).map((premade) => (
+            <button
+              key={premade.id}
+              onClick={() => setSelected(premade)}
+              className="premade-item group text-left w-full bg-white border border-black/5 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary)]/30"
+            >
+              <div className="relative aspect-square overflow-hidden bg-neutral-100">
+                <img src={premade.imageUrl} alt={`Premade #${premade.number}`} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-500 flex items-center justify-center">
+                  <span className="font-mono text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-widest uppercase">View</span>
+                </div>
+              </div>
+              <div className="p-4 flex items-center justify-between">
+                <span className="font-mono text-[10px] tracking-wider text-black/50 uppercase">Premade #{premade.number}</span>
+                <span className="text-sm font-semibold text-black">${premade.price}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {premades.length === 0 && (
+          <div className="text-center py-24">
+            <p className="font-mono text-black/30 text-xs uppercase tracking-widest">No premades available yet. Check back soon.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="border-t border-black/5 py-8">
+        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
+          <span className="font-mono text-[10px] text-black/30 uppercase tracking-widest">&copy; {new Date().getFullYear()} Altered Venganza</span>
+          <Link to="/" className="font-mono text-[10px] text-black/30 uppercase tracking-widest hover:text-black transition-colors">Home</Link>
+        </div>
+      </div>
+
+      {/* Modal */}
+      {selected && <PremadeModal premade={selected} onClose={() => setSelected(null)} />}
+    </div>
+  );
+};
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -692,6 +850,7 @@ export default function App() {
         <Route path="/vag" element={<GalleryPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/archive" element={<ArchivePage />} />
+        <Route path="/premades" element={<PremadesPage />} />
         <Route path="/service/:id" element={<ServiceDetail />} />
         <Route path="/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
         <Route path="/designs" element={<ServicePage title="Clothing Design Service" services={designsData} />} />
