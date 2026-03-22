@@ -1,7 +1,7 @@
 [build]
-  base = "mat-renders-landing"
+  base = "venganza-portfolio"
   command = "npm run build"
-  publish = "mat-renders-landing/dist"
+  publish = "venganza-portfolio/dist"
 
 [[redirects]]
   from = "/*"
