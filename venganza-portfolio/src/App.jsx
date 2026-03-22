@@ -3,8 +3,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation, useParams } from 'reac
 import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { premades } from './data/premades';
-import { STRIPE_PAYMENT_LINK, INSTAGRAM_DM_URL } from './config';
+import { STRIPE_PAYMENT_LINK, INSTAGRAM_DM_URL, INSTAGRAM_TOKEN, PREMADE_PRICE_PREMIUM, PREMADE_PRICE_BASIC } from './config';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -201,6 +200,73 @@ const ThemeController = () => {
 // HOME PAGE (LIGHT THEME)
 // ==========================================
 
+// ==========================================
+// LATEST PREMADE SHOWCASE (for Homepage)
+// ==========================================
+
+const LatestPremadeShowcase = () => {
+  const [latest, setLatest] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!INSTAGRAM_TOKEN) { setLoading(false); return; }
+
+    const fetchLatest = async () => {
+      try {
+        const res = await fetch(
+          `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&limit=50&access_token=${INSTAGRAM_TOKEN}`
+        );
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+
+        // Find the most recent post with #premade
+        const post = (data.data || []).find(p => {
+          const caption = (p.caption || '').toLowerCase();
+          return caption.includes('#premade') && (p.media_type === 'IMAGE' || p.media_type === 'CAROUSEL_ALBUM');
+        });
+
+        if (post) {
+          setLatest({
+            imageUrl: post.media_type === 'VIDEO' ? post.thumbnail_url : post.media_url,
+            permalink: post.permalink,
+            caption: (post.caption || '').split('\n')[0].replace(/#\w+/g, '').trim(),
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch latest premade:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLatest();
+  }, []);
+
+  return (
+    <div className="flex-1 w-full flex items-center justify-center my-16 md:my-8 relative z-10 min-h-[400px]">
+      <Link to="/premades" className="showcase-img w-[300px] h-[400px] md:w-[420px] md:h-[550px] border border-black/10 bg-black/5 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center shadow-xl relative group overflow-hidden cursor-pointer hover:border-[color:var(--primary)] transition-colors duration-500">
+        {loading && (
+          <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs animate-pulse">Loading...</span>
+        )}
+        {!loading && latest && (
+          <>
+            <img src={latest.imageUrl} alt="Latest Premade" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute bottom-6 left-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10">
+              <span className="font-mono text-[10px] text-white/70 uppercase tracking-[0.2em]">Latest Premade</span>
+              {latest.caption && <p className="font-mono text-xs text-white mt-1 truncate">{latest.caption}</p>}
+            </div>
+            <span className="absolute top-4 right-4 font-mono text-[10px] text-white/60 uppercase tracking-[0.2em] bg-black/30 backdrop-blur-sm px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">View All</span>
+          </>
+        )}
+        {!loading && !latest && (
+          <span className="font-mono text-[color:var(--primary)] uppercase tracking-[0.2em] text-xs opacity-50 group-hover:opacity-100 transition-opacity">Pre-made coming soon</span>
+        )}
+      </Link>
+    </div>
+  );
+};
+
 const Home = () => {
   const containerRef = useRef();
   useEffect(() => {
@@ -263,12 +329,8 @@ const Home = () => {
         </div>
       </div>
 
-      {/* CENTER TIER */}
-      <div className="flex-1 w-full flex items-center justify-center my-16 md:my-8 relative z-10 min-h-[400px]">
-         <div className="showcase-img w-[300px] h-[400px] md:w-[420px] md:h-[550px] border border-black/10 bg-black/5 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center shadow-xl relative group overflow-hidden cursor-pointer hover:border-[color:var(--primary)] transition-colors duration-500">
-            <span className="font-mono text-[color:var(--primary)] uppercase tracking-[0.2em] text-xs absolute z-20 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 whitespace-nowrap opacity-50 group-hover:opacity-100 transition-opacity">Pre-made coming soon</span>
-         </div>
-      </div>
+      {/* CENTER TIER — Latest Premade from Instagram */}
+      <LatestPremadeShowcase />
 
       {/* BOTTOM TIER */}
       <div className="flex flex-col md:flex-row justify-between items-center w-full relative z-20 gap-12 mt-auto">
@@ -829,10 +891,92 @@ const CartSidebar = ({ cart, onRemove, onClose }) => {
 };
 
 // ==========================================
+// INSTAGRAM PREMADES HOOK
+// ==========================================
+
+const useInstagramPremades = () => {
+  const [premades, setPremades] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!INSTAGRAM_TOKEN) {
+      setError('Instagram token not configured');
+      setLoading(false);
+      return;
+    }
+
+    const fetchPremades = async () => {
+      try {
+        const res = await fetch(
+          `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=50&access_token=${INSTAGRAM_TOKEN}`
+        );
+        if (!res.ok) throw new Error(`Instagram API error: ${res.status}`);
+        const data = await res.json();
+
+        // Filter posts with #premade, API returns newest first
+        const filtered = (data.data || [])
+          .filter(post => {
+            const caption = (post.caption || '').toLowerCase();
+            return caption.includes('#premade') && (post.media_type === 'IMAGE' || post.media_type === 'CAROUSEL_ALBUM');
+          });
+
+        const total = filtered.length;
+
+        const mapped = filtered.map((post, idx) => {
+            const caption = post.caption || '';
+            const captionLower = caption.toLowerCase();
+
+            // Inverted numbering: first (newest) post = highest number, last (oldest) = #001
+            const number = String(total - idx).padStart(3, '0');
+
+            // Detect SOLD status
+            const isSold = captionLower.includes('sold out') || captionLower.includes('🩹sold') || /\bsold\b/.test(captionLower);
+
+            // Detect type: look for P or B near #premade in caption
+            // Matches: "#premade p", "#premade P", "p #premade", "P#premade", "#premade  p", etc.
+            const isPremium = /\bp\s*#premade|#premade\s*p\b/i.test(caption);
+            const type = isPremium ? 'premium' : 'basic';
+            const price = isPremium ? PREMADE_PRICE_PREMIUM : PREMADE_PRICE_BASIC;
+
+            // Extract name from first line of caption (before hashtags)
+            const firstLine = caption.split('\n')[0].replace(/#\w+/g, '').trim();
+            const name = firstLine.length > 3 ? firstLine : `Premade #${number}`;
+
+            return {
+              id: post.id,
+              number,
+              title: name,
+              imageUrl: post.media_type === 'VIDEO' ? post.thumbnail_url : post.media_url,
+              instagramUrl: post.permalink,
+              price,
+              available: !isSold,
+              type,
+              timestamp: post.timestamp,
+            };
+          });
+
+        setPremades(mapped);
+      } catch (err) {
+        console.error('Failed to fetch Instagram premades:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPremades();
+  }, []);
+
+  return { premades, loading, error };
+};
+
+// ==========================================
 // PREMADES GALLERY PAGE
 // ==========================================
 
 const PremadesPage = () => {
+  const { premades, loading, error } = useInstagramPremades();
   const [selected, setSelected] = useState(null);
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
@@ -849,10 +993,18 @@ const PremadesPage = () => {
     window.scrollTo(0, 0);
     const ctx = gsap.context(() => {
       gsap.from('.premade-header', { y: 30, opacity: 0, stagger: 0.1, duration: 1.5, ease: 'power3.out' });
-      gsap.from('.premade-item', { y: 40, opacity: 0, duration: 0.8, stagger: 0.06, ease: 'power3.out', delay: 0.3 });
     }, containerRef);
     return () => ctx.revert();
   }, []);
+
+  // Animate premade items when they load from Instagram
+  useEffect(() => {
+    if (loading || premades.length === 0) return;
+    const ctx = gsap.context(() => {
+      gsap.from('.premade-item', { y: 40, opacity: 0, duration: 0.8, stagger: 0.06, ease: 'power3.out' });
+    }, containerRef);
+    return () => ctx.revert();
+  }, [loading, premades]);
 
   return (
     <div ref={containerRef} className="min-h-screen p-6 md:p-12 flex flex-col relative z-10">
@@ -873,7 +1025,7 @@ const PremadesPage = () => {
           </div>
           <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex flex-wrap items-center gap-2 mb-6">
             <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]"></span>
-            {premades.filter(p => p.available).length} Pieces Available
+            {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
           </p>
         </div>
 
@@ -895,35 +1047,64 @@ const PremadesPage = () => {
       {/* GALLERY GRID */}
       <div className="flex-1 w-full mt-16 md:mt-12 relative z-10">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {premades.filter(p => p.available).map((premade) => (
+          {premades.map((premade) => (
             <div key={premade.id} className="premade-item">
               <button
-                onClick={() => setSelected(premade)}
-                className="group text-left w-full bg-white/0 overflow-hidden transition-all duration-500 focus:outline-none"
+                onClick={() => premade.available && setSelected(premade)}
+                className={`group text-left w-full bg-white/0 overflow-hidden transition-all duration-500 focus:outline-none ${!premade.available ? 'cursor-default' : ''}`}
               >
                 <div className="relative aspect-square overflow-hidden bg-black/5 border border-black/10 rounded-xl hover:border-[color:var(--primary)] transition-colors duration-500">
-                  <img src={premade.imageUrl} alt={`Premade #${premade.number}`} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-500 flex items-center justify-center">
-                    <span className="font-mono text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-widest uppercase">View</span>
-                  </div>
+                  <img src={premade.imageUrl} alt={`Premade #${premade.number}`} loading="lazy" className={`w-full h-full object-cover transition-transform duration-700 ${premade.available ? 'group-hover:scale-105' : 'grayscale-[30%]'}`} />
+
+                  {/* Type badge: P = premium, B = basic */}
+                  <span className={`absolute top-3 left-3 w-7 h-7 rounded-full flex items-center justify-center font-mono text-[10px] font-bold tracking-wider z-10 ${premade.type === 'premium' ? 'bg-[color:var(--primary)] text-white shadow-[0_0_10px_rgba(123,31,36,0.4)]' : 'bg-white/80 text-black/60 backdrop-blur-sm border border-black/10'}`}>
+                    {premade.type === 'premium' ? 'P' : 'B'}
+                  </span>
+
+                  {/* SOLD overlay */}
+                  {!premade.available ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-[rgba(123,31,36,0.75)]">
+                      <span className="font-mono text-sm text-white font-bold tracking-[0.3em] uppercase">Sold</span>
+                    </div>
+                  ) : (
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-500 flex items-center justify-center">
+                      <span className="font-mono text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-widest uppercase">View</span>
+                    </div>
+                  )}
                 </div>
                 <div className="mt-3 flex items-center justify-between px-1">
-                  <span className="font-mono text-[10px] tracking-widest text-black/40 uppercase">#{premade.number}</span>
-                  <span className="font-mono text-xs font-semibold text-black">${premade.price}</span>
+                  <span className={`font-mono text-[10px] tracking-widest uppercase ${premade.available ? 'text-black/40' : 'text-black/25 line-through'}`}>#{premade.number}</span>
+                  <span className={`font-mono text-xs font-semibold ${premade.available ? 'text-black' : 'text-black/25'}`}>${premade.price}</span>
                 </div>
               </button>
-              <button
-                onClick={() => addToCart(premade)}
-                disabled={cart.find(item => item.id === premade.id)}
-                className="mt-2 w-full py-2 text-[10px] font-mono uppercase tracking-widest border border-black/10 rounded-lg text-black/50 hover:text-white hover:bg-black hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black/50 disabled:hover:border-black/10 flex items-center justify-center gap-1.5"
-              >
-                {cart.find(item => item.id === premade.id) ? 'In Cart' : <><Plus size={12} /> Add to Cart</>}
-              </button>
+              {premade.available ? (
+                <button
+                  onClick={() => addToCart(premade)}
+                  disabled={cart.find(item => item.id === premade.id)}
+                  className="mt-2 w-full py-2 text-[10px] font-mono uppercase tracking-widest border border-black/10 rounded-lg text-black/50 hover:text-white hover:bg-black hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black/50 disabled:hover:border-black/10 flex items-center justify-center gap-1.5"
+                >
+                  {cart.find(item => item.id === premade.id) ? 'In Cart' : <><Plus size={12} /> Add to Cart</>}
+                </button>
+              ) : (
+                <span className="mt-2 w-full py-2 text-[10px] font-mono uppercase tracking-widest text-black/20 flex items-center justify-center">Sold</span>
+              )}
             </div>
           ))}
         </div>
 
-        {premades.length === 0 && (
+        {loading && (
+          <div className="text-center py-24">
+            <p className="font-mono text-black/30 text-xs uppercase tracking-widest animate-pulse">Loading premades from Instagram...</p>
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="text-center py-24">
+            <p className="font-mono text-black/30 text-xs uppercase tracking-widest">Could not load premades. Check back soon.</p>
+          </div>
+        )}
+
+        {!loading && !error && premades.length === 0 && (
           <div className="text-center py-24">
             <p className="font-mono text-black/30 text-xs uppercase tracking-widest">No premades available yet. Check back soon.</p>
           </div>
