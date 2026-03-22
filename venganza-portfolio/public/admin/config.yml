@@ -1,0 +1,25 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/premades"
+public_folder: "/premades"
+
+collections:
+  - name: "premades"
+    label: "Premades"
+    label_singular: "Premade"
+    folder: "content/premades"
+    create: true
+    delete: true
+    slug: "premade-{{number}}"
+    sortable_fields: ["number", "title"]
+    summary: "#{{number}} — ${{price}}"
+    fields:
+      - { label: "Number", name: "number", widget: "string", hint: "e.g. 001, 002, 003" }
+      - { label: "Title", name: "title", widget: "string", required: false, hint: "Optional display name" }
+      - { label: "Image", name: "image", widget: "image", hint: "Upload the premade image" }
+      - { label: "Price (USD)", name: "price", widget: "number", default: 200, value_type: "int" }
+      - { label: "Available", name: "available", widget: "boolean", default: true }
+      - { label: "Instagram URL", name: "instagram_url", widget: "string", required: false, hint: "Link to the Instagram post" }
+      - { label: "Description", name: "body", widget: "markdown", required: false }

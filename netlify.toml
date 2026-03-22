@@ -1,7 +1,7 @@
 [build]
   base = "venganza-portfolio"
   command = "npm run build"
-  publish = "venganza-portfolio/dist"
+  publish = "dist"
 
 [[redirects]]
   from = "/*"
