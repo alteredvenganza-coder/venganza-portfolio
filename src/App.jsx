@@ -1,19 +1,21 @@
-import React from 'react';
+// Updated LatestPremadeShowcase function
+function LatestPremadeShowcase() {
+    // ...existing code...
+    fetch(`https://api.example.com/endpoint?fields=yourFields&limit=50`) // Updated here
+        .then(response => response.json())
+        .then(data => {
+            const caption = data.caption.substring(0, 2200); // Updated here
+            // ...existing code...
+        });
+}
 
-// Previous code
-
-const LatestPremadeShowcase = () => {
-    // Previous code
-
-    return (caption.includes('#premade') || caption.includes('#premades')) && <div>...</div>;
-};
-
-// More code
-
-const useInstagramPremades = () => {
-    // Previous code
-
-    return (caption.includes('#premade') || caption.includes('#premades')) && someFunction();
-};
-
-// Rest of the code
+// Updated useInstagramPremades function
+function useInstagramPremades() {
+    // ...existing code...
+    fetch(`https://api.example.com/endpoint?fields=yourFields&limit=50`) // Updated here
+        .then(response => response.json())
+        .then(data => {
+            const caption = data.caption.substring(0, 2200); // Updated here
+            // ...existing code...
+        });
+}
