@@ -956,22 +956,85 @@ const PremadesPage = () => {
   );
 };
 
+// ==========================================
+// ADMIN IMPORTS
+// ==========================================
+import { AuthProvider, useAuth } from './admin/lib/auth';
+import { EditorProvider } from './admin/lib/editor-context';
+import { ToastProvider } from './admin/lib/toast';
+import AdminLayout from './admin/components/AdminLayout';
+import EditorToolbar from './admin/components/EditorToolbar';
+import Dashboard from './admin/pages/Dashboard';
+import PremadesList from './admin/pages/PremadesList';
+import PremadeEdit from './admin/pages/PremadeEdit';
+import MediaLibrary from './admin/pages/MediaLibrary';
+import AdminSettings from './admin/pages/AdminSettings';
+
+const AdminGuard = () => {
+  const { user, loading, login } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <p className="font-mono text-xs text-white/30 uppercase tracking-widest animate-pulse">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="heading-font text-4xl tracking-widest text-white mb-4">Admin</h1>
+          <p className="font-mono text-xs text-white/40 uppercase tracking-widest mb-8">Altered Venganza</p>
+          <button
+            onClick={login}
+            className="bg-white text-black px-8 py-3 rounded-lg font-mono text-xs uppercase tracking-widest hover:bg-white/90 transition-colors"
+          >
+            Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return <AdminLayout />;
+};
+
 export default function App() {
   return (
     <BrowserRouter>
-      <ThemeController />
-      <AnimatedBackground />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/vag" element={<GalleryPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/archive" element={<ArchivePage />} />
-        <Route path="/premades" element={<PremadesPage />} />
-        <Route path="/service/:id" element={<ServiceDetail />} />
-        <Route path="/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
-        <Route path="/designs" element={<ServicePage title="Clothing Design Service" services={designsData} />} />
-      </Routes>
+      <AuthProvider>
+        <EditorProvider>
+          <ToastProvider>
+            <ThemeController />
+            <AnimatedBackground />
+            <EditorToolbar />
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/vag" element={<GalleryPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/archive" element={<ArchivePage />} />
+              <Route path="/premades" element={<PremadesPage />} />
+              <Route path="/service/:id" element={<ServiceDetail />} />
+              <Route path="/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
+              <Route path="/designs" element={<ServicePage title="Clothing Design Service" services={designsData} />} />
+
+              {/* Admin routes */}
+              <Route path="/admin" element={<AdminGuard />}>
+                <Route index element={<Dashboard />} />
+                <Route path="premades" element={<PremadesList />} />
+                <Route path="premades/new" element={<PremadeEdit />} />
+                <Route path="premades/edit/:filename" element={<PremadeEdit />} />
+                <Route path="media" element={<MediaLibrary />} />
+                <Route path="settings" element={<AdminSettings />} />
+              </Route>
+            </Routes>
+          </ToastProvider>
+        </EditorProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
