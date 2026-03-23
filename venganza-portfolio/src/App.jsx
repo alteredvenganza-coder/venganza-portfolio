@@ -301,6 +301,7 @@ const Home = () => {
               </div>
             )}
           </div>
+          <Link to="/vag" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">VAG</Link>
           <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">Premades</Link>
           <Link to="/archive" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">Archive</Link>
           <Link to="/about" className="nav-item font-mono text-[11px] text-[color:var(--primary)] hover:text-black uppercase tracking-[0.15em] transition-colors">Who the f*ck is Rare?</Link>
@@ -317,6 +318,7 @@ const Home = () => {
       <nav className="flex md:hidden items-center justify-center gap-4 flex-wrap px-6 pb-4">
         <Link to="/brand-identity" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">Brand Identity</Link>
         <Link to="/designs" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">Designs</Link>
+        <Link to="/vag" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">VAG</Link>
         <Link to="/premades" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">Premades</Link>
         <Link to="/archive" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">Archive</Link>
         <Link to="/about" className="font-mono text-[9px] text-[color:var(--primary)] hover:text-black uppercase tracking-[0.12em] transition-colors">Who the f*ck is Rare?</Link>
