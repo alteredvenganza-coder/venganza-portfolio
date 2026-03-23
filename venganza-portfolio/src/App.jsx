@@ -4,6 +4,7 @@ import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { INSTAGRAM_DM_URL, INSTAGRAM_HANDLE, PREMADE_PRICE_PREMIUM, PREMADE_PRICE_BASIC } from './config';
+import { useTheme } from './hooks/useTheme';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -310,6 +311,7 @@ const useLatestPremade = () => {
 const Home = () => {
   const containerRef = useRef();
   const { latest, loading: premadeLoading } = useLatestPremade();
+  const theme = useTheme();
   const [servicesOpen, setServicesOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -382,7 +384,10 @@ const Home = () => {
           {!premadeLoading && latest && (
             <img src={latest.imageUrl} alt="Latest Premade" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
           )}
-          {!premadeLoading && !latest && (
+          {!premadeLoading && !latest && theme.images?.heroLeft && (
+            <img src={theme.images.heroLeft} alt="Hero" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+          )}
+          {!premadeLoading && !latest && !theme.images?.heroLeft && (
             <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
               <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs">Coming Soon</span>
             </div>
@@ -394,8 +399,13 @@ const Home = () => {
         </Link>
 
         <Link to="/brand-identity" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer bg-neutral-100 flex items-center justify-center">
-          <span className="font-mono text-black/20 uppercase tracking-[0.2em] text-xs relative z-10">Coming Soon</span>
-          <span className="absolute bottom-6 left-6 md:bottom-8 md:left-8 font-mono text-[11px] md:text-xs text-black/60 group-hover:text-black uppercase tracking-[0.25em] group-hover:tracking-[0.35em] transition-all duration-500">
+          {theme.images?.heroRight ? (
+            <img src={theme.images.heroRight} alt="Brand Identity" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+          ) : (
+            <span className="font-mono text-black/20 uppercase tracking-[0.2em] text-xs relative z-10">Coming Soon</span>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          <span className={`absolute bottom-6 left-6 md:bottom-8 md:left-8 font-mono text-[11px] md:text-xs uppercase tracking-[0.25em] group-hover:tracking-[0.35em] transition-all duration-500 ${theme.images?.heroRight ? 'text-white' : 'text-black/60 group-hover:text-black'}`}>
             Brand Identity
           </span>
         </Link>
@@ -450,6 +460,7 @@ const ServiceItem = ({ title, subtitle, price, delivery }) => {
 const ServicePage = ({ title, services }) => {
   const containerRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const theme = useTheme();
 
   useEffect(() => {
     ScrollTrigger.refresh();
@@ -481,7 +492,7 @@ const ServicePage = ({ title, services }) => {
                 2026 PRICING
              </span>
           </div>
-          <img src="/logo.png" className="w-[200px] md:w-[280px] object-contain filter invert opacity-90 mx-auto" alt="Alter Logo" />
+          <img src={theme.images?.logo || '/logo.png'} className="w-[200px] md:w-[280px] object-contain filter invert opacity-90 mx-auto" alt="Alter Logo" />
        </div>
 
        <div className="header-element mb-16 text-center w-full max-w-2xl">
@@ -521,6 +532,7 @@ const ServiceDetail = () => {
   const service = allData.find(s => s.title === decodeURIComponent(id));
   const containerRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const theme = useTheme();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -551,7 +563,7 @@ const ServiceDetail = () => {
                 2026 PRICING
              </span>
           </div>
-          <img src="/logo.png" className="w-[200px] md:w-[260px] object-contain filter invert opacity-90 mx-auto" alt="Alter Logo" />
+          <img src={theme.images?.logo || '/logo.png'} className="w-[200px] md:w-[260px] object-contain filter invert opacity-90 mx-auto" alt="Alter Logo" />
        </div>
       
       <div className="header-element mb-16 w-full max-w-[480px] text-left">

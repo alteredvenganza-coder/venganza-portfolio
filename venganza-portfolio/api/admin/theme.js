@@ -56,6 +56,14 @@ async function githubFetch(endpoint, options = {}) {
 }
 
 const DEFAULT_THEME = {
+  images: {
+    heroLeft: '',
+    heroRight: '',
+    logo: '/logo.png',
+    aboutHero: '',
+    galleryBg: '',
+    ogImage: '',
+  },
   colors: {
     primary: '#7b1f24',
     background: '#f5f0eb',
