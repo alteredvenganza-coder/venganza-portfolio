@@ -402,9 +402,10 @@ const Home = () => {
           {theme.images?.heroRight && (
             <img src={theme.images.heroRight} alt="MAT Renders" className="absolute inset-0 w-full h-full object-cover" />
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
           <div className="relative z-10 text-center flex flex-col items-center justify-center">
-            <h2 className="heading-font text-4xl md:text-6xl tracking-widest text-black/80">MAT RENDERS</h2>
-            <p className="font-mono text-[10px] md:text-xs text-black/40 uppercase tracking-[0.3em] mt-3">Coming Soon</p>
+            <h2 className="heading-font text-4xl md:text-6xl tracking-widest text-white">MAT RENDERS</h2>
+            <p className="font-mono text-[10px] md:text-xs text-white/70 uppercase tracking-[0.3em] mt-3">Coming Soon</p>
           </div>
         </div>
       </div>
