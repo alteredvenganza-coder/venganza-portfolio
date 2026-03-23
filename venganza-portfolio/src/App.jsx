@@ -601,8 +601,16 @@ const GalleryPage = () => {
       <Link to="/" className="absolute top-10 right-10 inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
           Back to Home <ArrowRight size={16} />
       </Link>
-      <h1 className="heading-font text-5xl md:text-[6rem] text-white mb-12 leading-none mt-20">Venganza's Art Gallery</h1>
-      
+      <h1 className="heading-font text-5xl md:text-[6rem] text-white mb-4 leading-none mt-20">Venganza's Art Gallery</h1>
+      <div className="mb-12 flex flex-col items-center gap-2">
+        <p className="text-white/30 font-mono text-[10px] uppercase tracking-[0.3em]">
+          Curated by <Link to="/about" className="text-white/50 hover:text-white transition-colors underline underline-offset-4">Rare</Link>
+        </p>
+        <Link to="/about" className="text-white/40 hover:text-white transition-colors font-mono text-xs uppercase tracking-[0.2em]">
+          Rare???? &rarr;
+        </Link>
+      </div>
+
       <div className="max-w-md w-full bg-white/5 p-8 rounded-2xl border border-white/10 backdrop-blur-sm flex flex-col items-center gap-6">
          <p className="text-white/60 font-mono text-xs uppercase tracking-widest">Enter Password to Access</p>
          <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
@@ -611,14 +619,6 @@ const GalleryPage = () => {
          </div>
       </div>
 
-      <div className="mt-16 flex flex-col items-center gap-3">
-        <p className="text-white/30 font-mono text-[10px] uppercase tracking-[0.3em]">
-          Curated by <Link to="/about" className="text-white/50 hover:text-white transition-colors underline underline-offset-4">Rare</Link>
-        </p>
-        <Link to="/about" className="text-white/40 hover:text-white transition-colors font-mono text-xs uppercase tracking-[0.2em]">
-          Rare???? &rarr;
-        </Link>
-      </div>
     </div>
   );
 };
