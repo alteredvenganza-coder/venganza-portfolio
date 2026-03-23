@@ -1,52 +1,35 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import netlifyIdentity from 'netlify-identity-widget';
-import { setToken } from './git-gateway';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
+
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'admin123';
+const STORAGE_KEY = 'av_admin_auth';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    netlifyIdentity.init();
-
-    const currentUser = netlifyIdentity.currentUser();
-    if (currentUser) {
-      setUser(currentUser);
-      // Refresh token
-      currentUser.jwt().then(token => setToken(token));
+    const saved = sessionStorage.getItem(STORAGE_KEY);
+    if (saved === 'true') {
+      setUser({ email: 'admin@alteredvenganza.com' });
     }
     setLoading(false);
-
-    netlifyIdentity.on('login', (u) => {
-      setUser(u);
-      u.jwt().then(token => setToken(token));
-      netlifyIdentity.close();
-    });
-
-    netlifyIdentity.on('logout', () => {
-      setUser(null);
-      setToken(null);
-    });
-
-    return () => {
-      netlifyIdentity.off('login');
-      netlifyIdentity.off('logout');
-    };
   }, []);
 
-  const login = () => netlifyIdentity.open('login');
-  const logout = () => netlifyIdentity.logout();
+  const login = (password) => {
+    if (password === ADMIN_PASSWORD) {
+      sessionStorage.setItem(STORAGE_KEY, 'true');
+      setUser({ email: 'admin@alteredvenganza.com' });
+      return true;
+    }
+    return false;
+  };
 
-  // Refresh token periodically (tokens expire in ~1hr)
-  useEffect(() => {
-    if (!user) return;
-    const interval = setInterval(() => {
-      user.jwt(true).then(token => setToken(token));
-    }, 50 * 60 * 1000); // 50 min
-    return () => clearInterval(interval);
-  }, [user]);
+  const logout = () => {
+    sessionStorage.removeItem(STORAGE_KEY);
+    setUser(null);
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout }}>

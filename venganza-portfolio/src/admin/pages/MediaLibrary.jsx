@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Upload, Trash2, Copy, ImageIcon } from 'lucide-react';
-import { listFiles, deleteFile, uploadImage } from '../lib/git-gateway';
+import { listFiles, deleteFile, uploadImage } from '../lib/github';
 import { useToast } from '../lib/toast';
 
 export default function MediaLibrary() {

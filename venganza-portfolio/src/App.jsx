@@ -1211,6 +1211,8 @@ import AdminSettings from './admin/pages/AdminSettings';
 
 const AdminGuard = () => {
   const { user, loading, login } = useAuth();
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   if (loading) {
     return (
@@ -1221,17 +1223,37 @@ const AdminGuard = () => {
   }
 
   if (!user) {
+    const handleLogin = (e) => {
+      e.preventDefault();
+      const ok = login(password);
+      if (!ok) {
+        setError('Wrong password');
+        setPassword('');
+      }
+    };
+
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-center">
           <h1 className="heading-font text-4xl tracking-widest text-white mb-4">Admin</h1>
           <Link to="/" className="font-mono text-xs text-white/40 uppercase tracking-widest mb-8 block hover:text-white/60 transition-colors">Altered Venganza</Link>
-          <button
-            onClick={login}
-            className="bg-white text-black px-8 py-3 rounded-lg font-mono text-xs uppercase tracking-widest hover:bg-white/90 transition-colors"
-          >
-            Login
-          </button>
+          <form onSubmit={handleLogin} className="flex flex-col gap-3 items-center">
+            <input
+              type="password"
+              value={password}
+              onChange={e => { setPassword(e.target.value); setError(''); }}
+              placeholder="Password"
+              className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 font-mono text-sm text-white text-center placeholder:text-white/20 outline-none focus:border-white/20 transition-colors w-64"
+              autoFocus
+            />
+            {error && <p className="font-mono text-[10px] text-red-400 uppercase tracking-widest">{error}</p>}
+            <button
+              type="submit"
+              className="bg-white text-black px-8 py-3 rounded-lg font-mono text-xs uppercase tracking-widest hover:bg-white/90 transition-colors"
+            >
+              Login
+            </button>
+          </form>
         </div>
       </div>
     );

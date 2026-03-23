@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Upload } from 'lucide-react';
-import { getFile, saveFile, uploadImage } from '../lib/git-gateway';
+import { getFile, saveFile, uploadImage } from '../lib/github';
 import { useToast } from '../lib/toast';
 
 function parseFrontmatter(content) {

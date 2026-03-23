@@ -65,7 +65,7 @@ export default function AdminLayout() {
         <div className="p-4 border-t border-white/5">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-mono uppercase text-white/60">
-              {user?.email?.[0] || '?'}
+              A
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-mono text-[10px] text-white/60 truncate">{user?.email || 'Admin'}</p>

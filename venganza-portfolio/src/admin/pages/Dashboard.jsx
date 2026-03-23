@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layers, Image, ArrowRight } from 'lucide-react';
-import { listFiles } from '../lib/git-gateway';
+import { listFiles } from '../lib/github';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({ premades: 0, media: 0 });

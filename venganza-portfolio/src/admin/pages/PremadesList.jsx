@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Search, Trash2, Eye, EyeOff, Pencil } from 'lucide-react';
-import { listFiles, getFile, deleteFile } from '../lib/git-gateway';
+import { listFiles, getFile, deleteFile } from '../lib/github';
 import { useToast } from '../lib/toast';
 
 function parseFrontmatter(content) {

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Save } from 'lucide-react';
 import { useToast } from '../lib/toast';
 import { useAuth } from '../lib/auth';
 
@@ -19,7 +18,7 @@ export default function AdminSettings() {
           <h2 className="font-mono text-xs text-white/60 uppercase tracking-widest mb-4">Account</h2>
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center font-mono text-lg text-white/40 uppercase">
-              {user?.email?.[0] || '?'}
+              A
             </div>
             <div>
               <p className="font-mono text-sm text-white">{user?.email || 'Admin'}</p>
@@ -46,8 +45,8 @@ export default function AdminSettings() {
         <div className="bg-white/5 border border-white/5 rounded-xl p-6">
           <h2 className="font-mono text-xs text-white/60 uppercase tracking-widest mb-4">Quick Links</h2>
           <div className="space-y-2">
-            <a href="https://app.netlify.com" target="_blank" rel="noopener noreferrer" className="block font-mono text-xs text-white/50 hover:text-white transition-colors">
-              Netlify Dashboard &rarr;
+            <a href="https://vercel.com/dashboard" target="_blank" rel="noopener noreferrer" className="block font-mono text-xs text-white/50 hover:text-white transition-colors">
+              Vercel Dashboard &rarr;
             </a>
             <a href="https://github.com/alteredvenganza-coder/venganza-portfolio" target="_blank" rel="noopener noreferrer" className="block font-mono text-xs text-white/50 hover:text-white transition-colors">
               GitHub Repository &rarr;
