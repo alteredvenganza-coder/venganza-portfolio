@@ -962,8 +962,11 @@ const useInstagramPremades = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log('[Premades] Token length:', INSTAGRAM_TOKEN?.length || 0);
+    console.log('[Premades] Token starts:', INSTAGRAM_TOKEN?.substring(0, 10) || 'EMPTY');
+
     if (!INSTAGRAM_TOKEN) {
-      setError('Instagram token not configured');
+      setError('Token not configured — check VITE_INSTAGRAM_TOKEN env var');
       setLoading(false);
       return;
     }
@@ -1191,7 +1194,7 @@ const PremadesPage = () => {
 
         {!loading && error && (
           <div className="text-center py-24">
-            <p className="font-mono text-black/30 text-xs uppercase tracking-widest">Could not load premades. Check back soon.</p>
+            <p className="font-mono text-black/30 text-xs uppercase tracking-widest">Could not load premades. {error}</p>
           </div>
         )}
 
