@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation, useParams } from 'react-router-dom';
-import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2, ChevronDown } from 'lucide-react';
+import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2, ChevronDown, Menu } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { INSTAGRAM_DM_URL, INSTAGRAM_HANDLE, PREMADE_PRICE_PREMIUM, PREMADE_PRICE_BASIC } from './config';
@@ -197,6 +197,68 @@ const ThemeController = () => {
 };
 
 // ==========================================
+// MOBILE BURGER MENU (ERD Style)
+// ==========================================
+
+const MobileMenu = ({ onClose }) => {
+  const overlayRef = useRef(null);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    const ctx = gsap.context(() => {
+      gsap.from(overlayRef.current, { opacity: 0, duration: 0.3, ease: 'power2.out' });
+      gsap.from('.mobile-menu-link', { y: 30, opacity: 0, stagger: 0.05, duration: 0.6, ease: 'power3.out', delay: 0.15 });
+    });
+    return () => { document.body.style.overflow = ''; ctx.revert(); };
+  }, []);
+
+  return (
+    <div ref={overlayRef} className="fixed inset-0 z-[300] bg-white flex flex-col items-center justify-center">
+      <button onClick={onClose} className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center text-black/60 hover:text-black transition-colors">
+        <X size={24} />
+      </button>
+      <nav className="flex flex-col items-center gap-6">
+        <Link to="/brand-identity" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Brand Identity</Link>
+        <Link to="/designs" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Clothing Designs</Link>
+        <Link to="/vag" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">VAG</Link>
+        <Link to="/premades" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Premades</Link>
+        <Link to="/archive" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Archive</Link>
+        <Link to="/about" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-[color:var(--primary)] tracking-widest uppercase hover:text-black transition-colors">Who the f*ck is Rare?</Link>
+        <Link to="/contact" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Contact</Link>
+      </nav>
+    </div>
+  );
+};
+
+// ==========================================
+// SHARED FOOTER (all pages)
+// ==========================================
+
+const SiteFooter = ({ light = true }) => {
+  const textColor = light ? 'text-black/40' : 'text-white/40';
+  const hoverColor = light ? 'hover:text-black' : 'hover:text-white';
+  const borderColor = light ? 'border-black/10' : 'border-white/10';
+
+  return (
+    <footer className={`w-full relative z-20 mt-auto`}>
+      {/* Nav links */}
+      <nav className={`flex flex-wrap items-center justify-center gap-4 md:gap-6 py-6 border-t ${borderColor}`}>
+        <Link to="/brand-identity" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Brand Identity</Link>
+        <Link to="/designs" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Clothing Designs</Link>
+        <Link to="/vag" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>VAG</Link>
+        <Link to="/premades" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Premades</Link>
+        <Link to="/archive" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Archive</Link>
+        <Link to="/about" className={`font-mono text-[9px] md:text-[10px] text-[color:var(--primary)] ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Who the f*ck is Rare?</Link>
+      </nav>
+      {/* Copyright */}
+      <p className={`font-mono text-[8px] md:text-[9px] ${textColor} uppercase tracking-[0.15em] text-center pb-6`}>
+        &copy; 2026 Altered Venganza. VAT IT01433140322 — All rights reserved.
+      </p>
+    </footer>
+  );
+};
+
+// ==========================================
 // HOME PAGE (LIGHT THEME)
 // ==========================================
 
@@ -241,6 +303,7 @@ const Home = () => {
   const containerRef = useRef();
   const { latest, loading: premadeLoading } = useLatestPremade();
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -256,7 +319,7 @@ const Home = () => {
       {/* ============ TOP NAV BAR — ERD Style ============ */}
       <header className="flex items-start justify-between px-6 md:px-10 pt-6 md:pt-8 pb-4 relative z-20">
 
-        {/* Left — Logo + Handle + Description (responsive: 2 lines mobile, 1 line desktop) */}
+        {/* Left — Logo + Handle + Description */}
         <div className="nav-item flex-shrink-0">
           <Link to="/" className="heading-font leading-none text-black tracking-widest hover:opacity-70 transition-opacity block">
             <span className="hidden lg:inline text-4xl xl:text-5xl">Altered Venganza</span>
@@ -271,21 +334,16 @@ const Home = () => {
           </p>
         </div>
 
-        {/* Center — Navigation */}
+        {/* Center — Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8 pt-2">
-          {/* Services dropdown */}
           <div className="relative pb-2 -mb-2" onMouseEnter={() => setServicesOpen(true)} onMouseLeave={() => setServicesOpen(false)}>
             <button onClick={() => setServicesOpen(o => !o)} className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors flex items-center gap-1">
               Services <ChevronDown size={12} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
             </button>
             {servicesOpen && (
               <div className="absolute top-full left-0 bg-white border border-black/10 rounded-lg shadow-xl py-2 min-w-[200px] z-50">
-                <Link to="/brand-identity" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">
-                  Brand Identity
-                </Link>
-                <Link to="/designs" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">
-                  Clothing Designs
-                </Link>
+                <Link to="/brand-identity" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">Brand Identity</Link>
+                <Link to="/designs" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">Clothing Designs</Link>
               </div>
             )}
           </div>
@@ -295,28 +353,18 @@ const Home = () => {
           <Link to="/about" className="nav-item font-mono text-[11px] text-[color:var(--primary)] hover:text-black uppercase tracking-[0.15em] transition-colors">Who the f*ck is Rare?</Link>
         </nav>
 
-        {/* Right — Contact + Cart */}
+        {/* Right — Contact + Cart + Burger */}
         <div className="flex items-center gap-6 pt-2">
-          <Link to="/contact" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden sm:block">Contact</Link>
-          <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">Cart (0)</Link>
+          <Link to="/contact" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden md:block">Contact</Link>
+          <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden md:block">Cart (0)</Link>
+          <button onClick={() => setMenuOpen(true)} className="md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
+            <Menu size={24} />
+          </button>
         </div>
       </header>
 
-      {/* ============ MOBILE NAV ============ */}
-      <nav className="flex md:hidden items-center justify-center gap-4 flex-wrap px-6 pb-4">
-        <Link to="/brand-identity" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">Brand Identity</Link>
-        <Link to="/designs" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">Designs</Link>
-        <Link to="/vag" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">VAG</Link>
-        <Link to="/premades" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">Premades</Link>
-        <Link to="/archive" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">Archive</Link>
-        <Link to="/about" className="font-mono text-[9px] text-[color:var(--primary)] hover:text-black uppercase tracking-[0.12em] transition-colors">Who the f*ck is Rare?</Link>
-        <Link to="/contact" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors sm:hidden">Contact</Link>
-      </nav>
-
       {/* ============ HERO — Two panels side by side ============ */}
       <div className="flex-1 flex flex-col md:flex-row w-full relative z-10">
-
-        {/* Left Panel — Latest Premade */}
         <Link to="/premades" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer">
           {premadeLoading && (
             <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
@@ -331,15 +379,12 @@ const Home = () => {
               <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs">Coming Soon</span>
             </div>
           )}
-          {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-          {/* CTA */}
           <span className="absolute bottom-6 left-6 md:bottom-8 md:left-8 font-mono text-[11px] md:text-xs text-white uppercase tracking-[0.25em] group-hover:tracking-[0.35em] transition-all duration-500">
             Shop Premades
           </span>
         </Link>
 
-        {/* Right Panel — TBD (placeholder) */}
         <Link to="/brand-identity" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer bg-neutral-100">
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="font-mono text-black/20 uppercase tracking-[0.2em] text-xs">Coming Soon</span>
@@ -351,21 +396,13 @@ const Home = () => {
         </Link>
       </div>
 
-      {/* ============ BOTTOM BAR ============ */}
-      <footer className="flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-4 gap-3 relative z-20">
-        <p className="font-mono text-[8px] md:text-[9px] text-black/40 uppercase tracking-[0.15em]">
-          &copy; {new Date().getFullYear()} Altered Venganza — All rights reserved. VAT IT01433140322
-        </p>
-        <div className="flex items-center gap-4">
-          <a href={`https://instagram.com/${INSTAGRAM_HANDLE}`} target="_blank" rel="noopener noreferrer" className="font-mono text-[8px] md:text-[9px] text-black/40 hover:text-black uppercase tracking-[0.15em] transition-colors">
-            Instagram
-          </a>
-          <Link to="/about" className="font-mono text-[8px] md:text-[9px] text-black/40 hover:text-black uppercase tracking-[0.15em] transition-colors">
-            About
-          </Link>
-        </div>
-      </footer>
+      {/* ============ FOOTER ============ */}
+      <div className="px-6 md:px-10">
+        <SiteFooter light={true} />
+      </div>
 
+      {/* Mobile Menu */}
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
 };
@@ -751,10 +788,8 @@ const ArchivePage = () => {
         </div>
       </div>
       
-      <div className="mt-8 text-center sm:text-left w-full pb-4">
-         <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.2em]">
-           &copy; {new Date().getFullYear()} Altered Venganza — All rights reserved. VAT IT01433140322
-         </p>
+      <div className="mt-8 w-full">
+        <SiteFooter light={true} />
       </div>
 
     </div>
@@ -1091,23 +1126,23 @@ const PremadesPage = () => {
 
       {/* GALLERY GRID */}
       <div className="flex-1 w-full mt-16 md:mt-12 relative z-10">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-3 lg:grid-cols-4 gap-1 sm:gap-4 md:gap-6">
           {premades.map((premade) => (
             <div key={premade.id} className="premade-item">
               <button
                 onClick={() => premade.available && setSelected(premade)}
                 className={`group text-left w-full bg-white/0 overflow-hidden transition-all duration-500 focus:outline-none ${!premade.available ? 'cursor-default' : ''}`}
               >
-                <div className="relative aspect-square overflow-hidden bg-black/5 border border-black/10 rounded-xl hover:border-[color:var(--primary)] transition-colors duration-500">
+                <div className="relative aspect-[3/4] overflow-hidden bg-black/5 border border-black/10 rounded-none sm:rounded-xl hover:border-[color:var(--primary)] transition-colors duration-500">
                   <img src={premade.imageUrl} alt={`Premade #${premade.number}`} loading="lazy" className={`w-full h-full object-cover transition-transform duration-700 ${premade.available ? 'group-hover:scale-105' : 'grayscale-[30%]'}`} />
 
                   {/* Type badge: P = premium, B = basic, ARCHIVE = legacy */}
                   {premade.type === 'legacy' ? (
-                    <span className="absolute top-3 left-3 px-2 py-1 rounded-full font-mono text-[8px] font-bold tracking-widest z-10 bg-black/70 text-white/90 backdrop-blur-sm uppercase">
+                    <span className="absolute top-1.5 left-1.5 sm:top-3 sm:left-3 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-mono text-[6px] sm:text-[8px] font-bold tracking-widest z-10 bg-black/70 text-white/90 backdrop-blur-sm uppercase">
                       Archive
                     </span>
                   ) : (
-                    <span className={`absolute top-3 left-3 w-7 h-7 rounded-full flex items-center justify-center font-mono text-[10px] font-bold tracking-wider z-10 ${premade.type === 'premium' ? 'bg-[color:var(--primary)] text-white shadow-[0_0_10px_rgba(123,31,36,0.4)]' : 'bg-white/80 text-black/60 backdrop-blur-sm border border-black/10'}`}>
+                    <span className={`absolute top-1.5 left-1.5 sm:top-3 sm:left-3 w-5 h-5 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-mono text-[8px] sm:text-[10px] font-bold tracking-wider z-10 ${premade.type === 'premium' ? 'bg-[color:var(--primary)] text-white shadow-[0_0_10px_rgba(123,31,36,0.4)]' : 'bg-white/80 text-black/60 backdrop-blur-sm border border-black/10'}`}>
                       {premade.type === 'premium' ? 'P' : 'B'}
                     </span>
                   )}
@@ -1123,15 +1158,15 @@ const PremadesPage = () => {
                     </div>
                   )}
                 </div>
-                <div className="mt-3 flex items-center justify-between px-1">
-                  <span className={`font-mono text-[10px] tracking-widest uppercase ${premade.available ? 'text-black/40' : 'text-black/25 line-through'}`}>#{premade.number}</span>
+                <div className="mt-1 sm:mt-3 flex items-center justify-between px-0.5 sm:px-1">
+                  <span className={`font-mono text-[7px] sm:text-[10px] tracking-widest uppercase ${premade.available ? 'text-black/40' : 'text-black/25 line-through'}`}>#{premade.number}</span>
                   {premade.type === 'legacy' ? (
-                    <span className="flex items-center gap-1.5">
-                      <span className="font-mono text-[10px] text-black/30 line-through">${PREMADE_PRICE_BASIC}</span>
-                      <span className="font-mono text-xs font-semibold text-[color:var(--primary)]">${premade.price}</span>
+                    <span className="flex items-center gap-1 sm:gap-1.5">
+                      <span className="font-mono text-[7px] sm:text-[10px] text-black/30 line-through">${PREMADE_PRICE_BASIC}</span>
+                      <span className="font-mono text-[9px] sm:text-xs font-semibold text-[color:var(--primary)]">${premade.price}</span>
                     </span>
                   ) : (
-                    <span className={`font-mono text-xs font-semibold ${premade.available ? 'text-black' : 'text-black/25'}`}>${premade.price}</span>
+                    <span className={`font-mono text-[9px] sm:text-xs font-semibold ${premade.available ? 'text-black' : 'text-black/25'}`}>${premade.price}</span>
                   )}
                 </div>
               </button>
@@ -1139,12 +1174,12 @@ const PremadesPage = () => {
                 <button
                   onClick={() => addToCart(premade)}
                   disabled={cart.find(item => item.id === premade.id)}
-                  className="mt-2 w-full py-2 text-[10px] font-mono uppercase tracking-widest border border-black/10 rounded-lg text-black/50 hover:text-white hover:bg-black hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black/50 disabled:hover:border-black/10 flex items-center justify-center gap-1.5"
+                  className="hidden sm:flex mt-2 w-full py-2 text-[10px] font-mono uppercase tracking-widest border border-black/10 rounded-lg text-black/50 hover:text-white hover:bg-black hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black/50 disabled:hover:border-black/10 items-center justify-center gap-1.5"
                 >
                   {cart.find(item => item.id === premade.id) ? 'In Cart' : <><Plus size={12} /> Add to Cart</>}
                 </button>
               ) : (
-                <span className="mt-2 w-full py-2 text-[10px] font-mono uppercase tracking-widest text-black/20 flex items-center justify-center">Sold</span>
+                <span className="hidden sm:flex mt-2 w-full py-2 text-[10px] font-mono uppercase tracking-widest text-black/20 items-center justify-center">Sold</span>
               )}
             </div>
           ))}
@@ -1170,21 +1205,19 @@ const PremadesPage = () => {
       </div>
 
       {/* BOTTOM */}
-      <div className="flex flex-col md:flex-row justify-between items-center w-full relative z-20 gap-8 mt-20">
-        <div className="premade-header text-center md:text-left">
-          <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.2em] leading-loose">
-            &copy; {new Date().getFullYear()} Altered Venganza — All rights reserved.
-          </p>
-        </div>
+      <div className="w-full relative z-20 mt-20">
         {cart.length > 0 && (
-          <button
-            onClick={() => setCartOpen(true)}
-            className="group text-[color:var(--btn-tx)] hover:text-white transition-colors uppercase tracking-[0.2em] font-mono text-[10px] sm:text-xs flex items-center gap-2 border border-[color:var(--primary)] bg-[color:var(--primary)] px-6 py-3 rounded-full hover:bg-black hover:border-black"
-          >
-            <ShoppingBag size={14} />
-            View Cart ({cart.length}) — ${cart.reduce((s, i) => s + i.price, 0)}
-          </button>
+          <div className="flex justify-center mb-6">
+            <button
+              onClick={() => setCartOpen(true)}
+              className="group text-[color:var(--btn-tx)] hover:text-white transition-colors uppercase tracking-[0.2em] font-mono text-[10px] sm:text-xs flex items-center gap-2 border border-[color:var(--primary)] bg-[color:var(--primary)] px-6 py-3 rounded-full hover:bg-black hover:border-black"
+            >
+              <ShoppingBag size={14} />
+              View Cart ({cart.length}) — ${cart.reduce((s, i) => s + i.price, 0)}
+            </button>
+          </div>
         )}
+        <SiteFooter light={true} />
       </div>
 
       {/* Modal */}
