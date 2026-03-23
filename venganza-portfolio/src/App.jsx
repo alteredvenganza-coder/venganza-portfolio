@@ -1145,84 +1145,79 @@ const PremadesPage = () => {
         <Menu size={24} />
       </button>
 
-      {/* TOP — Same layout as Home */}
-      <div className="flex flex-col md:flex-row justify-between items-start w-full relative z-20">
-        <div className="premade-header max-w-3xl">
-          <Link to="/" className="heading-font text-6xl md:text-[7rem] leading-none text-black tracking-widest mb-6 block hover:opacity-80 transition-opacity">
-            Altered Venganza
-          </Link>
-          <div className="space-y-1 mb-8 max-w-2xl">
-            <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed">
-              Pre-made clothing renders &bull; Production ready files
-            </p>
-            <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed pt-1">
-              Fully alterable &amp; customizable to your brand &bull; Numbered &amp; Ready to purchase
-            </p>
-          </div>
-          <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex flex-wrap items-center gap-2 mb-6">
-            <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]"></span>
-            {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
+      {/* TOP HEADER */}
+      <div className="premade-header w-full relative z-20 mb-10">
+        <Link to="/" className="heading-font text-[3.5rem] leading-none text-black tracking-widest block hover:opacity-80 transition-opacity">
+          Altered Venganza
+        </Link>
+        <div className="space-y-1 mt-4 mb-6">
+          <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
+            Pre-made clothing renders &bull; Production ready files
+          </p>
+          <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
+            Fully alterable &amp; customizable to your brand &bull; Numbered &amp; Ready to purchase
           </p>
         </div>
-
-        <div className="premade-header flex flex-col items-start md:items-end gap-3 mt-8 md:mt-0 text-left md:text-right">
-          <Link to="/" className="hidden md:flex group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs items-center gap-3">
-            <span>Back to Home</span>
-            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:-translate-x-2" />
+        <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex items-center gap-2 mb-8">
+          <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]"></span>
+          {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
+        </p>
+        <div className="flex flex-col gap-2">
+          <Link to="/" className="font-mono text-xs text-black/50 hover:text-black transition-colors uppercase tracking-[0.2em]">
+            Back to Home
           </Link>
           <button
             onClick={() => setCartOpen(true)}
-            className="group text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3"
+            className="font-mono text-xs text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] flex items-center gap-2 w-fit"
           >
-            <span className="md:order-1">Cart ({cart.length})</span>
-            <ShoppingBag size={14} className="md:order-2" />
+            Cart ({cart.length}) <ShoppingBag size={13} />
           </button>
         </div>
       </div>
 
       {/* GALLERY GRID */}
-      <div className="flex-1 w-full mt-16 md:mt-12 relative z-10">
-        <div className="grid grid-cols-3 lg:grid-cols-4 gap-1 sm:gap-4 md:gap-6">
+      <div className="flex-1 w-full relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
           {premades.map((premade) => (
             <div key={premade.id} className="premade-item">
               <button
                 onClick={() => premade.available && setSelected(premade)}
-                className={`group text-left w-full bg-white/0 overflow-hidden transition-all duration-500 focus:outline-none ${!premade.available ? 'cursor-default' : ''}`}
+                className={`group text-left w-full overflow-hidden transition-all duration-500 focus:outline-none ${!premade.available ? 'cursor-default' : ''}`}
               >
-                <div className="relative aspect-[3/4] overflow-hidden bg-black/5 border border-black/10 rounded-none sm:rounded-xl hover:border-[color:var(--primary)] transition-colors duration-500">
+                <div className="relative aspect-[3/4] overflow-hidden bg-black/5 border border-black/10 rounded-2xl hover:border-[color:var(--primary)] transition-colors duration-500">
                   <img src={premade.imageUrl} alt={`Premade #${premade.number}`} loading="lazy" className={`w-full h-full object-cover transition-transform duration-700 ${premade.available ? 'group-hover:scale-105' : 'grayscale-[30%]'}`} />
 
-                  {/* Type badge: P = premium, B = basic, ARCHIVE = legacy */}
+                  {/* Type badge */}
                   {premade.type === 'legacy' ? (
-                    <span className="absolute top-1.5 left-1.5 sm:top-3 sm:left-3 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-mono text-[6px] sm:text-[8px] font-bold tracking-widest z-10 bg-black/70 text-white/90 backdrop-blur-sm uppercase">
+                    <span className="absolute top-3 left-3 px-2 py-1 rounded-full font-mono text-[8px] font-bold tracking-widest z-10 bg-black/70 text-white/90 backdrop-blur-sm uppercase">
                       Archive
                     </span>
                   ) : (
-                    <span className={`absolute top-1.5 left-1.5 sm:top-3 sm:left-3 w-5 h-5 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-mono text-[8px] sm:text-[10px] font-bold tracking-wider z-10 ${premade.type === 'premium' ? 'bg-[color:var(--primary)] text-white shadow-[0_0_10px_rgba(123,31,36,0.4)]' : 'bg-white/80 text-black/60 backdrop-blur-sm border border-black/10'}`}>
+                    <span className={`absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center font-mono text-[11px] font-bold tracking-wider z-10 ${premade.type === 'premium' ? 'bg-[color:var(--primary)] text-white shadow-[0_0_10px_rgba(123,31,36,0.4)]' : 'bg-white text-black/60 border border-black/15'}`}>
                       {premade.type === 'premium' ? 'P' : 'B'}
                     </span>
                   )}
 
                   {/* SOLD overlay */}
                   {!premade.available ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-[rgba(123,31,36,0.75)]">
+                    <div className="absolute inset-0 flex items-center justify-center bg-[rgba(123,31,36,0.75)] rounded-2xl">
                       <span className="font-mono text-sm text-white font-bold tracking-[0.3em] uppercase">Sold</span>
                     </div>
                   ) : (
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-500 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-500 flex items-center justify-center rounded-2xl">
                       <span className="font-mono text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-widest uppercase">View</span>
                     </div>
                   )}
                 </div>
-                <div className="mt-1 sm:mt-3 flex items-center justify-between px-0.5 sm:px-1">
-                  <span className={`font-mono text-[7px] sm:text-[10px] tracking-widest uppercase ${premade.available ? 'text-black/40' : 'text-black/25 line-through'}`}>#{premade.number}</span>
+                <div className="mt-2 flex items-center justify-between px-1">
+                  <span className={`font-mono text-[10px] tracking-widest uppercase ${premade.available ? 'text-black/40' : 'text-black/25 line-through'}`}>#{premade.number}</span>
                   {premade.type === 'legacy' ? (
-                    <span className="flex items-center gap-1 sm:gap-1.5">
-                      <span className="font-mono text-[7px] sm:text-[10px] text-black/30 line-through">${PREMADE_PRICE_BASIC}</span>
-                      <span className="font-mono text-[9px] sm:text-xs font-semibold text-[color:var(--primary)]">${premade.price}</span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="font-mono text-[10px] text-black/30 line-through">${PREMADE_PRICE_BASIC}</span>
+                      <span className="font-mono text-xs font-semibold text-[color:var(--primary)]">${premade.price}</span>
                     </span>
                   ) : (
-                    <span className={`font-mono text-[9px] sm:text-xs font-semibold ${premade.available ? 'text-black' : 'text-black/25'}`}>${premade.price}</span>
+                    <span className={`font-mono text-xs font-semibold ${premade.available ? 'text-black' : 'text-black/25'}`}>${premade.price}</span>
                   )}
                 </div>
               </button>
@@ -1230,12 +1225,12 @@ const PremadesPage = () => {
                 <button
                   onClick={() => addToCart(premade)}
                   disabled={cart.find(item => item.id === premade.id)}
-                  className="hidden sm:flex mt-2 w-full py-2 text-[10px] font-mono uppercase tracking-widest border border-black/10 rounded-lg text-black/50 hover:text-white hover:bg-black hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black/50 disabled:hover:border-black/10 items-center justify-center gap-1.5"
+                  className="flex mt-2 w-full py-2.5 text-[10px] font-mono uppercase tracking-widest border border-black/10 rounded-xl text-black/50 hover:text-white hover:bg-black hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black/50 disabled:hover:border-black/10 items-center justify-center gap-1.5"
                 >
                   {cart.find(item => item.id === premade.id) ? 'In Cart' : <><Plus size={12} /> Add to Cart</>}
                 </button>
               ) : (
-                <span className="hidden sm:flex mt-2 w-full py-2 text-[10px] font-mono uppercase tracking-widest text-black/20 items-center justify-center">Sold</span>
+                <span className="flex mt-2 w-full py-2.5 text-[10px] font-mono uppercase tracking-widest text-black/20 items-center justify-center">Sold</span>
               )}
             </div>
           ))}
