@@ -469,7 +469,7 @@ const ServicePage = ({ title, services }) => {
           <Link to="/" className="hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest mt-2 absolute right-0">
             Back to Home <ArrowRight size={14} />
           </Link>
-          <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-50 md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+          <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
             <Menu size={24} />
           </button>
        </div>
@@ -539,7 +539,7 @@ const ServiceDetail = () => {
           <button onClick={() => window.history.back()} className="hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest mt-2 absolute right-0">
             Back <ArrowRight size={14} />
           </button>
-          <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-50 md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+          <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
             <Menu size={24} />
           </button>
        </div>
@@ -629,7 +629,7 @@ const AboutPage = () => {
       <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-sm font-mono uppercase tracking-widest">
           Back to Home <ArrowRight size={16} />
       </Link>
-      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-50 md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
+      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
         <Menu size={24} />
       </button>
       <h1 className="heading-font text-6xl md:text-[8rem] text-black mb-8 leading-none mt-20">Who the f*ck is Rare?</h1>
@@ -650,7 +650,7 @@ const GalleryPage = () => {
       <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
           Back to Home <ArrowRight size={16} />
       </Link>
-      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-50 md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
         <Menu size={24} />
       </button>
       <h1 className="heading-font text-5xl md:text-[6rem] text-white mb-4 leading-none mt-20">Venganza's Art Gallery</h1>
@@ -678,7 +678,7 @@ const ContactPage = () => {
       <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
           Back to Home <ArrowRight size={16} />
       </Link>
-      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-50 md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
         <Menu size={24} />
       </button>
       
@@ -750,7 +750,7 @@ const ArchivePage = () => {
 
   return (
     <div className="min-h-screen relative z-10 flex flex-col py-12 px-6 lg:px-20 max-w-screen-2xl mx-auto">
-      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-50 md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
+      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
         <Menu size={24} />
       </button>
       <div className="mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 border-b border-black/10 pb-10 w-full">
@@ -1129,6 +1129,11 @@ const PremadesPage = () => {
   return (
     <div ref={containerRef} className="min-h-screen p-6 md:p-12 flex flex-col relative z-10">
 
+      {/* Mobile burger — fixed top right */}
+      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
+        <Menu size={24} />
+      </button>
+
       {/* TOP — Same layout as Home */}
       <div className="flex flex-col md:flex-row justify-between items-start w-full relative z-20">
         <div className="premade-header max-w-3xl">
@@ -1148,11 +1153,6 @@ const PremadesPage = () => {
             {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
           </p>
         </div>
-
-        {/* Mobile burger — fixed top right */}
-        <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-50 md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
-          <Menu size={24} />
-        </button>
 
         <div className="premade-header flex flex-col items-start md:items-end gap-3 mt-8 md:mt-0 text-left md:text-right">
           <Link to="/" className="hidden md:flex group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs items-center gap-3">
