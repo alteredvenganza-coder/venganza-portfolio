@@ -407,20 +407,12 @@ const Home = () => {
           </span>
         </Link>
 
-        <Link to="/brand-identity" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer bg-neutral-100">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-mono text-black/20 uppercase tracking-[0.2em] text-xs">Coming Soon</span>
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+        <Link to="/brand-identity" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer bg-neutral-100 flex items-center justify-center">
+          <span className="font-mono text-black/20 uppercase tracking-[0.2em] text-xs relative z-10">Coming Soon</span>
           <span className="absolute bottom-6 left-6 md:bottom-8 md:left-8 font-mono text-[11px] md:text-xs text-black/60 group-hover:text-black uppercase tracking-[0.25em] group-hover:tracking-[0.35em] transition-all duration-500">
             Brand Identity
           </span>
         </Link>
-      </div>
-
-      {/* ============ FOOTER ============ */}
-      <div className="px-6 md:px-10">
-        <SiteFooter light={true} />
       </div>
 
       {/* Mobile Menu */}
