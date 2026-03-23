@@ -274,8 +274,8 @@ const Home = () => {
         {/* Center — Navigation */}
         <nav className="hidden md:flex items-center gap-8 pt-2">
           {/* Services dropdown */}
-          <div className="relative" onMouseEnter={() => setServicesOpen(true)} onMouseLeave={() => setServicesOpen(false)}>
-            <button onClick={() => setServicesOpen(o => !o)} className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors flex items-center gap-1 pb-2">
+          <div className="relative pb-2 -mb-2" onMouseEnter={() => setServicesOpen(true)} onMouseLeave={() => setServicesOpen(false)}>
+            <button onClick={() => setServicesOpen(o => !o)} className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors flex items-center gap-1">
               Services <ChevronDown size={12} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
             </button>
             {servicesOpen && (
