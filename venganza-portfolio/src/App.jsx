@@ -249,7 +249,7 @@ const LatestPremadeShowcase = () => {
   }, []);
 
   return (
-    <div className="flex-1 w-full flex items-center justify-center my-16 md:my-8 relative z-10 min-h-[400px]">
+    <div className="flex-1 w-full flex flex-col items-center justify-center my-16 md:my-8 relative z-10 min-h-[400px] gap-6">
       <Link to="/premades" className="showcase-img w-[300px] h-[400px] md:w-[420px] md:h-[550px] border border-black/10 bg-black/5 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center shadow-xl relative group overflow-hidden cursor-pointer hover:border-[color:var(--primary)] transition-colors duration-500">
         {loading && (
           <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs animate-pulse">Loading...</span>
@@ -268,6 +268,9 @@ const LatestPremadeShowcase = () => {
         {!loading && !latest && (
           <span className="font-mono text-[color:var(--primary)] uppercase tracking-[0.2em] text-xs opacity-50 group-hover:opacity-100 transition-opacity">Pre-made coming soon</span>
         )}
+      </Link>
+      <Link to="/premades" className="group text-[color:var(--btn-tx)] hover:text-white transition-colors uppercase tracking-[0.2em] font-mono text-[10px] sm:text-xs flex items-center gap-2 border border-[color:var(--primary)] bg-[color:var(--primary)] px-6 py-3 rounded-full hover:bg-black hover:border-black shadow-none md:shadow-[0_0_15px_rgba(123,31,36,0.3)]">
+        View All Premades <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
       </Link>
     </div>
   );
@@ -289,9 +292,9 @@ const Home = () => {
       {/* TOP TIER */}
       <div className="flex flex-col md:flex-row justify-between items-start w-full relative z-20">
         <div className="home-element max-w-3xl">
-           <h1 className="heading-font text-6xl md:text-[7rem] leading-none text-black tracking-widest mb-6">
+           <Link to="/" className="heading-font text-6xl md:text-[7rem] leading-none text-black tracking-widest mb-6 block hover:opacity-80 transition-opacity">
              Altered Venganza
-           </h1>
+           </Link>
            <div className="space-y-1 mb-8 max-w-2xl">
              <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed">
                Multi-disciplinary studio made for brands that builds.
@@ -675,9 +678,9 @@ const ArchivePage = () => {
       <div className="mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 border-b border-black/10 pb-10 w-full">
          <div className="flex flex-col items-start gap-8 w-full">
            <div className="flex justify-between items-start w-full">
-             <h1 className="heading-font text-5xl md:text-7xl text-black tracking-widest leading-none">
+             <Link to="/" className="heading-font text-5xl md:text-7xl text-black tracking-widest leading-none block hover:opacity-80 transition-opacity">
                Altered Venganza
-             </h1>
+             </Link>
              <Link to="/" className="inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest mt-2">
                 Back to Home <ArrowRight size={14} />
              </Link>
@@ -1041,9 +1044,9 @@ const PremadesPage = () => {
       {/* TOP — Same layout as Home */}
       <div className="flex flex-col md:flex-row justify-between items-start w-full relative z-20">
         <div className="premade-header max-w-3xl">
-          <h1 className="heading-font text-6xl md:text-[7rem] leading-none text-black tracking-widest mb-6">
+          <Link to="/" className="heading-font text-6xl md:text-[7rem] leading-none text-black tracking-widest mb-6 block hover:opacity-80 transition-opacity">
             Altered Venganza
-          </h1>
+          </Link>
           <div className="space-y-1 mb-8 max-w-2xl">
             <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed">
               Pre-made clothing renders &bull; Production ready files
@@ -1209,7 +1212,7 @@ const AdminGuard = () => {
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-center">
           <h1 className="heading-font text-4xl tracking-widest text-white mb-4">Admin</h1>
-          <p className="font-mono text-xs text-white/40 uppercase tracking-widest mb-8">Altered Venganza</p>
+          <Link to="/" className="font-mono text-xs text-white/40 uppercase tracking-widest mb-8 block hover:text-white/60 transition-colors">Altered Venganza</Link>
           <button
             onClick={login}
             className="bg-white text-black px-8 py-3 rounded-lg font-mono text-xs uppercase tracking-widest hover:bg-white/90 transition-colors"
