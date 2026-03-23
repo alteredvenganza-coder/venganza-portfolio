@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation, useParams } from 'reac
 import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { INSTAGRAM_DM_URL, INSTAGRAM_TOKEN, INSTAGRAM_HANDLE, PREMADE_PRICE_PREMIUM, PREMADE_PRICE_BASIC } from './config';
+import { INSTAGRAM_DM_URL, INSTAGRAM_HANDLE, PREMADE_PRICE_PREMIUM, PREMADE_PRICE_BASIC } from './config';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -209,25 +209,13 @@ const useLatestPremade = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!INSTAGRAM_TOKEN) { setLoading(false); return; }
-
     const fetchLatest = async () => {
       try {
-        let allPosts = [];
-        let url = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&limit=50&access_token=${INSTAGRAM_TOKEN}`;
+        const res = await fetch('/api/instagram-feed');
+        if (!res.ok) throw new Error('API error');
+        const { data } = await res.json();
 
-        while (url) {
-          const res = await fetch(url);
-          if (!res.ok) throw new Error('API error');
-          const data = await res.json();
-          allPosts = [...allPosts, ...(data.data || [])];
-          url = data.paging?.next || null;
-        }
-
-        const post = allPosts.find(p => {
-          const caption = (p.caption || '').toLowerCase();
-          return caption.includes('#premade') && (p.media_type === 'IMAGE' || p.media_type === 'CAROUSEL_ALBUM');
-        });
+        const post = data?.[0]; // Already filtered by #premade, first = newest
 
         if (post) {
           setLatest({
@@ -962,39 +950,15 @@ const useInstagramPremades = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log('[Premades] Token length:', INSTAGRAM_TOKEN?.length || 0);
-    console.log('[Premades] Token starts:', INSTAGRAM_TOKEN?.substring(0, 10) || 'EMPTY');
-
-    if (!INSTAGRAM_TOKEN) {
-      setError('Token not configured — check VITE_INSTAGRAM_TOKEN env var');
-      setLoading(false);
-      return;
-    }
-
     const fetchPremades = async () => {
       try {
-        // Paginated fetch to get ALL posts
-        let allPosts = [];
-        let url = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=50&access_token=${INSTAGRAM_TOKEN}`;
-
-        while (url) {
-          const res = await fetch(url);
-          if (!res.ok) throw new Error(`Instagram API error: ${res.status}`);
-          const data = await res.json();
-          allPosts = [...allPosts, ...(data.data || [])];
-          url = data.paging?.next || null;
+        // Use serverless function as proxy (token stays server-side)
+        const res = await fetch('/api/instagram-feed');
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `API error: ${res.status}`);
         }
-
-        console.log('Total posts:', allPosts.length);
-        console.log('First 3 captions:', allPosts.slice(0, 3).map(p => p.caption));
-        console.log('Posts with #premade:', allPosts.filter(p => (p.caption || '').toLowerCase().includes('#premade')).length);
-
-        // Filter posts with #premade, no date filters
-        const filtered = allPosts
-          .filter(post => {
-            const caption = (post.caption || '').toLowerCase();
-            return caption.includes('#premade') && (post.media_type === 'IMAGE' || post.media_type === 'CAROUSEL_ALBUM');
-          });
+        const { data: filtered } = await res.json();
 
         const total = filtered.length;
 
