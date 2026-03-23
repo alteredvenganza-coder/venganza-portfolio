@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation, useParams } from 'reac
 import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { STRIPE_PAYMENT_LINK, INSTAGRAM_DM_URL, INSTAGRAM_TOKEN, PREMADE_PRICE_PREMIUM, PREMADE_PRICE_BASIC } from './config';
+import { INSTAGRAM_DM_URL, INSTAGRAM_TOKEN, PREMADE_PRICE_PREMIUM, PREMADE_PRICE_BASIC } from './config';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -828,6 +828,7 @@ const PremadeModal = ({ premade, onClose, onAddToCart }) => {
 const CartSidebar = ({ cart, onRemove, onClose }) => {
   const overlayRef = useRef(null);
   const panelRef = useRef(null);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const total = cart.reduce((sum, item) => sum + item.price, 0);
 
   useEffect(() => {
@@ -841,10 +842,37 @@ const CartSidebar = ({ cart, onRemove, onClose }) => {
 
   const handleOverlayClick = (e) => { if (e.target === overlayRef.current) onClose(); };
 
-  // Build Stripe URL with all premade numbers
-  const cartRef = cart.map(item => `premade-${item.number}`).join(',');
-  const stripeUrl = `${STRIPE_PAYMENT_LINK}?client_reference_id=${encodeURIComponent(cartRef)}`;
   const dmNumbers = cart.map(item => `#${item.number}`).join(', ');
+
+  const handleCheckout = async () => {
+    setCheckoutLoading(true);
+    try {
+      const res = await fetch('/.netlify/functions/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cart.map(item => ({
+            number: item.number,
+            price: item.price,
+            type: item.type,
+            imageUrl: item.imageUrl,
+          })),
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error('Checkout error:', data.error);
+        alert('Checkout failed. Please try again or DM us on Instagram.');
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      alert('Checkout failed. Please try again or DM us on Instagram.');
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
 
   return (
     <div ref={overlayRef} onClick={handleOverlayClick} className="fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm">
@@ -886,11 +914,14 @@ const CartSidebar = ({ cart, onRemove, onClose }) => {
               <span className="text-xl font-semibold text-black">${total}</span>
             </div>
 
-            <a href={stripeUrl} target="_blank" rel="noopener noreferrer"
-               className="w-full flex items-center justify-center gap-2 bg-black text-white px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg hover:bg-[color:var(--primary)] transition-colors">
+            <button
+              onClick={handleCheckout}
+              disabled={checkoutLoading}
+              className="w-full flex items-center justify-center gap-2 bg-black text-white px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg hover:bg-[color:var(--primary)] transition-colors disabled:opacity-50 disabled:cursor-wait"
+            >
               <ExternalLink size={16} />
-              Checkout — ${total}
-            </a>
+              {checkoutLoading ? 'Processing...' : `Checkout — $${total}`}
+            </button>
             <a href={INSTAGRAM_DM_URL} target="_blank" rel="noopener noreferrer"
                className="w-full flex items-center justify-center gap-2 bg-white text-black px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg border border-black/10 hover:border-black/30 transition-all">
               <MessageCircle size={16} />
