@@ -788,7 +788,14 @@ const PremadeModal = ({ premade, onClose, onAddToCart }) => {
         <div className="p-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-mono text-sm tracking-widest uppercase text-black/50">Premade #{premade.number}</h2>
-            <span className="text-2xl font-semibold text-black">{premade.type === 'legacy' ? `€${premade.price}` : `$${premade.price}`}</span>
+            {premade.type === 'legacy' ? (
+              <span className="flex items-center gap-2">
+                <span className="text-lg text-black/30 line-through">${PREMADE_PRICE_BASIC}</span>
+                <span className="text-2xl font-semibold text-[color:var(--primary)]">${premade.price}</span>
+              </span>
+            ) : (
+              <span className="text-2xl font-semibold text-black">${premade.price}</span>
+            )}
           </div>
 
           <div className="flex flex-col gap-3">
@@ -1102,7 +1109,14 @@ const PremadesPage = () => {
                 </div>
                 <div className="mt-3 flex items-center justify-between px-1">
                   <span className={`font-mono text-[10px] tracking-widest uppercase ${premade.available ? 'text-black/40' : 'text-black/25 line-through'}`}>#{premade.number}</span>
-                  <span className={`font-mono text-xs font-semibold ${premade.available ? 'text-black' : 'text-black/25'}`}>{premade.type === 'legacy' ? `€${premade.price}` : `$${premade.price}`}</span>
+                  {premade.type === 'legacy' ? (
+                    <span className="flex items-center gap-1.5">
+                      <span className="font-mono text-[10px] text-black/30 line-through">${PREMADE_PRICE_BASIC}</span>
+                      <span className="font-mono text-xs font-semibold text-[color:var(--primary)]">${premade.price}</span>
+                    </span>
+                  ) : (
+                    <span className={`font-mono text-xs font-semibold ${premade.available ? 'text-black' : 'text-black/25'}`}>${premade.price}</span>
+                  )}
                 </div>
               </button>
               {premade.available ? (
