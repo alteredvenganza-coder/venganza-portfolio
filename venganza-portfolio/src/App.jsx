@@ -610,6 +610,15 @@ const GalleryPage = () => {
            <button className="w-full sm:w-auto bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-semibold px-8 py-3 rounded-lg font-mono text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-colors">Enter</button>
          </div>
       </div>
+
+      <div className="mt-16 flex flex-col items-center gap-3">
+        <p className="text-white/30 font-mono text-[10px] uppercase tracking-[0.3em]">
+          Curated by <Link to="/about" className="text-white/50 hover:text-white transition-colors underline underline-offset-4">Rare</Link>
+        </p>
+        <Link to="/about" className="text-white/40 hover:text-white transition-colors font-mono text-xs uppercase tracking-[0.2em]">
+          Rare???? &rarr;
+        </Link>
+      </div>
     </div>
   );
 };
