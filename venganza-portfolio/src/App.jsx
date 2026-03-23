@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation, useParams } from 'reac
 import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { INSTAGRAM_DM_URL, INSTAGRAM_TOKEN, PREMADE_PRICE_PREMIUM, PREMADE_PRICE_BASIC } from './config';
+import { INSTAGRAM_DM_URL, INSTAGRAM_TOKEN, INSTAGRAM_HANDLE, PREMADE_PRICE_PREMIUM, PREMADE_PRICE_BASIC } from './config';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -204,7 +204,7 @@ const ThemeController = () => {
 // LATEST PREMADE SHOWCASE (for Homepage)
 // ==========================================
 
-const LatestPremadeShowcase = () => {
+const useLatestPremade = () => {
   const [latest, setLatest] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -213,7 +213,6 @@ const LatestPremadeShowcase = () => {
 
     const fetchLatest = async () => {
       try {
-        // Paginated fetch to get ALL posts
         let allPosts = [];
         let url = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&limit=50&access_token=${INSTAGRAM_TOKEN}`;
 
@@ -225,7 +224,6 @@ const LatestPremadeShowcase = () => {
           url = data.paging?.next || null;
         }
 
-        // Find the most recent post with #premade (first match = newest)
         const post = allPosts.find(p => {
           const caption = (p.caption || '').toLowerCase();
           return caption.includes('#premade') && (p.media_type === 'IMAGE' || p.media_type === 'CAROUSEL_ALBUM');
@@ -248,124 +246,135 @@ const LatestPremadeShowcase = () => {
     fetchLatest();
   }, []);
 
-  return (
-    <div className="flex-1 w-full flex flex-col items-center justify-center my-16 md:my-8 relative z-10 min-h-[400px] gap-6">
-      <Link to="/premades" className="showcase-img w-[300px] h-[400px] md:w-[420px] md:h-[550px] border border-black/10 bg-black/5 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center shadow-xl relative group overflow-hidden cursor-pointer hover:border-[color:var(--primary)] transition-colors duration-500">
-        {loading && (
-          <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs animate-pulse">Loading...</span>
-        )}
-        {!loading && latest && (
-          <>
-            <img src={latest.imageUrl} alt="Latest Premade" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute bottom-6 left-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10">
-              <span className="font-mono text-[10px] text-white/70 uppercase tracking-[0.2em]">Latest Premade</span>
-              {latest.caption && <p className="font-mono text-xs text-white mt-1 truncate">{latest.caption}</p>}
-            </div>
-            <span className="absolute top-4 right-4 font-mono text-[10px] text-white/60 uppercase tracking-[0.2em] bg-black/30 backdrop-blur-sm px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">View All</span>
-          </>
-        )}
-        {!loading && !latest && (
-          <span className="font-mono text-[color:var(--primary)] uppercase tracking-[0.2em] text-xs opacity-50 group-hover:opacity-100 transition-opacity">Pre-made coming soon</span>
-        )}
-      </Link>
-      <Link to="/premades" className="group text-[color:var(--btn-tx)] hover:text-white transition-colors uppercase tracking-[0.2em] font-mono text-[10px] sm:text-xs flex items-center gap-2 border border-[color:var(--primary)] bg-[color:var(--primary)] px-6 py-3 rounded-full hover:bg-black hover:border-black shadow-none md:shadow-[0_0_15px_rgba(123,31,36,0.3)]">
-        View All Premades <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-      </Link>
-    </div>
-  );
+  return { latest, loading };
 };
 
 const Home = () => {
   const containerRef = useRef();
+  const { latest, loading: premadeLoading } = useLatestPremade();
+  const [servicesOpen, setServicesOpen] = useState(false);
+
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from('.home-element', { y: 30, opacity: 0, stagger: 0.1, duration: 1.5, ease: 'power3.out' });
-      gsap.from('.showcase-img', { scale: 0.95, opacity: 0, duration: 2, ease: 'power2.out', delay: 0.5 });
+      gsap.from('.nav-item', { y: -20, opacity: 0, stagger: 0.05, duration: 1, ease: 'power3.out' });
+      gsap.from('.hero-panel', { y: 40, opacity: 0, stagger: 0.15, duration: 1.5, ease: 'power3.out', delay: 0.3 });
     }, containerRef);
     return () => ctx.revert();
   }, []);
 
   return (
-    <div className="min-h-screen p-6 md:p-12 flex flex-col relative z-10" ref={containerRef}>
-      
-      {/* TOP TIER */}
-      <div className="flex flex-col md:flex-row justify-between items-start w-full relative z-20">
-        <div className="home-element max-w-3xl">
-           <Link to="/" className="heading-font text-6xl md:text-[7rem] leading-none text-black tracking-widest mb-6 block hover:opacity-80 transition-opacity">
-             Altered Venganza
-           </Link>
-           <div className="space-y-1 mb-8 max-w-2xl">
-             <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed">
-               Multi-disciplinary studio made for brands that builds.
-             </p>
-             <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed pt-1">
-               Premium Branding + Custom Designs &bull; Pre-mades &amp; Softwares for Fashion Designers and Creatives
-             </p>
-           </div>
-           <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex flex-wrap items-center gap-2 mb-6">
-             Trieste, Italy / by Rare Martinez
-             <Link to="/about" className="text-black/40 hover:text-black transition-colors underline underline-offset-4 md:ml-2">
-               (Who the f*ck is Rare?)
-             </Link>
-           </p>
-           <Link to="/vag" className="group text-[color:var(--btn-tx)] hover:text-white transition-colors uppercase tracking-[0.2em] font-mono text-[10px] sm:text-xs flex items-center gap-2 mt-6 inline-flex border border-[color:var(--primary)] bg-[color:var(--primary)] px-6 py-3 rounded-full hover:bg-black hover:border-black shadow-none md:shadow-[0_0_15px_rgba(123,31,36,0.3)]">
-             Shop Venganza's Art Gallery <ArrowRight size={14} className="transition-transform transform group-hover:translate-x-1" />
-           </Link>
+    <div className="min-h-screen flex flex-col relative z-10" ref={containerRef}>
+
+      {/* ============ TOP NAV BAR — ERD Style ============ */}
+      <header className="flex items-start justify-between px-6 md:px-10 pt-6 md:pt-8 pb-4 relative z-20">
+
+        {/* Left — Logo + Handle + Description (responsive: 2 lines mobile, 1 line desktop) */}
+        <div className="nav-item flex-shrink-0">
+          <Link to="/" className="heading-font leading-none text-black tracking-widest hover:opacity-70 transition-opacity block">
+            <span className="hidden lg:inline text-4xl xl:text-5xl">Altered Venganza</span>
+            <span className="lg:hidden text-3xl sm:text-4xl">Altered<br/>Venganza</span>
+          </Link>
+          <a href="https://www.instagram.com/rare______________________/" target="_blank" rel="noopener noreferrer" className="font-mono text-[8px] md:text-[9px] text-black/40 hover:text-[color:var(--primary)] uppercase tracking-[0.1em] transition-colors mt-1.5 block">
+            rare______________________
+          </a>
+          <p className="font-mono text-[8px] md:text-[9px] text-black/50 uppercase tracking-[0.1em] leading-relaxed mt-2">
+            <span className="hidden lg:inline">Multi-disciplinary studio for brands that builds. Premium Branding + Custom Designs &bull; Pre-mades &amp; Softwares for Fashion Designers and Creatives.</span>
+            <span className="lg:hidden max-w-[260px] block">Multi-disciplinary studio<br/>for brands that builds.</span>
+          </p>
         </div>
 
-        <div className="home-element flex flex-col items-start md:items-end gap-3 mt-12 md:mt-0 text-left md:text-right">
-          <Link to="/brand-identity" className="group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
-            <span className="md:order-1">Brand Identity Service</span>
-            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
-          </Link>
-          <Link to="/designs" className="group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
-            <span className="md:order-1">Clothing Design Service</span>
-            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
-          </Link>
-          <Link to="/premades" className="group text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
-            <span className="md:order-1">Premades</span>
-            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
-          </Link>
-          <Link to="/archive" className="group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
-            <span className="md:order-1">Archive</span>
-            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
-          </Link>
-          <Link to="/contact" className="group text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
-            <span className="md:order-1">Contact</span>
-            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
-          </Link>
-        </div>
-      </div>
-
-      {/* CENTER TIER — Latest Premade from Instagram */}
-      <LatestPremadeShowcase />
-
-      {/* BOTTOM TIER */}
-      <div className="flex flex-col md:flex-row justify-between items-center w-full relative z-20 gap-12 mt-auto">
-         
-         <div className="home-element flex flex-col items-center md:items-start gap-4 w-full md:w-1/3 order-3 md:order-1 text-center md:text-left">
-            <div className="flex flex-col items-center md:items-start gap-2">
-              <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.2em]">Our Software — Coming Soon</p>
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3 opacity-80 max-w-[280px] sm:max-w-none">
-                <span className="heading-font text-lg text-black tracking-widest leading-none">MAT IDEAS</span>
-                <span className="font-mono text-black/20 text-xs hidden sm:block">/</span>
-                <span className="heading-font text-lg text-black tracking-widest leading-none">MAT RENDERS</span>
-                <span className="font-mono text-black/20 text-xs hidden sm:block">/</span>
-                <span className="heading-font text-lg text-black tracking-widest leading-none">MAT TRYON</span>
+        {/* Center — Navigation */}
+        <nav className="hidden md:flex items-center gap-8 pt-2">
+          {/* Services dropdown */}
+          <div className="relative" onMouseEnter={() => setServicesOpen(true)} onMouseLeave={() => setServicesOpen(false)}>
+            <button className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors flex items-center gap-1">
+              Services
+            </button>
+            {servicesOpen && (
+              <div className="absolute top-full left-0 mt-2 bg-white border border-black/10 rounded-lg shadow-xl py-2 min-w-[200px] z-50">
+                <Link to="/brand-identity" className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">
+                  Brand Identity
+                </Link>
+                <Link to="/designs" className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">
+                  Clothing Designs
+                </Link>
               </div>
+            )}
+          </div>
+          <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">Premades</Link>
+          <Link to="/archive" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">Archive</Link>
+          <Link to="/about" className="nav-item font-mono text-[11px] text-[color:var(--primary)] hover:text-black uppercase tracking-[0.15em] transition-colors">Who the f*ck is Rare?</Link>
+        </nav>
+
+        {/* Right — Contact + Cart */}
+        <div className="flex items-center gap-6 pt-2">
+          <Link to="/contact" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden sm:block">Contact</Link>
+          <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">Cart (0)</Link>
+        </div>
+      </header>
+
+      {/* ============ MOBILE NAV ============ */}
+      <nav className="flex md:hidden items-center justify-center gap-4 flex-wrap px-6 pb-4">
+        <Link to="/brand-identity" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">Brand Identity</Link>
+        <Link to="/designs" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">Designs</Link>
+        <Link to="/premades" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">Premades</Link>
+        <Link to="/archive" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors">Archive</Link>
+        <Link to="/about" className="font-mono text-[9px] text-[color:var(--primary)] hover:text-black uppercase tracking-[0.12em] transition-colors">Who the f*ck is Rare?</Link>
+        <Link to="/contact" className="font-mono text-[9px] text-black/60 hover:text-black uppercase tracking-[0.12em] transition-colors sm:hidden">Contact</Link>
+      </nav>
+
+      {/* ============ HERO — Two panels side by side ============ */}
+      <div className="flex-1 flex flex-col md:flex-row w-full relative z-10">
+
+        {/* Left Panel — Latest Premade */}
+        <Link to="/premades" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer">
+          {premadeLoading && (
+            <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
+              <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs animate-pulse">Loading...</span>
             </div>
-         </div>
+          )}
+          {!premadeLoading && latest && (
+            <img src={latest.imageUrl} alt="Latest Premade" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+          )}
+          {!premadeLoading && !latest && (
+            <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
+              <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs">Coming Soon</span>
+            </div>
+          )}
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          {/* CTA */}
+          <span className="absolute bottom-6 left-6 md:bottom-8 md:left-8 font-mono text-[11px] md:text-xs text-white uppercase tracking-[0.25em] group-hover:tracking-[0.35em] transition-all duration-500">
+            Shop Premades
+          </span>
+        </Link>
 
-         <div className="home-element text-center w-full md:w-1/3 order-2">
-            <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.2em] leading-loose mt-4 md:mt-0">
-              &copy; {new Date().getFullYear()} Altered Venganza — All rights reserved.<br className="hidden md:block"/> VAT IT01433140322
-            </p>
-         </div>
-
-         <div className="home-element text-center md:text-right w-full md:w-1/3 order-1 md:order-3">
-         </div>
+        {/* Right Panel — TBD (placeholder) */}
+        <Link to="/brand-identity" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer bg-neutral-100">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="font-mono text-black/20 uppercase tracking-[0.2em] text-xs">Coming Soon</span>
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+          <span className="absolute bottom-6 left-6 md:bottom-8 md:left-8 font-mono text-[11px] md:text-xs text-black/60 group-hover:text-black uppercase tracking-[0.25em] group-hover:tracking-[0.35em] transition-all duration-500">
+            Brand Identity
+          </span>
+        </Link>
       </div>
+
+      {/* ============ BOTTOM BAR ============ */}
+      <footer className="flex flex-col md:flex-row items-center justify-between px-6 md:px-10 py-4 gap-3 relative z-20">
+        <p className="font-mono text-[8px] md:text-[9px] text-black/40 uppercase tracking-[0.15em]">
+          &copy; {new Date().getFullYear()} Altered Venganza — All rights reserved. VAT IT01433140322
+        </p>
+        <div className="flex items-center gap-4">
+          <a href={`https://instagram.com/${INSTAGRAM_HANDLE}`} target="_blank" rel="noopener noreferrer" className="font-mono text-[8px] md:text-[9px] text-black/40 hover:text-black uppercase tracking-[0.15em] transition-colors">
+            Instagram
+          </a>
+          <Link to="/about" className="font-mono text-[8px] md:text-[9px] text-black/40 hover:text-black uppercase tracking-[0.15em] transition-colors">
+            About
+          </Link>
+        </div>
+      </footer>
 
     </div>
   );
@@ -847,7 +856,7 @@ const CartSidebar = ({ cart, onRemove, onClose }) => {
   const handleCheckout = async () => {
     setCheckoutLoading(true);
     try {
-      const res = await fetch('/.netlify/functions/create-checkout', {
+      const res = await fetch('/api/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
