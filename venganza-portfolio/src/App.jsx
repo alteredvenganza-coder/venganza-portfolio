@@ -675,7 +675,6 @@ const GalleryPage = () => {
          </div>
       </div>
 
-      <div className="w-full max-w-2xl mt-12"><SiteFooter light={false} /></div>
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
