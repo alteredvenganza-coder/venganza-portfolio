@@ -1046,10 +1046,10 @@ const PremadesPage = () => {
           </h1>
           <div className="space-y-1 mb-8 max-w-2xl">
             <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed">
-              Pre-made clothing renders &bull; Numbered &amp; Ready to purchase
+              Pre-made clothing renders &bull; Production ready files
             </p>
             <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed pt-1">
-              Pick your favorites, add to cart, and checkout.
+              Fully alterable &amp; customizable to your brand &bull; Numbered &amp; Ready to purchase
             </p>
           </div>
           <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex flex-wrap items-center gap-2 mb-6">
