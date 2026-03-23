@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation, useParams } from 'react-router-dom';
-import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2 } from 'lucide-react';
+import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2, ChevronDown } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { INSTAGRAM_DM_URL, INSTAGRAM_HANDLE, PREMADE_PRICE_PREMIUM, PREMADE_PRICE_BASIC } from './config';
@@ -275,15 +275,15 @@ const Home = () => {
         <nav className="hidden md:flex items-center gap-8 pt-2">
           {/* Services dropdown */}
           <div className="relative" onMouseEnter={() => setServicesOpen(true)} onMouseLeave={() => setServicesOpen(false)}>
-            <button className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors flex items-center gap-1">
-              Services
+            <button onClick={() => setServicesOpen(o => !o)} className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors flex items-center gap-1 pb-2">
+              Services <ChevronDown size={12} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
             </button>
             {servicesOpen && (
-              <div className="absolute top-full left-0 mt-2 bg-white border border-black/10 rounded-lg shadow-xl py-2 min-w-[200px] z-50">
-                <Link to="/brand-identity" className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">
+              <div className="absolute top-full left-0 bg-white border border-black/10 rounded-lg shadow-xl py-2 min-w-[200px] z-50">
+                <Link to="/brand-identity" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">
                   Brand Identity
                 </Link>
-                <Link to="/designs" className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">
+                <Link to="/designs" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">
                   Clothing Designs
                 </Link>
               </div>
