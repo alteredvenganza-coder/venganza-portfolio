@@ -1281,6 +1281,7 @@ import PremadesList from './admin/pages/PremadesList';
 import PremadeEdit from './admin/pages/PremadeEdit';
 import MediaLibrary from './admin/pages/MediaLibrary';
 import AdminSettings from './admin/pages/AdminSettings';
+import ThemeEditor from './admin/pages/ThemeEditor';
 
 const AdminGuard = () => {
   const { user, loading, login } = useAuth();
@@ -1359,6 +1360,7 @@ export default function App() {
               {/* Admin routes */}
               <Route path="/admin" element={<AdminGuard />}>
                 <Route index element={<Dashboard />} />
+                <Route path="theme" element={<ThemeEditor />} />
                 <Route path="premades" element={<PremadesList />} />
                 <Route path="premades/new" element={<PremadeEdit />} />
                 <Route path="premades/edit/:filename" element={<PremadeEdit />} />

@@ -1,102 +1,79 @@
 /**
- * GitHub API client for reading/writing content to the repo.
- * Uses a Personal Access Token (fine-grained, repo scope).
+ * Admin API client — proxies through /api/admin/content
+ * No secrets exposed to the browser.
  */
 
-const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN || '';
-const REPO_OWNER = import.meta.env.VITE_GITHUB_OWNER || 'alteredvenganza-coder';
-const REPO_NAME = import.meta.env.VITE_GITHUB_REPO || 'venganza-portfolio';
-const BRANCH = 'main';
-
-const API_BASE = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}`;
-
-function headers() {
-  return {
-    Authorization: `Bearer ${GITHUB_TOKEN}`,
-    Accept: 'application/vnd.github.v3+json',
-    'Content-Type': 'application/json',
-  };
+// List files in a directory
+export async function listFiles(path) {
+  const res = await fetch(`/api/admin/content?action=list&path=${encodeURIComponent(path)}`);
+  if (!res.ok) throw new Error(`List failed: ${res.status}`);
+  return res.json();
 }
 
-async function apiCall(endpoint, options = {}) {
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers: { ...headers(), ...options.headers },
-  });
+// Get file content
+export async function getFile(path) {
+  const res = await fetch(`/api/admin/content?action=get&path=${encodeURIComponent(path)}`);
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`GitHub API ${res.status}: ${text}`);
+    if (res.status === 404) return null;
+    throw new Error(`Get failed: ${res.status}`);
   }
   return res.json();
 }
 
-// Get file content from repo
-export async function getFile(path) {
-  try {
-    const data = await apiCall(`/contents/${path}?ref=${BRANCH}`);
-    return {
-      content: atob(data.content),
-      sha: data.sha,
-    };
-  } catch (e) {
-    if (e.message.includes('404')) return null;
-    throw e;
-  }
-}
-
-// List files in a directory
-export async function listFiles(path) {
-  try {
-    const data = await apiCall(`/contents/${path}?ref=${BRANCH}`);
-    return Array.isArray(data) ? data : [];
-  } catch (e) {
-    if (e.message.includes('404')) return [];
-    throw e;
-  }
-}
-
 // Create or update a file
 export async function saveFile(path, content, message, sha = null) {
-  const body = {
-    message,
-    content: btoa(unescape(encodeURIComponent(content))),
-    branch: BRANCH,
-  };
-  if (sha) body.sha = sha;
-
-  return apiCall(`/contents/${path}`, {
-    method: 'PUT',
-    body: JSON.stringify(body),
+  const res = await fetch('/api/admin/content', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'save', path, content, message, sha }),
   });
+  if (!res.ok) throw new Error(`Save failed: ${res.status}`);
+  return res.json();
 }
 
 // Delete a file
 export async function deleteFile(path, sha, message) {
-  return apiCall(`/contents/${path}`, {
-    method: 'DELETE',
-    body: JSON.stringify({ message, sha, branch: BRANCH }),
+  const res = await fetch('/api/admin/content', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'delete', path, sha, message }),
   });
+  if (!res.ok) throw new Error(`Delete failed: ${res.status}`);
+  return res.json();
 }
 
 // Upload binary file (image) — base64 encoded
 export async function uploadImage(path, base64Content, message) {
-  let sha = null;
-  try {
-    const existing = await apiCall(`/contents/${path}?ref=${BRANCH}`);
-    sha = existing.sha;
-  } catch (e) {
-    // File doesn't exist, that's fine
-  }
-
-  const body = {
-    message,
-    content: base64Content,
-    branch: BRANCH,
-  };
-  if (sha) body.sha = sha;
-
-  return apiCall(`/contents/${path}`, {
-    method: 'PUT',
-    body: JSON.stringify(body),
+  const res = await fetch('/api/admin/content', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'upload', path, base64: base64Content, message }),
   });
+  if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+  return res.json();
+}
+
+// Trigger Vercel redeploy
+export async function triggerDeploy() {
+  const res = await fetch('/api/admin/deploy', { method: 'POST' });
+  if (!res.ok) throw new Error(`Deploy failed: ${res.status}`);
+  return res.json();
+}
+
+// Get theme config
+export async function getTheme() {
+  const res = await fetch('/api/admin/theme');
+  if (!res.ok) throw new Error(`Get theme failed: ${res.status}`);
+  return res.json();
+}
+
+// Save theme config
+export async function saveTheme(theme, sha) {
+  const res = await fetch('/api/admin/theme', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ theme, sha }),
+  });
+  if (!res.ok) throw new Error(`Save theme failed: ${res.status}`);
+  return res.json();
 }

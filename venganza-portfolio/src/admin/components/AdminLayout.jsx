@@ -1,10 +1,11 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Image, Settings, LogOut, PenTool, Layers } from 'lucide-react';
+import { LayoutDashboard, Image, Settings, LogOut, PenTool, Layers, Palette } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { useEditor } from '../lib/editor-context';
 
 const NAV = [
   { to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
+  { to: '/admin/theme', icon: Palette, label: 'Theme' },
   { to: '/admin/premades', icon: Layers, label: 'Premades' },
   { to: '/admin/media', icon: Image, label: 'Media' },
   { to: '/admin/settings', icon: Settings, label: 'Settings' },
