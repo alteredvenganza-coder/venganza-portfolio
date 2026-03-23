@@ -788,7 +788,7 @@ const PremadeModal = ({ premade, onClose, onAddToCart }) => {
         <div className="p-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-mono text-sm tracking-widest uppercase text-black/50">Premade #{premade.number}</h2>
-            <span className="text-2xl font-semibold text-black">${premade.price}</span>
+            <span className="text-2xl font-semibold text-black">{premade.type === 'legacy' ? `€${premade.price}` : `$${premade.price}`}</span>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -952,8 +952,14 @@ const useInstagramPremades = () => {
             // Detect type: look for P or B near #premade in caption
             // Matches: "#premade p", "#premade P", "p #premade", "P#premade", "#premade  p", etc.
             const isPremium = /\bp\s*#premade|#premade\s*p\b/i.test(caption);
-            const type = isPremium ? 'premium' : 'basic';
-            const price = isPremium ? PREMADE_PRICE_PREMIUM : PREMADE_PRICE_BASIC;
+
+            // Legacy discount: posts from Feb 5 2024 and older → €90
+            const postDate = new Date(post.timestamp);
+            const cutoffDate = new Date('2024-02-05');
+            const isLegacy = postDate <= cutoffDate;
+
+            const type = isLegacy ? 'legacy' : (isPremium ? 'premium' : 'basic');
+            const price = isLegacy ? 90 : (isPremium ? PREMADE_PRICE_PREMIUM : PREMADE_PRICE_BASIC);
 
             // Extract name from first line of caption (before hashtags)
             const firstLine = caption.split('\n')[0].replace(/#\w+/g, '').trim();
@@ -1072,10 +1078,16 @@ const PremadesPage = () => {
                 <div className="relative aspect-square overflow-hidden bg-black/5 border border-black/10 rounded-xl hover:border-[color:var(--primary)] transition-colors duration-500">
                   <img src={premade.imageUrl} alt={`Premade #${premade.number}`} loading="lazy" className={`w-full h-full object-cover transition-transform duration-700 ${premade.available ? 'group-hover:scale-105' : 'grayscale-[30%]'}`} />
 
-                  {/* Type badge: P = premium, B = basic */}
-                  <span className={`absolute top-3 left-3 w-7 h-7 rounded-full flex items-center justify-center font-mono text-[10px] font-bold tracking-wider z-10 ${premade.type === 'premium' ? 'bg-[color:var(--primary)] text-white shadow-[0_0_10px_rgba(123,31,36,0.4)]' : 'bg-white/80 text-black/60 backdrop-blur-sm border border-black/10'}`}>
-                    {premade.type === 'premium' ? 'P' : 'B'}
-                  </span>
+                  {/* Type badge: P = premium, B = basic, ARCHIVE = legacy */}
+                  {premade.type === 'legacy' ? (
+                    <span className="absolute top-3 left-3 px-2 py-1 rounded-full font-mono text-[8px] font-bold tracking-widest z-10 bg-black/70 text-white/90 backdrop-blur-sm uppercase">
+                      Archive
+                    </span>
+                  ) : (
+                    <span className={`absolute top-3 left-3 w-7 h-7 rounded-full flex items-center justify-center font-mono text-[10px] font-bold tracking-wider z-10 ${premade.type === 'premium' ? 'bg-[color:var(--primary)] text-white shadow-[0_0_10px_rgba(123,31,36,0.4)]' : 'bg-white/80 text-black/60 backdrop-blur-sm border border-black/10'}`}>
+                      {premade.type === 'premium' ? 'P' : 'B'}
+                    </span>
+                  )}
 
                   {/* SOLD overlay */}
                   {!premade.available ? (
@@ -1090,7 +1102,7 @@ const PremadesPage = () => {
                 </div>
                 <div className="mt-3 flex items-center justify-between px-1">
                   <span className={`font-mono text-[10px] tracking-widest uppercase ${premade.available ? 'text-black/40' : 'text-black/25 line-through'}`}>#{premade.number}</span>
-                  <span className={`font-mono text-xs font-semibold ${premade.available ? 'text-black' : 'text-black/25'}`}>${premade.price}</span>
+                  <span className={`font-mono text-xs font-semibold ${premade.available ? 'text-black' : 'text-black/25'}`}>{premade.type === 'legacy' ? `€${premade.price}` : `$${premade.price}`}</span>
                 </div>
               </button>
               {premade.available ? (
