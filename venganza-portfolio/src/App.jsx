@@ -213,14 +213,20 @@ const LatestPremadeShowcase = () => {
 
     const fetchLatest = async () => {
       try {
-        const res = await fetch(
-          `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&limit=50&access_token=${INSTAGRAM_TOKEN}`
-        );
-        if (!res.ok) throw new Error('API error');
-        const data = await res.json();
+        // Paginated fetch to get ALL posts
+        let allPosts = [];
+        let url = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&limit=50&access_token=${INSTAGRAM_TOKEN}`;
 
-        // Find the most recent post with #premade
-        const post = (data.data || []).find(p => {
+        while (url) {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error('API error');
+          const data = await res.json();
+          allPosts = [...allPosts, ...(data.data || [])];
+          url = data.paging?.next || null;
+        }
+
+        // Find the most recent post with #premade (first match = newest)
+        const post = allPosts.find(p => {
           const caption = (p.caption || '').toLowerCase();
           return caption.includes('#premade') && (p.media_type === 'IMAGE' || p.media_type === 'CAROUSEL_ALBUM');
         });
@@ -908,14 +914,24 @@ const useInstagramPremades = () => {
 
     const fetchPremades = async () => {
       try {
-        const res = await fetch(
-          `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=50&access_token=${INSTAGRAM_TOKEN}`
-        );
-        if (!res.ok) throw new Error(`Instagram API error: ${res.status}`);
-        const data = await res.json();
+        // Paginated fetch to get ALL posts
+        let allPosts = [];
+        let url = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=50&access_token=${INSTAGRAM_TOKEN}`;
 
-        // Filter posts with #premade, API returns newest first
-        const filtered = (data.data || [])
+        while (url) {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`Instagram API error: ${res.status}`);
+          const data = await res.json();
+          allPosts = [...allPosts, ...(data.data || [])];
+          url = data.paging?.next || null;
+        }
+
+        console.log('Total posts:', allPosts.length);
+        console.log('First 3 captions:', allPosts.slice(0, 3).map(p => p.caption));
+        console.log('Posts with #premade:', allPosts.filter(p => (p.caption || '').toLowerCase().includes('#premade')).length);
+
+        // Filter posts with #premade, no date filters
+        const filtered = allPosts
           .filter(post => {
             const caption = (post.caption || '').toLowerCase();
             return caption.includes('#premade') && (post.media_type === 'IMAGE' || post.media_type === 'CAROUSEL_ALBUM');
