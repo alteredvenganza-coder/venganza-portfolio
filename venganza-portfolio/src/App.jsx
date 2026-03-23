@@ -218,6 +218,7 @@ const MobileMenu = ({ onClose }) => {
         <X size={24} />
       </button>
       <nav className="flex flex-col items-center gap-6">
+        <Link to="/" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Home</Link>
         <Link to="/brand-identity" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Brand Identity</Link>
         <Link to="/designs" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Clothing Designs</Link>
         <Link to="/vag" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">VAG</Link>
@@ -237,24 +238,9 @@ const MobileMenu = ({ onClose }) => {
 const SiteFooter = ({ light = true }) => {
   const textColor = light ? 'text-black/40' : 'text-white/40';
   const hoverColor = light ? 'hover:text-black' : 'hover:text-white';
-  const borderColor = light ? 'border-black/10' : 'border-white/10';
-  const headingColor = light ? 'text-black/60' : 'text-white/60';
 
   return (
     <footer className={`w-full relative z-20 mt-auto`}>
-      {/* Services nav links */}
-      <div className={`border-t ${borderColor} pt-8 pb-4`}>
-        <p className={`font-mono text-[9px] md:text-[10px] ${headingColor} uppercase tracking-[0.2em] text-center mb-4`}>Services</p>
-        <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
-          <Link to="/brand-identity" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Brand Identity</Link>
-          <Link to="/designs" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Clothing Designs</Link>
-          <Link to="/vag" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>VAG</Link>
-          <Link to="/premades" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Premades</Link>
-          <Link to="/archive" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Archive</Link>
-          <Link to="/about" className={`font-mono text-[9px] md:text-[10px] text-[color:var(--primary)] ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Who the f*ck is Rare?</Link>
-        </nav>
-      </div>
-
       {/* Softwares */}
       <div className="py-6 text-center">
         <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5 mb-3">
