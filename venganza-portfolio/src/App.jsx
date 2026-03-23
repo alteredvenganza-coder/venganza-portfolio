@@ -398,17 +398,15 @@ const Home = () => {
           </span>
         </Link>
 
-        <Link to="/brand-identity" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer bg-neutral-100 flex items-center justify-center">
-          {theme.images?.heroRight ? (
-            <img src={theme.images.heroRight} alt="Brand Identity" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
-          ) : (
-            <span className="font-mono text-black/20 uppercase tracking-[0.2em] text-xs relative z-10">Coming Soon</span>
+        <div className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden bg-neutral-100 flex items-center justify-center">
+          {theme.images?.heroRight && (
+            <img src={theme.images.heroRight} alt="MAT Renders" className="absolute inset-0 w-full h-full object-cover" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-          <span className={`absolute bottom-6 left-6 md:bottom-8 md:left-8 font-mono text-[11px] md:text-xs uppercase tracking-[0.25em] group-hover:tracking-[0.35em] transition-all duration-500 ${theme.images?.heroRight ? 'text-white' : 'text-black/60 group-hover:text-black'}`}>
-            Brand Identity
-          </span>
-        </Link>
+          <div className="relative z-10 text-center flex flex-col items-center justify-center">
+            <h2 className="heading-font text-4xl md:text-6xl tracking-widest text-black/80">MAT RENDERS</h2>
+            <p className="font-mono text-[10px] md:text-xs text-black/40 uppercase tracking-[0.3em] mt-3">Coming Soon</p>
+          </div>
+        </div>
       </div>
 
       {/* Footer */}
