@@ -238,18 +238,40 @@ const SiteFooter = ({ light = true }) => {
   const textColor = light ? 'text-black/40' : 'text-white/40';
   const hoverColor = light ? 'hover:text-black' : 'hover:text-white';
   const borderColor = light ? 'border-black/10' : 'border-white/10';
+  const headingColor = light ? 'text-black/60' : 'text-white/60';
 
   return (
     <footer className={`w-full relative z-20 mt-auto`}>
-      {/* Nav links */}
-      <nav className={`flex flex-wrap items-center justify-center gap-4 md:gap-6 py-6 border-t ${borderColor}`}>
-        <Link to="/brand-identity" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Brand Identity</Link>
-        <Link to="/designs" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Clothing Designs</Link>
-        <Link to="/vag" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>VAG</Link>
-        <Link to="/premades" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Premades</Link>
-        <Link to="/archive" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Archive</Link>
-        <Link to="/about" className={`font-mono text-[9px] md:text-[10px] text-[color:var(--primary)] ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Who the f*ck is Rare?</Link>
-      </nav>
+      {/* Services nav links */}
+      <div className={`border-t ${borderColor} pt-8 pb-4`}>
+        <p className={`font-mono text-[9px] md:text-[10px] ${headingColor} uppercase tracking-[0.2em] text-center mb-4`}>Services</p>
+        <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+          <Link to="/brand-identity" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Brand Identity</Link>
+          <Link to="/designs" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Clothing Designs</Link>
+          <Link to="/vag" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>VAG</Link>
+          <Link to="/premades" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Premades</Link>
+          <Link to="/archive" className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Archive</Link>
+          <Link to="/about" className={`font-mono text-[9px] md:text-[10px] text-[color:var(--primary)] ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>Who the f*ck is Rare?</Link>
+        </nav>
+      </div>
+
+      {/* Softwares */}
+      <div className="py-6 text-center">
+        <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5 mb-3">
+          <span className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors cursor-pointer`}>MAT Renders</span>
+          <span className={`font-mono text-[9px] md:text-[10px] ${textColor} uppercase tracking-[0.15em]`}>&bull;</span>
+          <span className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors cursor-pointer`}>MAT Ideas</span>
+          <span className={`font-mono text-[9px] md:text-[10px] ${textColor} uppercase tracking-[0.15em]`}>&bull;</span>
+          <span className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors cursor-pointer`}>MAT Try On</span>
+          <span className={`font-mono text-[9px] md:text-[10px] ${textColor} uppercase tracking-[0.15em]`}>&bull;</span>
+          <span className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors cursor-pointer`}>MAT Drop</span>
+        </div>
+        <p className={`font-mono text-[8px] md:text-[9px] ${textColor} uppercase tracking-[0.2em] mb-2`}>Coming Soon</p>
+        <Link to="/about" className={`font-mono text-[8px] md:text-[9px] text-[color:var(--primary)] ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>
+          What is Materializing Ideas?
+        </Link>
+      </div>
+
       {/* Copyright */}
       <p className={`font-mono text-[8px] md:text-[9px] ${textColor} uppercase tracking-[0.15em] text-center pb-6`}>
         &copy; 2026 Altered Venganza. VAT IT01433140322 — All rights reserved.
@@ -444,6 +466,7 @@ const ServiceItem = ({ title, subtitle, price, delivery }) => {
 
 const ServicePage = ({ title, services }) => {
   const containerRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     ScrollTrigger.refresh();
@@ -460,9 +483,12 @@ const ServicePage = ({ title, services }) => {
     <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center" ref={containerRef}>
        
        <div className="w-full max-w-2xl flex justify-between items-start mb-12 header-element relative">
-          <Link to="/" className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest mt-2 absolute right-0">
+          <Link to="/" className="hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest mt-2 absolute right-0">
             Back to Home <ArrowRight size={14} />
           </Link>
+          <button onClick={() => setMenuOpen(true)} className="md:hidden absolute right-0 mt-1 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+            <Menu size={24} />
+          </button>
        </div>
 
        {/* Logo Block Restored */}
@@ -501,6 +527,8 @@ const ServicePage = ({ title, services }) => {
             Includes: 2 rounds of revisions. Additional revisions are available at 20% of the project total per revision.
           </p>
        </div>
+       <div className="w-full max-w-2xl"><SiteFooter light={false} /></div>
+       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
 };
@@ -509,6 +537,7 @@ const ServiceDetail = () => {
   const { id } = useParams();
   const service = allData.find(s => s.title === decodeURIComponent(id));
   const containerRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -524,8 +553,11 @@ const ServiceDetail = () => {
     <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center w-full" ref={containerRef}>
        
        <div className="w-full max-w-[480px] flex justify-between items-start mb-8 header-element relative">
-          <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest mt-2 absolute right-0">
+          <button onClick={() => window.history.back()} className="hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest mt-2 absolute right-0">
             Back <ArrowRight size={14} />
+          </button>
+          <button onClick={() => setMenuOpen(true)} className="md:hidden absolute right-0 mt-1 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+            <Menu size={24} />
           </button>
        </div>
 
@@ -597,6 +629,8 @@ const ServiceDetail = () => {
              <Instagram size={14} /> Book this service
           </a>
       </div>
+      <div className="w-full max-w-[480px]"><SiteFooter light={false} /></div>
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
 };
@@ -606,26 +640,36 @@ const ServiceDetail = () => {
 // ==========================================
 
 const AboutPage = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-center relative z-10 px-6">
-      <Link to="/" className="absolute top-10 right-10 inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-sm font-mono uppercase tracking-widest">
+      <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-sm font-mono uppercase tracking-widest">
           Back to Home <ArrowRight size={16} />
       </Link>
+      <button onClick={() => setMenuOpen(true)} className="absolute top-6 right-6 md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
+        <Menu size={24} />
+      </button>
       <h1 className="heading-font text-6xl md:text-[8rem] text-black mb-8 leading-none mt-20">Who the f*ck is Rare?</h1>
-      <p className="max-w-xl text-black/60 font-mono leading-relaxed">
+      <p className="max-w-xl text-black/60 font-mono leading-relaxed mb-12">
         Placeholder for brand manifesto, history, or creator biography. <br/><br/>
         More content coming soon.
       </p>
+      <div className="w-full max-w-2xl mt-auto"><SiteFooter light={true} /></div>
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
 };
 
 const GalleryPage = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-center relative z-10 px-6">
-      <Link to="/" className="absolute top-10 right-10 inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
+      <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
           Back to Home <ArrowRight size={16} />
       </Link>
+      <button onClick={() => setMenuOpen(true)} className="absolute top-6 right-6 md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+        <Menu size={24} />
+      </button>
       <h1 className="heading-font text-5xl md:text-[6rem] text-white mb-4 leading-none mt-20">Venganza's Art Gallery</h1>
       <p className="text-white/30 font-mono text-[10px] uppercase tracking-[0.3em] mb-12">
         Curated by Rare
@@ -639,16 +683,22 @@ const GalleryPage = () => {
          </div>
       </div>
 
+      <div className="w-full max-w-2xl mt-12"><SiteFooter light={false} /></div>
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
 };
 
 const ContactPage = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative z-10 px-6 py-20">
-      <Link to="/" className="absolute top-10 right-10 inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
+      <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
           Back to Home <ArrowRight size={16} />
       </Link>
+      <button onClick={() => setMenuOpen(true)} className="absolute top-6 right-6 md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+        <Menu size={24} />
+      </button>
       
       <div className="max-w-2xl w-full flex flex-col items-center">
          <h1 className="heading-font text-5xl md:text-[6rem] text-white mb-4 leading-none text-center">Contact</h1>
@@ -681,6 +731,8 @@ const ContactPage = () => {
             </button>
          </form>
       </div>
+      <div className="w-full max-w-2xl mt-12"><SiteFooter light={false} /></div>
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
 };
@@ -691,6 +743,7 @@ const ContactPage = () => {
 
 const ArchivePage = () => {
   const [path, setPath] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false);
   
   const years = ['2026', '2025', '2024', '2023', '2022', '2021', '2020'];
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -721,9 +774,12 @@ const ArchivePage = () => {
              <Link to="/" className="heading-font text-5xl md:text-7xl text-black tracking-widest leading-none block hover:opacity-80 transition-opacity">
                Altered Venganza
              </Link>
-             <Link to="/" className="inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest mt-2">
+             <Link to="/" className="hidden md:inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest mt-2">
                 Back to Home <ArrowRight size={14} />
              </Link>
+             <button onClick={() => setMenuOpen(true)} className="md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
+               <Menu size={24} />
+             </button>
            </div>
            <h2 className="font-mono text-sm text-black/60 uppercase tracking-[0.2em] mt-4">Client Archive</h2>
          </div>
@@ -792,6 +848,7 @@ const ArchivePage = () => {
         <SiteFooter light={true} />
       </div>
 
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
 }
@@ -1060,6 +1117,7 @@ const PremadesPage = () => {
   const [selected, setSelected] = useState(null);
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const containerRef = useRef(null);
 
   const addToCart = (premade) => {
@@ -1110,10 +1168,13 @@ const PremadesPage = () => {
         </div>
 
         <div className="premade-header flex flex-col items-start md:items-end gap-3 mt-8 md:mt-0 text-left md:text-right">
-          <Link to="/" className="group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3">
-            <span className="md:order-1">Back to Home</span>
-            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 md:-translate-x-4 group-hover:translate-x-0 md:group-hover:-translate-x-2 md:order-2" />
+          <Link to="/" className="hidden md:flex group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs items-center gap-3">
+            <span>Back to Home</span>
+            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:-translate-x-2" />
           </Link>
+          <button onClick={() => setMenuOpen(true)} className="md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
+            <Menu size={24} />
+          </button>
           <button
             onClick={() => setCartOpen(true)}
             className="group text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3"
@@ -1224,6 +1285,8 @@ const PremadesPage = () => {
       {selected && <PremadeModal premade={selected} onClose={() => setSelected(null)} onAddToCart={addToCart} />}
       {/* Cart Sidebar */}
       {cartOpen && <CartSidebar cart={cart} onRemove={removeFromCart} onClose={() => setCartOpen(false)} />}
+      {/* Mobile Menu */}
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
 };
