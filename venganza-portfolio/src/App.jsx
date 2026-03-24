@@ -750,13 +750,7 @@ const AboutPage = () => {
 
       {/* Content */}
       <div className="relative z-10 max-w-xl">
-        <p className="slide-up-1 text-black/50 font-mono text-xs leading-relaxed uppercase tracking-[0.15em] mb-6">
-          Placeholder for brand manifesto,<br />history, or creator biography.
-        </p>
-        <p className="slide-up-2 text-black/30 font-mono text-[10px] uppercase tracking-[0.25em] mb-10">
-          More content coming soon.
-        </p>
-        <div className="slide-up-3 flex items-center justify-center gap-3">
+        <div className="slide-up-1 flex items-center justify-center gap-3">
           <span className="w-8 h-px bg-black/20" />
           <span className="font-mono text-[9px] text-black/25 uppercase tracking-[0.3em]">Altered Venganza</span>
           <span className="w-8 h-px bg-black/20" />
