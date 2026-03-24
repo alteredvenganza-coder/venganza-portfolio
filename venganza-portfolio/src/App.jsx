@@ -469,6 +469,7 @@ const ServiceItem = ({ title, subtitle, price, delivery }) => {
 const ServicePage = ({ title, services }) => {
   const containerRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const theme = useTheme();
   const location = useLocation();
   const isTailored = decodeURIComponent(location.pathname).includes('Tailored');
@@ -484,41 +485,51 @@ const ServicePage = ({ title, services }) => {
     return () => ctx.revert();
   }, [title]);
 
+  const hasLogo = theme.images?.logo && !logoError;
+
   return (
     <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center" ref={containerRef}>
 
-       {/* Fixed header: logo left, nav/burger right */}
-       <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-10 py-4">
+       {/* Fixed header: logo/brand left, nav/burger right */}
+       <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-10 py-4 bg-[color:var(--bg-color)]/80 backdrop-blur-sm">
          <Link to="/" className="opacity-80 hover:opacity-100 transition-opacity">
-           {theme.images?.logo ? (
+           {hasLogo ? (
              <img
                src={theme.images.logo}
                alt="Altered Venganza"
+               onError={() => setLogoError(true)}
                className={`h-7 md:h-8 w-auto object-contain${isTailored ? '' : ' invert'}`}
              />
            ) : (
-             <span className="heading-font text-2xl tracking-widest text-[color:var(--primary)]">AV</span>
+             <span className={`heading-font text-xl tracking-widest${isTailored ? ' text-black' : ' text-white'}`}>Altered Venganza</span>
            )}
          </Link>
          <div className="flex items-center gap-4">
-           <Link to="/" className="hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest">
+           <Link to="/" className={`hidden md:inline-flex items-center gap-2 transition-colors text-[10px] font-mono uppercase tracking-widest${isTailored ? ' text-black/50 hover:text-black' : ' text-white/50 hover:text-white'}`}>
              Back to Home <ArrowRight size={14} />
            </Link>
-           <button onClick={() => setMenuOpen(true)} className="md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+           <button onClick={() => setMenuOpen(true)} className={`md:hidden w-10 h-10 flex items-center justify-center transition-colors${isTailored ? ' text-black/70 hover:text-black' : ' text-white/70 hover:text-white'}`}>
              <Menu size={24} />
            </button>
          </div>
        </header>
 
-       {/* Logo Block — central decorative logo */}
-       <div className="relative mb-20 flex justify-center w-full max-w-lg header-element">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full lg:translate-x-[-120%] pr-4">
-             <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
-                2026 PRICING
-             </span>
-          </div>
-          <img src={theme.images?.logo || '/logo.png'} className={`w-[200px] md:w-[280px] object-contain opacity-90 mx-auto${isTailored ? '' : ' filter invert'}`} alt="Alter Logo" />
-       </div>
+       {/* Decorative logo block — only shown when logo image exists */}
+       {hasLogo && (
+         <div className="relative mb-20 flex justify-center w-full max-w-lg header-element">
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full lg:translate-x-[-120%] pr-4">
+               <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
+                  2026 PRICING
+               </span>
+            </div>
+            <img
+               src={theme.images.logo}
+               onError={() => setLogoError(true)}
+               className={`w-[200px] md:w-[280px] object-contain opacity-90 mx-auto${isTailored ? '' : ' filter invert'}`}
+               alt="Alter Logo"
+            />
+         </div>
+       )}
 
        <div className="header-element mb-16 text-center w-full max-w-2xl">
           <p className="text-white/80 font-mono text-xs uppercase tracking-[0.2em] mb-6">{title}</p>
@@ -557,6 +568,7 @@ const ServiceDetail = () => {
   const service = allData.find(s => s.title === decodeURIComponent(id));
   const containerRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const theme = useTheme();
   const location = useLocation();
   const isTailored = decodeURIComponent(location.pathname).includes('Tailored');
@@ -571,41 +583,51 @@ const ServiceDetail = () => {
 
   if (!service) return <div className="min-h-screen text-center text-white py-32 font-mono">Service not found.</div>;
 
+  const hasLogo = theme.images?.logo && !logoError;
+
   return (
     <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center w-full" ref={containerRef}>
 
-       {/* Fixed header: logo left, nav/burger right */}
-       <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-10 py-4">
+       {/* Fixed header: brand/logo left, back/burger right */}
+       <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-10 py-4 bg-[color:var(--bg-color)]/80 backdrop-blur-sm">
          <Link to="/" className="opacity-80 hover:opacity-100 transition-opacity">
-           {theme.images?.logo ? (
+           {hasLogo ? (
              <img
                src={theme.images.logo}
                alt="Altered Venganza"
+               onError={() => setLogoError(true)}
                className={`h-7 md:h-8 w-auto object-contain${isTailored ? '' : ' invert'}`}
              />
            ) : (
-             <span className="heading-font text-2xl tracking-widest text-[color:var(--primary)]">AV</span>
+             <span className={`heading-font text-xl tracking-widest${isTailored ? ' text-black' : ' text-white'}`}>Altered Venganza</span>
            )}
          </Link>
          <div className="flex items-center gap-4">
-           <button onClick={() => window.history.back()} className="hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest">
+           <button onClick={() => window.history.back()} className={`hidden md:inline-flex items-center gap-2 transition-colors text-[10px] font-mono uppercase tracking-widest${isTailored ? ' text-black/50 hover:text-black' : ' text-white/50 hover:text-white'}`}>
              Back <ArrowRight size={14} />
            </button>
-           <button onClick={() => setMenuOpen(true)} className="md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+           <button onClick={() => setMenuOpen(true)} className={`md:hidden w-10 h-10 flex items-center justify-center transition-colors${isTailored ? ' text-black/70 hover:text-black' : ' text-white/70 hover:text-white'}`}>
              <Menu size={24} />
            </button>
          </div>
        </header>
 
-       {/* Logo Block — central decorative logo */}
-       <div className="relative mb-20 flex justify-center w-full max-w-[480px] header-element">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-4 md:-translate-x-[110%]">
-             <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
-                2026 PRICING
-             </span>
-          </div>
-          <img src={theme.images?.logo || '/logo.png'} className={`w-[200px] md:w-[260px] object-contain opacity-90 mx-auto${isTailored ? '' : ' filter invert'}`} alt="Alter Logo" />
-       </div>
+       {/* Decorative logo block — only shown when logo image exists */}
+       {hasLogo && (
+         <div className="relative mb-20 flex justify-center w-full max-w-[480px] header-element">
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-4 md:-translate-x-[110%]">
+               <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
+                  2026 PRICING
+               </span>
+            </div>
+            <img
+               src={theme.images.logo}
+               onError={() => setLogoError(true)}
+               className={`w-[200px] md:w-[260px] object-contain opacity-90 mx-auto${isTailored ? '' : ' filter invert'}`}
+               alt="Alter Logo"
+            />
+         </div>
+       )}
       
       <div className="header-element mb-16 w-full max-w-[480px] text-left">
         <h1 className="serif-heading text-5xl md:text-6xl text-white mb-2 leading-none">{service.title}</h1>
