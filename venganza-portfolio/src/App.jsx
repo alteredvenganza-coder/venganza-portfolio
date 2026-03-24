@@ -144,11 +144,13 @@ const AnimatedBackground = () => {
   }, [location.pathname]);
 
   const path = location.pathname;
+  const decoded = decodeURIComponent(path);
   const isLightMode = path === '/' || path === '/archive';
+  const isTailored = decoded.includes('Tailored');
 
   return (
     <div ref={bgRef} className="fixed inset-0 pointer-events-none z-[0] overflow-hidden">
-      {!isLightMode && (
+      {!isLightMode && !isTailored && (
         <svg className="noise-overlay" xmlns="http://www.w3.org/2000/svg">
           <filter id="noiseFilter" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
             <feTurbulence
@@ -165,7 +167,7 @@ const AnimatedBackground = () => {
           <rect width="100%" height="100%" filter="url(#noiseFilter)" />
         </svg>
       )}
-      {!isLightMode ? (
+      {(!isLightMode || isTailored) ? (
         <>
           <div className="glow-wrapper glow-orb-wrapper-1" style={{ pointerEvents: 'none' }}><div className="glow-orb-1"></div></div>
           <div className="glow-wrapper glow-orb-wrapper-2" style={{ pointerEvents: 'none' }}><div className="glow-orb-2"></div></div>
@@ -183,13 +185,22 @@ const AnimatedBackground = () => {
 const ThemeController = () => {
   const location = useLocation();
   useEffect(() => {
-    document.body.classList.remove('theme-red', 'theme-light', 'theme-dark');
+    document.body.classList.remove('theme-red', 'theme-light', 'theme-dark', 'theme-tailored');
     const path = location.pathname;
-    
-    if (path === '/' || path === '/archive' || path === '/about' || path === '/premades') {
+    const decoded = decodeURIComponent(path);
+
+    if (path === '/' || path === '/archive' || path === '/about' || path === '/premades' || path === '/materializing-ideas') {
       document.body.classList.add('theme-light');
-    } else if (path === '/designs' || decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Premade') || decodeURIComponent(path).includes('Techpack')) {
+    } else if (decoded.includes('Tailored')) {
+      document.body.classList.add('theme-tailored');
+    } else if (path === '/designs' || decoded.includes('E-commerce') || decoded.includes('Premade') || decoded.includes('Techpack')) {
       document.body.classList.add('theme-dark');
+    } else if (decoded.includes('/order')) {
+      if (decoded.includes('E-commerce') || decoded.includes('Techpack')) {
+        document.body.classList.add('theme-dark');
+      } else {
+        document.body.classList.add('theme-red');
+      }
     } else {
       document.body.classList.add('theme-red');
     }
@@ -459,6 +470,8 @@ const ServicePage = ({ title, services }) => {
   const containerRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const theme = useTheme();
+  const location = useLocation();
+  const isTailored = decodeURIComponent(location.pathname).includes('Tailored');
 
   useEffect(() => {
     ScrollTrigger.refresh();
@@ -473,24 +486,38 @@ const ServicePage = ({ title, services }) => {
 
   return (
     <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center" ref={containerRef}>
-       
-       <div className="w-full max-w-2xl flex justify-between items-start mb-12 header-element relative">
-          <Link to="/" className="hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest mt-2 absolute right-0">
-            Back to Home <ArrowRight size={14} />
-          </Link>
-          <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
-            <Menu size={24} />
-          </button>
-       </div>
 
-       {/* Logo Block Restored */}
+       {/* Fixed header: logo left, nav/burger right */}
+       <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-10 py-4">
+         <Link to="/" className="opacity-80 hover:opacity-100 transition-opacity">
+           {theme.images?.logo ? (
+             <img
+               src={theme.images.logo}
+               alt="Altered Venganza"
+               className={`h-7 md:h-8 w-auto object-contain${isTailored ? '' : ' invert'}`}
+             />
+           ) : (
+             <span className="heading-font text-2xl tracking-widest text-[color:var(--primary)]">AV</span>
+           )}
+         </Link>
+         <div className="flex items-center gap-4">
+           <Link to="/" className="hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest">
+             Back to Home <ArrowRight size={14} />
+           </Link>
+           <button onClick={() => setMenuOpen(true)} className="md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+             <Menu size={24} />
+           </button>
+         </div>
+       </header>
+
+       {/* Logo Block — central decorative logo */}
        <div className="relative mb-20 flex justify-center w-full max-w-lg header-element">
           <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full lg:translate-x-[-120%] pr-4">
              <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
                 2026 PRICING
              </span>
           </div>
-          <img src={theme.images?.logo || '/logo.png'} className="w-[200px] md:w-[280px] object-contain filter invert opacity-90 mx-auto" alt="Alter Logo" />
+          <img src={theme.images?.logo || '/logo.png'} className={`w-[200px] md:w-[280px] object-contain opacity-90 mx-auto${isTailored ? '' : ' filter invert'}`} alt="Alter Logo" />
        </div>
 
        <div className="header-element mb-16 text-center w-full max-w-2xl">
@@ -531,6 +558,8 @@ const ServiceDetail = () => {
   const containerRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const theme = useTheme();
+  const location = useLocation();
+  const isTailored = decodeURIComponent(location.pathname).includes('Tailored');
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -544,24 +573,38 @@ const ServiceDetail = () => {
 
   return (
     <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center w-full" ref={containerRef}>
-       
-       <div className="w-full max-w-[480px] flex justify-between items-start mb-8 header-element relative">
-          <button onClick={() => window.history.back()} className="hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest mt-2 absolute right-0">
-            Back <ArrowRight size={14} />
-          </button>
-          <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
-            <Menu size={24} />
-          </button>
-       </div>
 
-       {/* Logo Block Restored */}
+       {/* Fixed header: logo left, nav/burger right */}
+       <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-10 py-4">
+         <Link to="/" className="opacity-80 hover:opacity-100 transition-opacity">
+           {theme.images?.logo ? (
+             <img
+               src={theme.images.logo}
+               alt="Altered Venganza"
+               className={`h-7 md:h-8 w-auto object-contain${isTailored ? '' : ' invert'}`}
+             />
+           ) : (
+             <span className="heading-font text-2xl tracking-widest text-[color:var(--primary)]">AV</span>
+           )}
+         </Link>
+         <div className="flex items-center gap-4">
+           <button onClick={() => window.history.back()} className="hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest">
+             Back <ArrowRight size={14} />
+           </button>
+           <button onClick={() => setMenuOpen(true)} className="md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
+             <Menu size={24} />
+           </button>
+         </div>
+       </header>
+
+       {/* Logo Block — central decorative logo */}
        <div className="relative mb-20 flex justify-center w-full max-w-[480px] header-element">
           <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-4 md:-translate-x-[110%]">
              <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
                 2026 PRICING
              </span>
           </div>
-          <img src={theme.images?.logo || '/logo.png'} className="w-[200px] md:w-[260px] object-contain filter invert opacity-90 mx-auto" alt="Alter Logo" />
+          <img src={theme.images?.logo || '/logo.png'} className={`w-[200px] md:w-[260px] object-contain opacity-90 mx-auto${isTailored ? '' : ' filter invert'}`} alt="Alter Logo" />
        </div>
       
       <div className="header-element mb-16 w-full max-w-[480px] text-left">
@@ -622,7 +665,7 @@ const ServiceDetail = () => {
              <Instagram size={14} /> Book this service
           </a>
       </div>
-      <div className="w-full max-w-[480px]"><SiteFooter light={false} /></div>
+      <div className="w-full max-w-[480px]"><SiteFooter light={isTailored} /></div>
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
