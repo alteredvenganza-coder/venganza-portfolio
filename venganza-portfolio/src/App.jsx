@@ -712,13 +712,39 @@ const AboutPage = () => {
           0% { top: -10%; }
           100% { top: 110%; }
         }
+        @keyframes orbDrift1 {
+          0%,100% { transform: translate(0px, 0px) scale(1); }
+          25% { transform: translate(80px, -60px) scale(1.08); }
+          50% { transform: translate(-50px, 80px) scale(0.95); }
+          75% { transform: translate(60px, 40px) scale(1.04); }
+        }
+        @keyframes orbDrift2 {
+          0%,100% { transform: translate(0px, 0px) scale(1); }
+          30% { transform: translate(-90px, 50px) scale(1.1); }
+          60% { transform: translate(70px, -80px) scale(0.92); }
+          80% { transform: translate(-40px, -30px) scale(1.06); }
+        }
+        @keyframes orbDrift3 {
+          0%,100% { transform: translate(0px, 0px) scale(1); }
+          20% { transform: translate(60px, 90px) scale(0.96); }
+          55% { transform: translate(-80px, -40px) scale(1.12); }
+          80% { transform: translate(40px, -70px) scale(0.98); }
+        }
         .about-title { animation: flicker 6s infinite; }
         .float-a { animation: floatA 7s ease-in-out infinite; }
         .float-b { animation: floatB 9s ease-in-out infinite; }
         .slide-up-1 { animation: slideUp 0.7s ease forwards; animation-delay: 1.8s; opacity: 0; }
         .slide-up-2 { animation: slideUp 0.7s ease forwards; animation-delay: 2.2s; opacity: 0; }
         .slide-up-3 { animation: slideUp 0.7s ease forwards; animation-delay: 2.6s; opacity: 0; }
+        .about-orb-1 { animation: orbDrift1 12s ease-in-out infinite; }
+        .about-orb-2 { animation: orbDrift2 16s ease-in-out infinite; }
+        .about-orb-3 { animation: orbDrift3 20s ease-in-out infinite; }
       `}</style>
+
+      {/* Red gradient orbs */}
+      <div className="about-orb-1 pointer-events-none fixed" style={{ top: '10%', left: '20%', width: '70vw', height: '70vw', maxWidth: 800, maxHeight: 800, borderRadius: '50%', background: 'radial-gradient(circle at center, rgba(123,31,36,0.22) 0%, transparent 65%)', filter: 'blur(90px)', zIndex: 0 }} />
+      <div className="about-orb-2 pointer-events-none fixed" style={{ top: '40%', right: '10%', width: '55vw', height: '55vw', maxWidth: 650, maxHeight: 650, borderRadius: '50%', background: 'radial-gradient(circle at center, rgba(123,31,36,0.18) 0%, transparent 60%)', filter: 'blur(100px)', zIndex: 0 }} />
+      <div className="about-orb-3 pointer-events-none fixed" style={{ bottom: '5%', left: '5%', width: '60vw', height: '60vw', maxWidth: 700, maxHeight: 700, borderRadius: '50%', background: 'radial-gradient(circle at center, rgba(123,31,36,0.14) 0%, transparent 65%)', filter: 'blur(110px)', zIndex: 0 }} />
 
       {/* Grain overlay */}
       <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.04]"
