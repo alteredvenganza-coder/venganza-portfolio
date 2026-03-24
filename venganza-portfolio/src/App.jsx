@@ -548,7 +548,6 @@ const ServiceItem = ({ title, subtitle, price, delivery, linkTo }) => {
 const ServicePage = ({ title, services }) => {
   const containerRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [logoError, setLogoError] = useState(false);
   const theme = useTheme();
   const location = useLocation();
   const isTailored = decodeURIComponent(location.pathname).includes('Tailored');
@@ -563,8 +562,6 @@ const ServicePage = ({ title, services }) => {
     }, containerRef);
     return () => ctx.revert();
   }, [title]);
-
-  const hasLogo = theme.images?.logo && !logoError;
 
   return (
     <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center" ref={containerRef}>
@@ -650,8 +647,6 @@ const ServiceDetail = () => {
   }, [id]);
 
   if (!service) return <div className="min-h-screen text-center text-white py-32 font-mono">Service not found.</div>;
-
-  const hasLogo = theme.images?.logo && !logoError;
 
   return (
     <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center w-full" ref={containerRef}>
