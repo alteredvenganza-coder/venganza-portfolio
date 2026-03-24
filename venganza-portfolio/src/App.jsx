@@ -186,7 +186,7 @@ const ThemeController = () => {
     document.body.classList.remove('theme-red', 'theme-light', 'theme-dark');
     const path = location.pathname;
     
-    if (path === '/' || path === '/archive' || path === '/about' || path === '/premades') {
+    if (path === '/' || path === '/archive' || path === '/about' || path === '/premades' || path === '/materializing-ideas') {
       document.body.classList.add('theme-light');
     } else if (path === '/designs' || decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Premade') || decodeURIComponent(path).includes('Techpack')) {
       document.body.classList.add('theme-dark');
@@ -254,7 +254,7 @@ const SiteFooter = ({ light = true }) => {
           <span className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors cursor-pointer`}>MAT Drop</span>
         </div>
         <p className={`font-mono text-[8px] md:text-[9px] ${textColor} uppercase tracking-[0.2em] mb-2`}>Coming Soon</p>
-        <Link to="/about" className={`font-mono text-[8px] md:text-[9px] text-[color:var(--primary)] ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>
+        <Link to="/materializing-ideas" className={`font-mono text-[8px] md:text-[9px] text-[color:var(--primary)] ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>
           What is Materializing Ideas?
         </Link>
       </div>
@@ -649,6 +649,61 @@ const AboutPage = () => {
         More content coming soon.
       </p>
       <div className="w-full max-w-2xl mt-auto"><SiteFooter light={true} /></div>
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
+    </div>
+  );
+};
+
+const MaterializingIdeasPage = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const products = [
+    { name: 'MAT Renders', tag: 'AI Renders', desc: 'Pre-made & custom AI clothing renders. Production-ready files, fully alterable to your brand.' },
+    { name: 'MAT Ideas', tag: 'Creative Canvas', desc: 'A system to develop and visualize your creative direction before spending a single dollar on production.' },
+    { name: 'MAT Try On', tag: 'Virtual Fitting', desc: 'See how your designs look on real body proportions — no photoshoot needed.' },
+    { name: 'MAT Drop', tag: 'Drop System', desc: 'Tools and templates to plan, build, and execute a clothing drop from concept to launch.' },
+  ];
+  return (
+    <div className="min-h-screen flex flex-col relative z-10 px-6 py-16 md:py-24 max-w-4xl mx-auto w-full">
+      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
+        <Menu size={24} />
+      </button>
+      <Link to="/" className="hidden md:inline-flex self-end items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest mb-12">
+        Back to Home <ArrowRight size={14} />
+      </Link>
+
+      {/* Hero */}
+      <div className="mb-16">
+        <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[color:var(--primary)] mb-4">Materializing Ideas</p>
+        <h1 className="heading-font text-[3rem] md:text-[6rem] text-black leading-none mb-8">
+          Creative Canvas<br />System
+        </h1>
+        <p className="font-mono text-sm text-black/60 uppercase tracking-[0.15em] max-w-lg leading-relaxed">
+          Tools for fashion creators — AI renders · flat templates · design tools.<br />
+          <span className="text-black font-semibold">Made for doers, not dreamers.</span>
+        </p>
+      </div>
+
+      {/* Divider */}
+      <div className="w-full h-px bg-black/10 mb-16" />
+
+      {/* Products */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
+        {products.map((p) => (
+          <div key={p.name} className="border border-black/10 rounded-2xl p-6 hover:border-[color:var(--primary)] transition-colors duration-300">
+            <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-[color:var(--primary)] mb-2">{p.tag}</p>
+            <h2 className="heading-font text-2xl text-black mb-3">{p.name}</h2>
+            <p className="font-mono text-[11px] text-black/50 leading-relaxed uppercase tracking-[0.05em]">{p.desc}</p>
+            <p className="font-mono text-[9px] text-black/25 uppercase tracking-[0.2em] mt-4">Coming Soon</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer note */}
+      <p className="font-mono text-[10px] text-black/30 uppercase tracking-[0.2em] text-center">
+        A sub-brand of Altered Venganza — <Link to="/about" className="text-[color:var(--primary)] hover:text-black transition-colors">Who the f*ck is Rare?</Link>
+      </p>
+
+      <div className="mt-12"><SiteFooter light={true} /></div>
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
@@ -1362,6 +1417,7 @@ export default function App() {
               {/* Public routes */}
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<AboutPage />} />
+              <Route path="/materializing-ideas" element={<MaterializingIdeasPage />} />
               <Route path="/vag" element={<GalleryPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/archive" element={<ArchivePage />} />
