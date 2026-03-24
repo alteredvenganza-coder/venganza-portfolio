@@ -79,15 +79,35 @@ const designsData = [
     subtitle: "Based on your references",
     price: "EUR €190 – €350",
     delivery: "3 to 7 days",
-    features: [
-      "Personal or commercial use",
-      "PNG/JPG/PSD/PDF",
-      "Free mockup",
-      "High resolution 300 ppi",
-      "Size Chart if required",
-      "Factory contact based in Portugal with MOQ of 50 pcs"
-    ],
-    layout: "bullets"
+    layout: "options",
+    options: [
+      {
+        price: "Basic — €190",
+        delivery: "(3-4 days)",
+        features: [
+          "1 custom graphic based on your references",
+          "Personal or commercial use",
+          "PNG/JPG/PDF",
+          "Free mockup",
+          "High resolution 300 ppi",
+          "1 revision round"
+        ]
+      },
+      {
+        price: "Premium — €350",
+        delivery: "(5-7 days)",
+        features: [
+          "Up to 3 custom graphics based on your references",
+          "Personal or commercial use",
+          "PNG/JPG/PSD/PDF",
+          "Free mockup",
+          "High resolution 300 ppi",
+          "Size Chart if required",
+          "Factory contact based in Portugal with MOQ of 50 pcs",
+          "2 revision rounds"
+        ]
+      }
+    ]
   },
   {
     title: "E-commerce Visual Asset",
@@ -216,11 +236,11 @@ const ThemeController = () => {
     
     if (path === '/' || path === '/archive' || path === '/about' || path === '/premades' || path === '/materializing-ideas') {
       document.body.classList.add('theme-light');
-    } else if (path === '/designs' || decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Premade') || decodeURIComponent(path).includes('Techpack') || decodeURIComponent(path).includes('Tailored')) {
+    } else if (path === '/designs' || decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Premade') || decodeURIComponent(path).includes('Techpack')) {
       document.body.classList.add('theme-dark');
     } else if (decodeURIComponent(path).includes('/order')) {
       // Order pages inherit same dark/red logic as their service
-      if (decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Techpack') || decodeURIComponent(path).includes('Tailored')) {
+      if (decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Techpack')) {
         document.body.classList.add('theme-dark');
       } else {
         document.body.classList.add('theme-red');
@@ -655,7 +675,7 @@ const SERVICE_PRICES = {
   'Drop Starter': 90000,
   'RETAINER': 60000,
   'Premade Design': 15000,
-  'Tailored Design': 19000,
+  'Tailored Design': { options: { 'Basic': 19000, 'Premium': 35000 } },
   'E-commerce Visual Asset': { options: { 'Single View': 4500, 'Custom View': 6000, '360°': 14000 } },
   'Techpack': { options: { 'One Page': 7000, 'Full Techpack': 17000 } },
 };
