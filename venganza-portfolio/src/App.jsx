@@ -356,45 +356,80 @@ const SiteFooter = ({ light = true }) => {
 // LATEST PREMADE SHOWCASE (for Homepage)
 // ==========================================
 
-const useLatestPremade = () => {
-  const [latest, setLatest] = useState(null);
+// Returns first N premade images for the hero slideshow
+const useHeroSlides = (count = 5) => {
+  const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchLatest = async () => {
+    const fetch_ = async () => {
       try {
         const res = await fetch('/api/instagram-feed');
         if (!res.ok) throw new Error('API error');
         const { data } = await res.json();
-
-        const post = data?.[0]; // Already filtered by #premade, first = newest
-
-        if (post) {
-          setLatest({
-            imageUrl: post.media_type === 'VIDEO' ? post.thumbnail_url : post.media_url,
-            permalink: post.permalink,
-            caption: (post.caption || '').split('\n')[0].replace(/#\w+/g, '').trim(),
-          });
-        }
+        setSlides(
+          (data || []).slice(0, count).map(p => ({
+            imageUrl: p.media_type === 'VIDEO' ? p.thumbnail_url : p.media_url,
+            permalink: p.permalink,
+          }))
+        );
       } catch (err) {
-        console.error('Failed to fetch latest premade:', err);
+        console.error('Failed to fetch hero slides:', err);
       } finally {
         setLoading(false);
       }
     };
+    fetch_();
+  }, [count]);
 
-    fetchLatest();
+  return { slides, loading };
+};
+
+// Returns the latest Instagram reel/video
+const useLatestReel = () => {
+  const [reel, setReel] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetch_ = async () => {
+      try {
+        const res = await fetch('/api/instagram-reel');
+        if (!res.ok) throw new Error('API error');
+        const { reel: r } = await res.json();
+        setReel(r || null);
+      } catch (err) {
+        console.error('Failed to fetch latest reel:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch_();
   }, []);
 
-  return { latest, loading };
+  return { reel, loading };
+};
+
+// Keep for backwards compat
+const useLatestPremade = () => {
+  const { slides, loading } = useHeroSlides(1);
+  return { latest: slides[0] || null, loading };
 };
 
 const Home = () => {
   const containerRef = useRef();
-  const { latest, loading: premadeLoading } = useLatestPremade();
+  const { slides, loading: slidesLoading } = useHeroSlides(6);
+  const { reel, loading: reelLoading } = useLatestReel();
   const theme = useTheme();
   const [servicesOpen, setServicesOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [slideIndex, setSlideIndex] = useState(0);
+
+  // Auto-advance slideshow
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const id = setInterval(() => setSlideIndex(i => (i + 1) % slides.length), 4000);
+    return () => clearInterval(id);
+  }, [slides.length]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -455,30 +490,47 @@ const Home = () => {
       </header>
 
       {/* ============ HERO — Two panels side by side ============ */}
-      <div className="flex-1 flex flex-col md:flex-row w-full relative z-10">
+      <div className="flex flex-col md:flex-row w-full relative z-10" style={{ minHeight: '70vh' }}>
+        {/* Left — Premades Slideshow */}
         <Link to="/premades" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer">
-          {premadeLoading && (
+          {slidesLoading && (
             <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
               <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs animate-pulse">Loading...</span>
             </div>
           )}
-          {!premadeLoading && latest && (
-            <img src={latest.imageUrl} alt="Latest Premade" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+          {/* Slideshow images */}
+          {slides.map((slide, i) => (
+            <img
+              key={slide.imageUrl}
+              src={slide.imageUrl}
+              alt={`Premade ${i + 1}`}
+              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+              style={{ opacity: i === slideIndex ? 1 : 0 }}
+            />
+          ))}
+          {!slidesLoading && slides.length === 0 && theme.images?.heroLeft && (
+            <img src={theme.images.heroLeft} alt="Hero" className="absolute inset-0 w-full h-full object-cover" />
           )}
-          {!premadeLoading && !latest && theme.images?.heroLeft && (
-            <img src={theme.images.heroLeft} alt="Hero" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
-          )}
-          {!premadeLoading && !latest && !theme.images?.heroLeft && (
+          {!slidesLoading && slides.length === 0 && !theme.images?.heroLeft && (
             <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
               <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs">Coming Soon</span>
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          {/* Slide dots */}
+          {slides.length > 1 && (
+            <div className="absolute bottom-14 left-6 md:bottom-16 md:left-8 flex gap-1.5 z-10">
+              {slides.map((_, i) => (
+                <span key={i} className={`w-1 h-1 rounded-full transition-all duration-500 ${i === slideIndex ? 'bg-white w-3' : 'bg-white/40'}`} />
+              ))}
+            </div>
+          )}
           <span className="absolute bottom-6 left-6 md:bottom-8 md:left-8 font-mono text-[11px] md:text-xs text-white uppercase tracking-[0.25em] group-hover:tracking-[0.35em] transition-all duration-500">
             Shop Premades
           </span>
         </Link>
 
+        {/* Right — MAT Renders */}
         <div className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden bg-neutral-100 flex items-center justify-center">
           {theme.images?.heroRight && (
             <img src={theme.images.heroRight} alt="MAT Renders" className="absolute inset-0 w-full h-full object-cover" />
@@ -490,6 +542,50 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      {/* ============ LATEST REEL ============ */}
+      {!reelLoading && reel && (
+        <div className="w-full px-6 md:px-10 py-10 md:py-14 flex flex-col md:flex-row items-center gap-8 md:gap-12 border-t border-black/8">
+          {/* Video thumbnail / player */}
+          <a
+            href={reel.permalink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative flex-shrink-0 w-full md:w-[220px] aspect-[9/16] rounded-2xl overflow-hidden bg-black/5 shadow-lg hover:shadow-2xl transition-shadow duration-500"
+          >
+            {reel.thumbnail_url && (
+              <img src={reel.thumbnail_url} alt="Latest Reel" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            )}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors duration-300">
+              {/* Play icon */}
+              <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+              </div>
+            </div>
+            <span className="absolute top-3 left-3 px-2 py-1 rounded-full font-mono text-[8px] font-bold tracking-widest bg-white/20 backdrop-blur-sm border border-white/30 text-white uppercase">
+              Reel
+            </span>
+          </a>
+
+          {/* Text */}
+          <div className="flex flex-col gap-4 max-w-sm">
+            <p className="font-mono text-[9px] text-black/40 uppercase tracking-[0.2em]">Latest on Instagram</p>
+            {reel.caption && (
+              <p className="font-mono text-xs text-black/70 leading-relaxed line-clamp-3">
+                {reel.caption.split('\n')[0].replace(/#\w+/g, '').trim()}
+              </p>
+            )}
+            <a
+              href={reel.permalink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 font-mono text-[10px] text-black/50 hover:text-black uppercase tracking-[0.2em] transition-colors w-fit"
+            >
+              <Instagram size={12} /> Watch on Instagram
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <div className="px-6 md:px-10">
@@ -1703,106 +1799,64 @@ const PremadesPage = () => {
   }, [loading, premades]);
 
   return (
-    <div ref={containerRef} className="min-h-screen flex relative z-10">
+    <div ref={containerRef} className="min-h-screen p-6 md:p-12 flex flex-col relative z-10">
 
-      {/* ============ LEFT SIDEBAR — Glassmorphism ============ */}
-      <aside className="premade-header hidden md:flex flex-col fixed left-0 top-0 bottom-0 w-[260px] lg:w-[300px] z-[50] p-8 lg:p-10
-        bg-white/65 backdrop-blur-2xl border-r border-white/50 shadow-[4px_0_32px_rgba(0,0,0,0.06)]">
+      {/* Mobile burger */}
+      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
+        <Menu size={24} />
+      </button>
 
-        {/* Brand */}
-        <Link to="/" className="heading-font text-[2rem] lg:text-[2.4rem] leading-[1.1] text-black tracking-widest block hover:opacity-70 transition-opacity mb-6">
-          Altered<br/>Venganza
-        </Link>
+      {/* ============ TOP HEADER — like Home but nav on the RIGHT ============ */}
+      <div className="premade-header w-full flex items-start justify-between mb-10 pr-14 md:pr-0">
 
-        {/* Divider */}
-        <div className="w-8 h-px bg-black/20 mb-6" />
-
-        {/* Description */}
-        <div className="space-y-2 mb-8">
-          <p className="text-black/55 font-mono text-[9px] uppercase tracking-[0.12em] leading-relaxed">
-            Pre-made clothing renders
-          </p>
-          <p className="text-black/55 font-mono text-[9px] uppercase tracking-[0.12em] leading-relaxed">
-            Production ready files
-          </p>
-          <p className="text-black/55 font-mono text-[9px] uppercase tracking-[0.12em] leading-relaxed">
-            Fully alterable &amp; customizable
-          </p>
-          <p className="text-black/55 font-mono text-[9px] uppercase tracking-[0.12em] leading-relaxed">
-            Numbered &amp; ready to purchase
+        {/* Left — Brand + description + count */}
+        <div>
+          <Link to="/" className="heading-font text-[3rem] md:text-[3.5rem] leading-none text-black tracking-widest block hover:opacity-80 transition-opacity">
+            Altered Venganza
+          </Link>
+          <div className="space-y-1 mt-4 mb-4">
+            <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
+              Pre-made clothing renders &bull; Production ready files
+            </p>
+            <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
+              Fully alterable &amp; customizable to your brand &bull; Numbered &amp; Ready to purchase
+            </p>
+          </div>
+          <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]" />
+            {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
           </p>
         </div>
 
-        {/* Live count */}
-        <p className="font-mono text-[9px] text-black/50 uppercase tracking-[0.12em] flex items-center gap-2 mb-10">
-          <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_6px_rgba(123,31,36,0.5)]" />
-          {loading ? '...' : `${premades.filter(p => p.available).length} pieces available`}
-        </p>
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Navigation */}
-        <div className="flex flex-col gap-3">
-          <Link to="/" className="font-mono text-[9px] text-black/40 hover:text-black transition-colors uppercase tracking-[0.2em]">
+        {/* Right — Navigation (like Home page right side) */}
+        <div className="hidden md:flex flex-col items-end gap-3 pt-2 flex-shrink-0">
+          <Link to="/" className="font-mono text-[11px] text-black/50 hover:text-black transition-colors uppercase tracking-[0.2em]">
             ← Back to Home
           </Link>
           <button
             onClick={() => setCartOpen(true)}
-            className="font-mono text-[9px] text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] flex items-center gap-2 w-fit"
+            className="font-mono text-[11px] text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] flex items-center gap-2"
           >
-            Cart ({cart.length}) <ShoppingBag size={11} />
+            Cart ({cart.length}) <ShoppingBag size={13} />
           </button>
           {cart.length > 0 && (
             <button
               onClick={() => setCartOpen(true)}
-              className="mt-2 w-full py-2.5 text-[9px] font-mono uppercase tracking-widest border border-[color:var(--primary)] bg-[color:var(--primary)] text-white rounded-xl hover:bg-black hover:border-black transition-all flex items-center justify-center gap-1.5"
+              className="flex items-center gap-2 px-4 py-2 text-[10px] font-mono uppercase tracking-widest rounded-xl
+                bg-white/60 backdrop-blur-md border border-black/12 shadow-sm
+                text-[color:var(--primary)] hover:bg-[color:var(--primary)] hover:text-white hover:border-[color:var(--primary)]
+                transition-all duration-300"
             >
-              <ShoppingBag size={11} />
+              <ShoppingBag size={12} />
               View Cart — ${cart.reduce((s, i) => s + i.price, 0)}
             </button>
           )}
         </div>
-
-        {/* Instagram */}
-        <a href="https://www.instagram.com/rare______________________/" target="_blank" rel="noopener noreferrer"
-          className="mt-6 font-mono text-[8px] text-black/25 hover:text-black/50 uppercase tracking-[0.15em] transition-colors">
-          rare______________________
-        </a>
-      </aside>
-
-      {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-[50] px-5 py-4
-        bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-[0_2px_16px_rgba(0,0,0,0.05)]
-        flex items-center justify-between">
-        <Link to="/" className="heading-font text-xl text-black tracking-widest hover:opacity-70 transition-opacity">
-          Altered Venganza
-        </Link>
-        <div className="flex items-center gap-4">
-          <button onClick={() => setCartOpen(true)} className="font-mono text-[9px] text-[color:var(--primary)] uppercase tracking-widest flex items-center gap-1.5">
-            <ShoppingBag size={14} /> {cart.length > 0 && `(${cart.length})`}
-          </button>
-          <button onClick={() => setMenuOpen(true)} className="w-9 h-9 flex items-center justify-center text-black/70 hover:text-black transition-colors">
-            <Menu size={22} />
-          </button>
-        </div>
       </div>
 
-      {/* ============ MAIN CONTENT ============ */}
-      <main className="flex-1 md:ml-[260px] lg:ml-[300px] flex flex-col min-h-screen pt-[72px] md:pt-0">
-        <div className="flex-1 p-5 md:p-8 lg:p-10">
-
-          {/* Mobile label */}
-          <div className="md:hidden mb-6">
-            <p className="font-mono text-[9px] text-black/40 uppercase tracking-[0.12em] flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--primary)] animate-pulse" />
-              {loading ? '...' : `${premades.filter(p => p.available).length} pieces available`}
-            </p>
-          </div>
-
-          {/* GALLERY GRID */}
-          <div className="w-full relative z-10">
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
+      {/* ============ GALLERY GRID ============ */}
+      <div className="flex-1 w-full relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
           {premades.map((premade) => (
             <div key={premade.id} className="premade-item">
               <button
@@ -1846,11 +1900,18 @@ const PremadesPage = () => {
                   )}
                 </div>
               </button>
+
+              {/* Add to Cart — Glassmorphism button */}
               {premade.available ? (
                 <button
                   onClick={() => addPremadeToCart(premade)}
                   disabled={cart.find(item => item.kind === 'premade' && item.id === premade.id)}
-                  className="flex mt-2 w-full py-2.5 text-[10px] font-mono uppercase tracking-widest border border-black/10 rounded-xl text-black/50 hover:text-white hover:bg-black hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black/50 disabled:hover:border-black/10 items-center justify-center gap-1.5"
+                  className="flex mt-2 w-full py-2.5 text-[10px] font-mono uppercase tracking-widest rounded-xl
+                    bg-white/60 backdrop-blur-md border border-black/10 shadow-sm
+                    text-black/60 hover:bg-black hover:text-white hover:border-black hover:shadow-md
+                    transition-all duration-300
+                    disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white/60 disabled:hover:text-black/60 disabled:hover:border-black/10 disabled:hover:shadow-sm
+                    items-center justify-center gap-1.5"
                 >
                   {cart.find(item => item.id === premade.id) ? 'In Cart' : <><Plus size={12} /> Add to Cart</>}
                 </button>
@@ -1866,26 +1927,36 @@ const PremadesPage = () => {
             <p className="font-mono text-black/30 text-xs uppercase tracking-widest animate-pulse">Loading premades from Instagram...</p>
           </div>
         )}
-
         {!loading && error && (
           <div className="text-center py-24">
             <p className="font-mono text-black/30 text-xs uppercase tracking-widest">Could not load premades. {error}</p>
           </div>
         )}
-
         {!loading && !error && premades.length === 0 && (
           <div className="text-center py-24">
             <p className="font-mono text-black/30 text-xs uppercase tracking-widest">No premades available yet. Check back soon.</p>
           </div>
         )}
-          </div>
-        </div>
+      </div>
 
-        {/* FOOTER */}
-        <div className="w-full mt-16 px-5 md:px-8 lg:px-10">
-          <SiteFooter light={true} />
-        </div>
-      </main>
+      {/* BOTTOM — View Cart CTA + Footer */}
+      <div className="w-full relative z-20 mt-20">
+        {cart.length > 0 && (
+          <div className="flex justify-center mb-6">
+            <button
+              onClick={() => setCartOpen(true)}
+              className="flex items-center gap-2 px-8 py-3.5 font-mono text-xs uppercase tracking-widest rounded-full
+                bg-white/70 backdrop-blur-md border border-black/12 shadow-md
+                text-[color:var(--primary)] hover:bg-[color:var(--primary)] hover:text-white hover:border-[color:var(--primary)] hover:shadow-lg
+                transition-all duration-300"
+            >
+              <ShoppingBag size={14} />
+              View Cart ({cart.length}) — ${cart.reduce((s, i) => s + i.price, 0)}
+            </button>
+          </div>
+        )}
+        <SiteFooter light={true} />
+      </div>
 
       {/* Modal */}
       {selected && <PremadeModal premade={selected} onClose={() => setSelected(null)} onAddToCart={addPremadeToCart} />}
