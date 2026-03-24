@@ -269,16 +269,8 @@ const ThemeController = () => {
 
     if (path === '/' || path === '/archive' || path === '/about' || path === '/premades' || path === '/materializing-ideas') {
       document.body.classList.add('theme-light');
-    } else if (decoded.includes('Tailored')) {
+    } else if (decoded.includes('Tailored') || path === '/designs' || decoded.includes('E-commerce') || decoded.includes('Techpack')) {
       document.body.classList.add('theme-tailored');
-    } else if (path === '/designs' || decoded.includes('E-commerce') || decoded.includes('Premade') || decoded.includes('Techpack')) {
-      document.body.classList.add('theme-dark');
-    } else if (decoded.includes('/order')) {
-      if (decoded.includes('E-commerce') || decoded.includes('Techpack')) {
-        document.body.classList.add('theme-dark');
-      } else {
-        document.body.classList.add('theme-red');
-      }
     } else {
       document.body.classList.add('theme-red');
     }
@@ -416,7 +408,7 @@ const Home = () => {
     <div className="min-h-screen flex flex-col relative z-10" ref={containerRef}>
 
       {/* ============ TOP NAV BAR — ERD Style ============ */}
-      <header className="flex items-start justify-between px-6 md:px-10 pt-6 md:pt-8 pb-4 relative z-20">
+      <header className="flex items-start px-6 md:px-10 pt-6 md:pt-8 pb-4 relative z-20">
 
         {/* Left — Logo + Handle + Description */}
         <div className="nav-item flex-shrink-0">
@@ -433,8 +425,8 @@ const Home = () => {
           </p>
         </div>
 
-        {/* Center — Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8 pt-2">
+        {/* Center — Desktop Navigation (truly centered) */}
+        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8 pt-2">
           <div className="relative pb-2 -mb-2" onMouseEnter={() => setServicesOpen(true)} onMouseLeave={() => setServicesOpen(false)}>
             <button onClick={() => setServicesOpen(o => !o)} className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors flex items-center gap-1">
               Services <ChevronDown size={12} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
@@ -453,7 +445,7 @@ const Home = () => {
         </nav>
 
         {/* Right — Contact + Cart + Burger */}
-        <div className="flex items-center gap-6 pt-2">
+        <div className="flex items-center gap-6 pt-2 ml-auto">
           <Link to="/contact" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden md:block">Contact</Link>
           <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden md:block">Cart (0)</Link>
           <button onClick={() => setMenuOpen(true)} className="md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
@@ -550,7 +542,8 @@ const ServicePage = ({ title, services }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const theme = useTheme();
   const location = useLocation();
-  const isTailored = decodeURIComponent(location.pathname).includes('Tailored');
+  const _p = decodeURIComponent(location.pathname);
+  const isTailored = _p.includes('Tailored') || location.pathname === '/designs' || _p.includes('E-commerce') || _p.includes('Techpack');
 
   useEffect(() => {
     ScrollTrigger.refresh();
@@ -623,7 +616,8 @@ const ServiceDetail = () => {
   const { addToCart, setCartOpen } = useCart();
   const theme = useTheme();
   const location = useLocation();
-  const isTailored = decodeURIComponent(location.pathname).includes('Tailored');
+  const _p = decodeURIComponent(location.pathname);
+  const isTailored = _p.includes('Tailored') || location.pathname === '/designs' || _p.includes('E-commerce') || _p.includes('Techpack');
 
   useEffect(() => {
     const ctx = gsap.context(() => {
