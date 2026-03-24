@@ -635,20 +635,135 @@ const ServiceDetail = () => {
 
 const AboutPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [displayed, setDisplayed] = useState('');
+  const [phase, setPhase] = useState('scramble'); // scramble | reveal | done
+  const [visible, setVisible] = useState(false);
+  const fullText = 'Who the f*ck is Rare?';
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+
+  useEffect(() => {
+    // Start scramble phase
+    let frame = 0;
+    let revealIndex = 0;
+    const totalFrames = 40;
+
+    const interval = setInterval(() => {
+      frame++;
+      if (frame < totalFrames) {
+        // Random scramble, progressively reveal from left
+        revealIndex = Math.floor((frame / totalFrames) * fullText.length);
+        const scrambled = fullText.split('').map((ch, i) => {
+          if (i < revealIndex) return ch;
+          if (ch === ' ') return ' ';
+          return chars[Math.floor(Math.random() * chars.length)];
+        }).join('');
+        setDisplayed(scrambled);
+      } else {
+        setDisplayed(fullText);
+        setPhase('done');
+        clearInterval(interval);
+      }
+    }, 40);
+
+    const visTimer = setTimeout(() => setVisible(true), 300);
+    return () => { clearInterval(interval); clearTimeout(visTimer); };
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-center relative z-10 px-6">
-      <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-sm font-mono uppercase tracking-widest">
-          Back to Home <ArrowRight size={16} />
+    <div className="min-h-screen flex flex-col items-center justify-center text-center relative z-10 px-6 overflow-hidden">
+
+      {/* Animated noise background */}
+      <style>{`
+        @keyframes grain {
+          0%, 100% { transform: translate(0,0) }
+          10% { transform: translate(-2%,-3%) }
+          20% { transform: translate(3%,2%) }
+          30% { transform: translate(-1%,4%) }
+          40% { transform: translate(4%,-1%) }
+          50% { transform: translate(-3%,3%) }
+          60% { transform: translate(2%,-4%) }
+          70% { transform: translate(-4%,1%) }
+          80% { transform: translate(1%,3%) }
+          90% { transform: translate(3%,-2%) }
+        }
+        @keyframes flicker {
+          0%, 100% { opacity: 1 }
+          92% { opacity: 1 }
+          93% { opacity: 0.4 }
+          94% { opacity: 1 }
+          96% { opacity: 0.6 }
+          97% { opacity: 1 }
+        }
+        @keyframes floatA {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          33% { transform: translateY(-18px) rotate(3deg); }
+          66% { transform: translateY(10px) rotate(-2deg); }
+        }
+        @keyframes floatB {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          40% { transform: translateY(14px) rotate(-4deg); }
+          75% { transform: translateY(-12px) rotate(2deg); }
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scanline {
+          0% { top: -10%; }
+          100% { top: 110%; }
+        }
+        .about-title { animation: flicker 6s infinite; }
+        .float-a { animation: floatA 7s ease-in-out infinite; }
+        .float-b { animation: floatB 9s ease-in-out infinite; }
+        .slide-up-1 { animation: slideUp 0.7s ease forwards; animation-delay: 1.8s; opacity: 0; }
+        .slide-up-2 { animation: slideUp 0.7s ease forwards; animation-delay: 2.2s; opacity: 0; }
+        .slide-up-3 { animation: slideUp 0.7s ease forwards; animation-delay: 2.6s; opacity: 0; }
+      `}</style>
+
+      {/* Grain overlay */}
+      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.04]"
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`, animation: 'grain 0.5s steps(1) infinite' }} />
+
+      {/* Scanline */}
+      <div className="pointer-events-none fixed left-0 w-full h-[2px] bg-black/5 z-0" style={{ animation: 'scanline 4s linear infinite' }} />
+
+      {/* Floating decorative elements */}
+      <span className="float-a absolute top-[15%] left-[8%] font-mono text-[10px] text-black/10 uppercase tracking-[0.3em] select-none">©rare</span>
+      <span className="float-b absolute top-[20%] right-[10%] font-mono text-[9px] text-black/8 uppercase tracking-[0.4em] select-none">AV</span>
+      <span className="float-a absolute bottom-[25%] left-[12%] font-mono text-[8px] text-black/8 uppercase tracking-[0.3em] select-none" style={{animationDelay:'2s'}}>2026</span>
+      <span className="float-b absolute bottom-[30%] right-[8%] font-mono text-[9px] text-[color:var(--primary)] opacity-20 uppercase tracking-[0.4em] select-none" style={{animationDelay:'1s'}}>■</span>
+      <span className="float-a absolute top-[55%] left-[5%] font-mono text-[8px] text-black/6 uppercase tracking-[0.3em] select-none" style={{animationDelay:'3s'}}>altered</span>
+
+      {/* Nav */}
+      <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest z-10">
+        Back to Home <ArrowRight size={14} />
       </Link>
       <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
         <Menu size={24} />
       </button>
-      <h1 className="heading-font text-6xl md:text-[8rem] text-black mb-8 leading-none mt-20">Who the f*ck is Rare?</h1>
-      <p className="max-w-xl text-black/60 font-mono leading-relaxed mb-12">
-        Placeholder for brand manifesto, history, or creator biography. <br/><br/>
-        More content coming soon.
-      </p>
-      <div className="w-full max-w-2xl mt-auto"><SiteFooter light={true} /></div>
+
+      {/* Title */}
+      <h1 className="about-title heading-font text-[2.8rem] md:text-[7rem] text-black leading-none mt-20 mb-10 relative z-10 select-none" style={{letterSpacing:'0.02em'}}>
+        {displayed || '\u00A0'}
+        {phase !== 'done' && <span className="inline-block w-[3px] h-[0.8em] bg-[color:var(--primary)] ml-1 align-middle animate-pulse" />}
+      </h1>
+
+      {/* Content */}
+      <div className="relative z-10 max-w-xl">
+        <p className="slide-up-1 text-black/50 font-mono text-xs leading-relaxed uppercase tracking-[0.15em] mb-6">
+          Placeholder for brand manifesto,<br />history, or creator biography.
+        </p>
+        <p className="slide-up-2 text-black/30 font-mono text-[10px] uppercase tracking-[0.25em] mb-10">
+          More content coming soon.
+        </p>
+        <div className="slide-up-3 flex items-center justify-center gap-3">
+          <span className="w-8 h-px bg-black/20" />
+          <span className="font-mono text-[9px] text-black/25 uppercase tracking-[0.3em]">Altered Venganza</span>
+          <span className="w-8 h-px bg-black/20" />
+        </div>
+      </div>
+
+      <div className="w-full max-w-2xl mt-auto relative z-10"><SiteFooter light={true} /></div>
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
