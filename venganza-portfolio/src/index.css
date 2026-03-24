@@ -80,6 +80,7 @@
 .theme-tailored input, .theme-tailored textarea { color: rgba(0,0,0,0.85) !important; }
 .theme-tailored input::placeholder, .theme-tailored textarea::placeholder { color: rgba(0,0,0,0.25) !important; }
 
+
 body {
   background-color: var(--bg-color);
   color: #d4d4d4;

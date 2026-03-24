@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { BrowserRouter, Routes, Route, Link, useLocation, useParams } from 'react-router-dom';
+import React, { useEffect, useRef, useState, createContext, useContext } from 'react';
+import { BrowserRouter, Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2, ChevronDown, Menu } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -7,6 +7,36 @@ import { INSTAGRAM_DM_URL, INSTAGRAM_HANDLE, PREMADE_PRICE_PREMIUM, PREMADE_PRIC
 import { useTheme } from './hooks/useTheme';
 
 gsap.registerPlugin(ScrollTrigger);
+
+// ==========================================
+// GLOBAL CART CONTEXT
+// ==========================================
+
+const CartContext = createContext(null);
+
+const CartProvider = ({ children }) => {
+  const [cart, setCart] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
+
+  const addToCart = (item) => {
+    setCart(prev => {
+      const dup = item.kind === 'premade'
+        ? prev.some(i => i.kind === 'premade' && i.id === item.id)
+        : prev.some(i => i.kind === 'service' && i.title === item.title && i.tier === item.tier);
+      return dup ? prev : [...prev, item];
+    });
+  };
+  const removeFromCart = (idx) => setCart(p => p.filter((_, i) => i !== idx));
+  const clearCart = () => setCart([]);
+
+  return (
+    <CartContext.Provider value={{ cart, cartOpen, setCartOpen, addToCart, removeFromCart, clearCart }}>
+      {children}
+    </CartContext.Provider>
+  );
+};
+
+const useCart = () => useContext(CartContext);
 
 // ==========================================
 // DATA
@@ -59,7 +89,8 @@ const brandIdentityData = [
 const designsData = [
   {
     title: "Premade Design",
-    subtitle: "Balanced identity system",
+    linkTo: "/premades",
+    subtitle: "Ready-to-buy clothing graphics",
     price: "EUR €150 – €250",
     delivery: "4h-1 day delivery",
     features: [
@@ -72,6 +103,41 @@ const designsData = [
       "Factory contact based in Portugal with MOQ of 50 pcs"
     ],
     layout: "bullets"
+  },
+  {
+    title: "Tailored Design",
+    subtitle: "Based on your references",
+    price: "EUR €190 – €350",
+    delivery: "3 to 7 days",
+    layout: "options",
+    options: [
+      {
+        price: "Basic — €190",
+        delivery: "(3-4 days)",
+        features: [
+          "1 custom graphic based on your references",
+          "Personal or commercial use",
+          "PNG/JPG/PDF",
+          "Free mockup",
+          "High resolution 300 ppi",
+          "1 revision round"
+        ]
+      },
+      {
+        price: "Premium — €350",
+        delivery: "(5-7 days)",
+        features: [
+          "Up to 3 custom graphics based on your references",
+          "Personal or commercial use",
+          "PNG/JPG/PSD/PDF",
+          "Free mockup",
+          "High resolution 300 ppi",
+          "Size Chart if required",
+          "Factory contact based in Portugal with MOQ of 50 pcs",
+          "2 revision rounds"
+        ]
+      }
+    ]
   },
   {
     title: "E-commerce Visual Asset",
@@ -90,9 +156,21 @@ const designsData = [
     subtitle: "Specification Sheet",
     price: "EUR €70 – €170",
     delivery: "1-2 days delivery",
-    layout: "bullets",
-    features: ["Flat technical drawing (front / back)", "Fabric & color specifications", "Print / embroidery placement", "Essential construction notes"],
-    details: "Simplified production guide for basic garments. Full Techpack — €170 include complete measurement chart, stitching & construction details, fabric specs, and packaging notes."
+    layout: "options",
+    options: [
+      {
+        price: "One Page — €70",
+        delivery: "(1 day delivery)",
+        features: ["Flat technical drawing (front / back)", "Fabric & color specifications", "Print / embroidery placement", "Essential construction notes"],
+        details: "Simplified production guide for basic garments."
+      },
+      {
+        price: "Full Techpack — €170",
+        delivery: "(1-2 days delivery)",
+        features: ["Complete measurement chart", "Stitching & construction details", "Fabric & color specifications", "Print / embroidery placement", "Packaging notes"],
+        details: "Complete specification sheet ready for factory production."
+      }
+    ]
   }
 ];
 
@@ -265,7 +343,7 @@ const SiteFooter = ({ light = true }) => {
           <span className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors cursor-pointer`}>MAT Drop</span>
         </div>
         <p className={`font-mono text-[8px] md:text-[9px] ${textColor} uppercase tracking-[0.2em] mb-2`}>Coming Soon</p>
-        <Link to="/about" className={`font-mono text-[8px] md:text-[9px] text-[color:var(--primary)] ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>
+        <Link to="/materializing-ideas" className={`font-mono text-[8px] md:text-[9px] text-[color:var(--primary)] ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>
           What is Materializing Ideas?
         </Link>
       </div>
@@ -413,9 +491,10 @@ const Home = () => {
           {theme.images?.heroRight && (
             <img src={theme.images.heroRight} alt="MAT Renders" className="absolute inset-0 w-full h-full object-cover" />
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
           <div className="relative z-10 text-center flex flex-col items-center justify-center">
-            <h2 className="heading-font text-4xl md:text-6xl tracking-widest text-black/80">MAT RENDERS</h2>
-            <p className="font-mono text-[10px] md:text-xs text-black/40 uppercase tracking-[0.3em] mt-3">Coming Soon</p>
+            <h2 className="heading-font text-4xl md:text-6xl tracking-widest text-white">MAT RENDERS</h2>
+            <p className="font-mono text-[10px] md:text-xs text-white/70 uppercase tracking-[0.3em] mt-3">Coming Soon</p>
           </div>
         </div>
       </div>
@@ -435,10 +514,10 @@ const Home = () => {
 // SERVICE PAGES (DARK THEMES & EDITORIAL LAYOUT)
 // ==========================================
 
-const ServiceItem = ({ title, subtitle, price, delivery }) => {
+const ServiceItem = ({ title, subtitle, price, delivery, linkTo }) => {
   return (
     <Link
-      to={`/service/${encodeURIComponent(title)}`}
+      to={linkTo || `/service/${encodeURIComponent(title)}`}
       className="block py-10 border-b border-white/10 group last:border-0 opacity-0 translate-y-8 service-item transition-all duration-500 relative overflow-hidden text-center"
     >
       {/* Hover tint that sweeps in */}
@@ -493,16 +572,7 @@ const ServicePage = ({ title, services }) => {
        {/* Fixed header: logo/brand left, nav/burger right */}
        <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-10 py-4 bg-[color:var(--bg-color)]/80 backdrop-blur-sm">
          <Link to="/" className="opacity-80 hover:opacity-100 transition-opacity">
-           {hasLogo ? (
-             <img
-               src={theme.images.logo}
-               alt="Altered Venganza"
-               onError={() => setLogoError(true)}
-               className={`h-7 md:h-8 w-auto object-contain${isTailored ? '' : ' invert'}`}
-             />
-           ) : (
-             <span className={`heading-font text-xl tracking-widest${isTailored ? ' text-black' : ' text-white'}`}>Altered Venganza</span>
-           )}
+           <span className={`heading-font text-xl tracking-widest${isTailored ? ' text-black' : ' text-white'}`}>Altered Venganza</span>
          </Link>
          <div className="flex items-center gap-4">
            <Link to="/" className={`hidden md:inline-flex items-center gap-2 transition-colors text-[10px] font-mono uppercase tracking-widest${isTailored ? ' text-black/50 hover:text-black' : ' text-white/50 hover:text-white'}`}>
@@ -525,6 +595,7 @@ const ServicePage = ({ title, services }) => {
             Altered Venganza
           </h1>
        </div>
+
 
        <div className="header-element mb-16 text-center w-full max-w-2xl">
           <p className="text-white/80 font-mono text-xs uppercase tracking-[0.2em] mb-6">{title}</p>
@@ -563,7 +634,9 @@ const ServiceDetail = () => {
   const service = allData.find(s => s.title === decodeURIComponent(id));
   const containerRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [logoError, setLogoError] = useState(false);
+  const [cartTier, setCartTier] = useState(null);
+  const [cartAdded, setCartAdded] = useState(false);
+  const { addToCart, setCartOpen } = useCart();
   const theme = useTheme();
   const location = useLocation();
   const isTailored = decodeURIComponent(location.pathname).includes('Tailored');
@@ -586,16 +659,7 @@ const ServiceDetail = () => {
        {/* Fixed header: brand/logo left, back/burger right */}
        <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-10 py-4 bg-[color:var(--bg-color)]/80 backdrop-blur-sm">
          <Link to="/" className="opacity-80 hover:opacity-100 transition-opacity">
-           {hasLogo ? (
-             <img
-               src={theme.images.logo}
-               alt="Altered Venganza"
-               onError={() => setLogoError(true)}
-               className={`h-7 md:h-8 w-auto object-contain${isTailored ? '' : ' invert'}`}
-             />
-           ) : (
-             <span className={`heading-font text-xl tracking-widest${isTailored ? ' text-black' : ' text-white'}`}>Altered Venganza</span>
-           )}
+           <span className={`heading-font text-xl tracking-widest${isTailored ? ' text-black' : ' text-white'}`}>Altered Venganza</span>
          </Link>
          <div className="flex items-center gap-4">
            <button onClick={() => window.history.back()} className={`hidden md:inline-flex items-center gap-2 transition-colors text-[10px] font-mono uppercase tracking-widest${isTailored ? ' text-black/50 hover:text-black' : ' text-white/50 hover:text-white'}`}>
@@ -618,7 +682,8 @@ const ServiceDetail = () => {
             Altered Venganza
           </h1>
        </div>
-      
+
+
       <div className="header-element mb-16 w-full max-w-[480px] text-left">
         <h1 className="serif-heading text-5xl md:text-6xl text-white mb-2 leading-none">{service.title}</h1>
         <h2 className="serif-heading text-lg md:text-xl text-white/90 font-light mb-8">{service.subtitle}</h2>
@@ -669,15 +734,308 @@ const ServiceDetail = () => {
       </div>
 
       {/* Footer Details */}
-      <div className="w-full max-w-[480px] text-center pb-4 pt-24 header-element mt-auto">
-         <p className="font-mono text-[8px] md:text-[10px] text-white/60 uppercase tracking-[0.2em] leading-loose max-w-sm mx-auto mb-10">
+      <div className="w-full max-w-[480px] pb-4 pt-24 header-element mt-auto flex flex-col gap-3">
+         <p className="font-mono text-[8px] md:text-[10px] text-white/60 uppercase tracking-[0.2em] leading-loose max-w-sm mx-auto mb-6 text-center">
             Includes: 2 rounds of revisions. Additional revisions are available at 20% of the project total per revision.
           </p>
-         <a href="https://instagram.com" target="_blank" rel="noreferrer" className="w-full py-5 bg-transparent border border-white/20 hover:bg-white hover:text-black hover:border-white transition-all duration-500 font-mono text-[10px] justify-center tracking-widest uppercase flex items-center gap-3">
-             <Instagram size={14} /> Book this service
-          </a>
+
+         {/* Add to Cart — tier picker for options layout */}
+         {service.layout === 'options' && (
+           <div className="flex flex-col gap-2 mb-2">
+             <p className="font-mono text-[10px] uppercase tracking-widest text-white/40 text-center">Select to add to cart</p>
+             <div className="flex flex-col gap-2">
+               {service.options.map((opt, i) => (
+                 <button key={i} type="button" onClick={() => setCartTier(i)}
+                   className={`text-left px-4 py-3 border transition-all duration-300 font-mono text-[10px] uppercase tracking-wider ${cartTier === i ? 'border-[color:var(--primary)] bg-white/5 text-white' : 'border-white/10 text-white/40 hover:border-white/25 hover:text-white/60'}`}>
+                   {opt.price} <span className="text-white/25">{opt.delivery}</span>
+                 </button>
+               ))}
+             </div>
+           </div>
+         )}
+
+         <button
+           onClick={() => {
+             const tier = service.layout === 'options' ? (cartTier !== null ? service.options[cartTier]?.price : null) : null;
+             if (service.layout === 'options' && cartTier === null) return;
+             const priceDef = SERVICE_PRICES[service.title];
+             let priceCents = typeof priceDef === 'number' ? priceDef : 0;
+             if (priceDef?.options && cartTier !== null) {
+               const key = Object.keys(priceDef.options).find(k => service.options[cartTier]?.price?.includes(k));
+               if (key) priceCents = priceDef.options[key];
+             }
+             addToCart({ kind: 'service', id: `${service.title}__${tier || ''}`, title: service.title, tier, priceDisplay: tier || service.price, priceCents });
+             setCartAdded(true);
+             setTimeout(() => setCartAdded(false), 2000);
+           }}
+           disabled={service.layout === 'options' && cartTier === null}
+           className="w-full py-4 border border-white/20 text-white/70 hover:border-white/50 hover:text-white transition-all duration-500 font-mono text-[10px] justify-center tracking-widest uppercase flex items-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed"
+         >
+           <ShoppingBag size={13} /> {cartAdded ? 'Added!' : 'Add to Cart'}
+         </button>
+
+         <Link to={`/service/${encodeURIComponent(service.title)}/order`}
+            className="w-full py-5 bg-[color:var(--primary)] text-[color:var(--btn-tx)] hover:bg-white hover:text-black transition-all duration-500 font-mono text-[10px] justify-center tracking-widest uppercase flex items-center gap-3">
+             Order &amp; Send Brief <ArrowRight size={14} />
+          </Link>
       </div>
       <div className="w-full max-w-[480px]"><SiteFooter light={isTailored} /></div>
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
+    </div>
+  );
+};
+
+// ==========================================
+// SERVICE ORDER PAGE
+// ==========================================
+
+const SERVICE_PRICES = {
+  'Packaging Design & Development': 90000,
+  'Clothing Brand': 350000,
+  'Drop Starter': 90000,
+  'RETAINER': 60000,
+  'Premade Design': 15000,
+  'Tailored Design': { options: { 'Basic': 19000, 'Premium': 35000 } },
+  'E-commerce Visual Asset': { options: { 'Single View': 4500, 'Custom View': 6000, '360°': 14000 } },
+  'Techpack': { options: { 'One Page': 7000, 'Full Techpack': 17000 } },
+};
+
+const ServiceOrderPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const service = allData.find(s => s.title === decodeURIComponent(id));
+  const [form, setForm] = useState({ name: '', email: '', brand: '', instagram: '', brief: '', referenceLinks: '' });
+  const [files, setFiles] = useState([]);
+  const [selectedTier, setSelectedTier] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [cartAdded, setCartAdded] = useState(false);
+  const fileInputRef = useRef(null);
+  const containerRef = useRef(null);
+  const { addToCart, setCartOpen } = useCart();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('success') === 'true') setSuccess(true);
+  }, [location.search]);
+
+  useEffect(() => {
+    if (success) return;
+    const ctx = gsap.context(() => {
+      gsap.from('.order-el', { y: 24, opacity: 0, stagger: 0.07, duration: 1, ease: 'power3.out' });
+    }, containerRef);
+    return () => ctx.revert();
+  }, [success]);
+
+  if (!service) return <div className="min-h-screen flex items-center justify-center text-white font-mono text-xs">Service not found.</div>;
+
+  const getPriceCents = () => {
+    if (service.layout === 'options' && selectedTier !== null) {
+      const tier = service.options[selectedTier];
+      const priceDef = SERVICE_PRICES[service.title];
+      if (priceDef?.options) {
+        const key = Object.keys(priceDef.options).find(k => tier.price.includes(k));
+        return key ? priceDef.options[key] : Object.values(priceDef.options)[0];
+      }
+    }
+    const p = SERVICE_PRICES[service.title];
+    return typeof p === 'number' ? p : 0;
+  };
+
+  const addFiles = (incoming) => {
+    setFiles(prev => {
+      const merged = [...prev, ...Array.from(incoming)];
+      return merged.slice(0, 8);
+    });
+  };
+
+  const handleDrop = (e) => { e.preventDefault(); setDragging(false); addFiles(e.dataTransfer.files); };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (service.layout === 'options' && selectedTier === null) { setError('Please select a package.'); return; }
+    setLoading(true); setError('');
+    try {
+      const payload = {
+        service: service.title,
+        tier: selectedTier !== null ? service.options[selectedTier]?.price : null,
+        ...form,
+        fileNames: files.map(f => f.name),
+      };
+      const res = await fetch('/api/service-checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.url) { window.location.href = data.url; }
+      else setError(data.error || 'Something went wrong. Try again.');
+    } catch { setError('Network error. Please try again.'); }
+    setLoading(false);
+  };
+
+  if (success) return (
+    <div className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative z-10 gap-6">
+      <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">Order Confirmed</p>
+      <h1 className="serif-heading text-5xl md:text-6xl text-white">Payment received.</h1>
+      <p className="text-white/50 font-mono text-[11px] max-w-sm leading-relaxed">
+        Now send your files — mood boards, logos, references — to:<br />
+        <span className="text-white mt-2 block">studio@alteredvenganza.com</span>
+      </p>
+      <p className="text-white/30 font-mono text-[9px] uppercase tracking-widest max-w-xs">
+        Include your brand name and order email in the subject line.
+      </p>
+      <Link to="/" className="mt-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
+        Back to Home <ArrowRight size={12} />
+      </Link>
+    </div>
+  );
+
+  return (
+    <div ref={containerRef} className="min-h-screen pt-20 px-6 pb-28 relative z-10 flex flex-col items-center">
+      <div className="w-full max-w-[520px]">
+
+        {/* Nav row */}
+        <div className="flex justify-between items-center mb-10 order-el">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-white/40 hover:text-white transition-colors font-mono text-[10px] uppercase tracking-widest">
+            <ArrowLeft size={12} /> Back
+          </button>
+          <button onClick={() => setMenuOpen(true)} className="md:hidden text-white/60 hover:text-white"><Menu size={20} /></button>
+        </div>
+
+        {/* Header */}
+        <div className="mb-10 order-el">
+          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40 mb-2">Order · {service.price}</p>
+          <h1 className="serif-heading text-4xl md:text-5xl text-white leading-tight">{service.title}</h1>
+          <p className="text-white/50 font-light text-sm mt-1">{service.subtitle}</p>
+        </div>
+
+        {/* Tier selector */}
+        {service.layout === 'options' && (
+          <div className="mb-10 order-el">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-4">Select Package *</p>
+            <div className="flex flex-col gap-2">
+              {service.options.map((opt, i) => (
+                <button key={i} type="button" onClick={() => setSelectedTier(i)}
+                  className={`text-left px-5 py-4 border transition-all duration-300 ${selectedTier === i ? 'border-[color:var(--primary)] bg-white/5 text-white' : 'border-white/10 text-white/50 hover:border-white/30 hover:text-white/70'}`}>
+                  <span className="font-medium text-sm">{opt.price}</span>
+                  <span className="text-white/30 text-xs font-mono ml-2">{opt.delivery}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+
+          {/* Name + Email */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 order-el">
+            {[['name', 'Name *', 'text'], ['email', 'Email *', 'email']].map(([key, label, type]) => (
+              <div key={key} className="flex flex-col gap-2">
+                <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">{label}</label>
+                <input type={type} required value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+                  className="bg-transparent border-b border-white/20 py-3 font-mono text-sm text-white outline-none focus:border-[color:var(--primary)] transition-colors placeholder:text-white/20" />
+              </div>
+            ))}
+          </div>
+
+          {/* Brand + Instagram */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 order-el">
+            <div className="flex flex-col gap-2">
+              <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">Brand / Label *</label>
+              <input type="text" required value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))}
+                className="bg-transparent border-b border-white/20 py-3 font-mono text-sm text-white outline-none focus:border-[color:var(--primary)] transition-colors" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">Instagram</label>
+              <input type="text" value={form.instagram} onChange={e => setForm(f => ({ ...f, instagram: e.target.value }))}
+                placeholder="@handle"
+                className="bg-transparent border-b border-white/20 py-3 font-mono text-sm text-white outline-none focus:border-[color:var(--primary)] transition-colors placeholder:text-white/20" />
+            </div>
+          </div>
+
+          {/* Brief */}
+          <div className="flex flex-col gap-2 order-el">
+            <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">Project Brief *</label>
+            <textarea rows={4} required value={form.brief} onChange={e => setForm(f => ({ ...f, brief: e.target.value }))}
+              placeholder="Describe your brand, vision, style, specific requirements..."
+              className="bg-transparent border border-white/15 p-4 font-mono text-sm text-white outline-none focus:border-[color:var(--primary)] transition-colors resize-none placeholder:text-white/20" />
+          </div>
+
+          {/* Reference links */}
+          <div className="flex flex-col gap-2 order-el">
+            <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+              Reference Links <span className="normal-case text-white/25 text-[9px]">(Pinterest, Instagram, etc.)</span>
+            </label>
+            <textarea rows={2} value={form.referenceLinks} onChange={e => setForm(f => ({ ...f, referenceLinks: e.target.value }))}
+              placeholder="https://pinterest.com/..."
+              className="bg-transparent border border-white/15 p-4 font-mono text-[11px] text-white outline-none focus:border-[color:var(--primary)] transition-colors resize-none placeholder:text-white/20" />
+          </div>
+
+          {/* File drop zone */}
+          <div className="flex flex-col gap-3 order-el">
+            <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+              Reference Files <span className="normal-case text-white/25 text-[9px]">(mood boards, logos, inspiration)</span>
+            </label>
+            <div
+              onDragOver={e => { e.preventDefault(); setDragging(true); }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`border border-dashed py-10 px-6 flex flex-col items-center gap-3 cursor-pointer transition-all duration-300 ${dragging ? 'border-[color:var(--primary)] bg-white/5' : 'border-white/15 hover:border-white/30'}`}
+            >
+              <FileImage size={22} className="text-white/25" />
+              <p className="font-mono text-[10px] uppercase tracking-widest text-white/30 text-center">Drop files here or click to browse</p>
+              <p className="font-mono text-[9px] text-white/20">JPG · PNG · PDF · up to 8 files</p>
+              <input ref={fileInputRef} type="file" multiple accept="image/*,.pdf" className="hidden" onChange={e => addFiles(e.target.files)} />
+            </div>
+            {files.length > 0 && (
+              <ul className="flex flex-col gap-1.5">
+                {files.map((f, i) => (
+                  <li key={i} className="flex items-center justify-between px-4 py-2.5 border border-white/10 bg-white/[0.02]">
+                    <span className="font-mono text-[10px] text-white/50 truncate max-w-[85%]">{f.name}</span>
+                    <button type="button" onClick={() => setFiles(p => p.filter((_, j) => j !== i))} className="text-white/25 hover:text-white/70 transition-colors ml-3 flex-shrink-0">
+                      <X size={11} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Price + CTA */}
+          <div className="flex flex-col gap-4 pt-6 border-t border-white/10 order-el">
+            <div className="flex justify-between items-baseline">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+                {service.layout === 'options' ? 'Package' : 'Starting From'}
+              </span>
+              <span className="text-xl text-white font-medium">
+                {service.layout === 'options'
+                  ? (selectedTier !== null ? service.options[selectedTier]?.price : '—')
+                  : service.price}
+              </span>
+            </div>
+            {error && <p className="font-mono text-[10px] text-red-400 uppercase tracking-widest">{error}</p>}
+            <button type="submit" disabled={loading || (service.layout === 'options' && selectedTier === null)}
+              className="w-full py-5 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[11px] uppercase tracking-widest hover:bg-white hover:text-black transition-colors duration-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+              {loading ? 'Processing...' : <><span>Proceed to Payment</span><ArrowRight size={12} /></>}
+            </button>
+            <button type="button"
+              disabled={service.layout === 'options' && selectedTier === null}
+              onClick={() => {
+                const tier = selectedTier !== null ? service.options[selectedTier]?.price : null;
+                addToCart({ kind: 'service', id: `${service.title}__${tier || ''}`, title: service.title, tier, priceDisplay: tier || service.price, priceCents: getPriceCents() });
+                setCartAdded(true);
+                setTimeout(() => { setCartAdded(false); setCartOpen(true); }, 400);
+              }}
+              className="w-full py-4 border border-white/20 text-white/60 font-mono text-[11px] uppercase tracking-widest hover:border-white/40 hover:text-white transition-all duration-500 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+              <ShoppingBag size={12} /> {cartAdded ? 'Added to Cart!' : 'Add to Cart'}
+            </button>
+            <p className="font-mono text-[9px] text-white/25 text-center uppercase tracking-wider">Secure checkout via Stripe · 2 revision rounds included</p>
+          </div>
+
+        </form>
+      </div>
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
@@ -689,20 +1047,210 @@ const ServiceDetail = () => {
 
 const AboutPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [displayed, setDisplayed] = useState('');
+  const [phase, setPhase] = useState('scramble'); // scramble | reveal | done
+  const [visible, setVisible] = useState(false);
+  const fullText = 'Who the f*ck is Rare?';
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+
+  useEffect(() => {
+    // Start scramble phase
+    let frame = 0;
+    let revealIndex = 0;
+    const totalFrames = 40;
+
+    const interval = setInterval(() => {
+      frame++;
+      if (frame < totalFrames) {
+        // Random scramble, progressively reveal from left
+        revealIndex = Math.floor((frame / totalFrames) * fullText.length);
+        const scrambled = fullText.split('').map((ch, i) => {
+          if (i < revealIndex) return ch;
+          if (ch === ' ') return ' ';
+          return chars[Math.floor(Math.random() * chars.length)];
+        }).join('');
+        setDisplayed(scrambled);
+      } else {
+        setDisplayed(fullText);
+        setPhase('done');
+        clearInterval(interval);
+      }
+    }, 40);
+
+    const visTimer = setTimeout(() => setVisible(true), 300);
+    return () => { clearInterval(interval); clearTimeout(visTimer); };
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-center relative z-10 px-6">
-      <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-sm font-mono uppercase tracking-widest">
-          Back to Home <ArrowRight size={16} />
+    <div className="min-h-screen flex flex-col items-center justify-center text-center relative z-10 px-6 overflow-hidden">
+
+      {/* Animated noise background */}
+      <style>{`
+        @keyframes grain {
+          0%, 100% { transform: translate(0,0) }
+          10% { transform: translate(-2%,-3%) }
+          20% { transform: translate(3%,2%) }
+          30% { transform: translate(-1%,4%) }
+          40% { transform: translate(4%,-1%) }
+          50% { transform: translate(-3%,3%) }
+          60% { transform: translate(2%,-4%) }
+          70% { transform: translate(-4%,1%) }
+          80% { transform: translate(1%,3%) }
+          90% { transform: translate(3%,-2%) }
+        }
+        @keyframes flicker {
+          0%, 100% { opacity: 1 }
+          92% { opacity: 1 }
+          93% { opacity: 0.4 }
+          94% { opacity: 1 }
+          96% { opacity: 0.6 }
+          97% { opacity: 1 }
+        }
+        @keyframes floatA {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          33% { transform: translateY(-18px) rotate(3deg); }
+          66% { transform: translateY(10px) rotate(-2deg); }
+        }
+        @keyframes floatB {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          40% { transform: translateY(14px) rotate(-4deg); }
+          75% { transform: translateY(-12px) rotate(2deg); }
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scanline {
+          0% { top: -10%; }
+          100% { top: 110%; }
+        }
+        @keyframes orbDrift1 {
+          0%,100% { transform: translate(0px, 0px) scale(1); }
+          25% { transform: translate(80px, -60px) scale(1.08); }
+          50% { transform: translate(-50px, 80px) scale(0.95); }
+          75% { transform: translate(60px, 40px) scale(1.04); }
+        }
+        @keyframes orbDrift2 {
+          0%,100% { transform: translate(0px, 0px) scale(1); }
+          30% { transform: translate(-90px, 50px) scale(1.1); }
+          60% { transform: translate(70px, -80px) scale(0.92); }
+          80% { transform: translate(-40px, -30px) scale(1.06); }
+        }
+        @keyframes orbDrift3 {
+          0%,100% { transform: translate(0px, 0px) scale(1); }
+          20% { transform: translate(60px, 90px) scale(0.96); }
+          55% { transform: translate(-80px, -40px) scale(1.12); }
+          80% { transform: translate(40px, -70px) scale(0.98); }
+        }
+        .about-title { animation: flicker 6s infinite; }
+        .float-a { animation: floatA 7s ease-in-out infinite; }
+        .float-b { animation: floatB 9s ease-in-out infinite; }
+        .slide-up-1 { animation: slideUp 0.7s ease forwards; animation-delay: 1.8s; opacity: 0; }
+        .slide-up-2 { animation: slideUp 0.7s ease forwards; animation-delay: 2.2s; opacity: 0; }
+        .slide-up-3 { animation: slideUp 0.7s ease forwards; animation-delay: 2.6s; opacity: 0; }
+        .about-orb-1 { animation: orbDrift1 12s ease-in-out infinite; }
+        .about-orb-2 { animation: orbDrift2 16s ease-in-out infinite; }
+        .about-orb-3 { animation: orbDrift3 20s ease-in-out infinite; }
+      `}</style>
+
+      {/* Red gradient orbs */}
+      <div className="about-orb-1 pointer-events-none fixed" style={{ top: '10%', left: '20%', width: '70vw', height: '70vw', maxWidth: 800, maxHeight: 800, borderRadius: '50%', background: 'radial-gradient(circle at center, rgba(123,31,36,0.22) 0%, transparent 65%)', filter: 'blur(90px)', zIndex: 0 }} />
+      <div className="about-orb-2 pointer-events-none fixed" style={{ top: '40%', right: '10%', width: '55vw', height: '55vw', maxWidth: 650, maxHeight: 650, borderRadius: '50%', background: 'radial-gradient(circle at center, rgba(123,31,36,0.18) 0%, transparent 60%)', filter: 'blur(100px)', zIndex: 0 }} />
+      <div className="about-orb-3 pointer-events-none fixed" style={{ bottom: '5%', left: '5%', width: '60vw', height: '60vw', maxWidth: 700, maxHeight: 700, borderRadius: '50%', background: 'radial-gradient(circle at center, rgba(123,31,36,0.14) 0%, transparent 65%)', filter: 'blur(110px)', zIndex: 0 }} />
+
+      {/* Grain overlay */}
+      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.04]"
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`, animation: 'grain 0.5s steps(1) infinite' }} />
+
+      {/* Scanline */}
+      <div className="pointer-events-none fixed left-0 w-full h-[2px] bg-black/5 z-0" style={{ animation: 'scanline 4s linear infinite' }} />
+
+      {/* Floating decorative elements */}
+      <span className="float-a absolute top-[15%] left-[8%] font-mono text-[10px] text-black/10 uppercase tracking-[0.3em] select-none">©rare</span>
+      <span className="float-b absolute top-[20%] right-[10%] font-mono text-[9px] text-black/8 uppercase tracking-[0.4em] select-none">AV</span>
+      <span className="float-a absolute bottom-[25%] left-[12%] font-mono text-[8px] text-black/8 uppercase tracking-[0.3em] select-none" style={{animationDelay:'2s'}}>2026</span>
+      <span className="float-b absolute bottom-[30%] right-[8%] font-mono text-[9px] text-[color:var(--primary)] opacity-20 uppercase tracking-[0.4em] select-none" style={{animationDelay:'1s'}}>■</span>
+      <span className="float-a absolute top-[55%] left-[5%] font-mono text-[8px] text-black/6 uppercase tracking-[0.3em] select-none" style={{animationDelay:'3s'}}>altered</span>
+
+      {/* Nav */}
+      <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest z-10">
+        Back to Home <ArrowRight size={14} />
       </Link>
       <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
         <Menu size={24} />
       </button>
-      <h1 className="heading-font text-6xl md:text-[8rem] text-black mb-8 leading-none mt-20">Who the f*ck is Rare?</h1>
-      <p className="max-w-xl text-black/60 font-mono leading-relaxed mb-12">
-        Placeholder for brand manifesto, history, or creator biography. <br/><br/>
-        More content coming soon.
+
+      {/* Title */}
+      <h1 className="about-title heading-font text-[2.8rem] md:text-[7rem] text-black leading-none mt-20 mb-10 relative z-10 select-none" style={{letterSpacing:'0.02em'}}>
+        {displayed || '\u00A0'}
+        {phase !== 'done' && <span className="inline-block w-[3px] h-[0.8em] bg-[color:var(--primary)] ml-1 align-middle animate-pulse" />}
+      </h1>
+
+      {/* Content */}
+      <div className="relative z-10 max-w-xl">
+        <div className="slide-up-1 flex items-center justify-center gap-3">
+          <span className="w-8 h-px bg-black/20" />
+          <span className="font-mono text-[9px] text-black/25 uppercase tracking-[0.3em]">Altered Venganza</span>
+          <span className="w-8 h-px bg-black/20" />
+        </div>
+      </div>
+
+      <div className="w-full max-w-2xl mt-auto relative z-10"><SiteFooter light={true} /></div>
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
+    </div>
+  );
+};
+
+const MaterializingIdeasPage = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const products = [
+    { name: 'MAT Renders', tag: 'AI Renders', desc: 'Pre-made & custom AI clothing renders. Production-ready files, fully alterable to your brand.' },
+    { name: 'MAT Ideas', tag: 'Creative Canvas', desc: 'A system to develop and visualize your creative direction before spending a single dollar on production.' },
+    { name: 'MAT Try On', tag: 'Virtual Fitting', desc: 'See how your designs look on real body proportions — no photoshoot needed.' },
+    { name: 'MAT Drop', tag: 'Drop System', desc: 'Tools and templates to plan, build, and execute a clothing drop from concept to launch.' },
+  ];
+  return (
+    <div className="min-h-screen flex flex-col relative z-10 px-6 py-16 md:py-24 max-w-4xl mx-auto w-full">
+      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
+        <Menu size={24} />
+      </button>
+      <Link to="/" className="hidden md:inline-flex self-end items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest mb-12">
+        Back to Home <ArrowRight size={14} />
+      </Link>
+
+      {/* Hero */}
+      <div className="mb-16">
+        <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[color:var(--primary)] mb-4">Materializing Ideas</p>
+        <h1 className="heading-font text-[3rem] md:text-[6rem] text-black leading-none mb-8">
+          Creative Canvas<br />System
+        </h1>
+        <p className="font-mono text-sm text-black/60 uppercase tracking-[0.15em] max-w-lg leading-relaxed">
+          Tools for fashion creators — AI renders · flat templates · design tools.<br />
+          <span className="text-black font-semibold">Made for doers, not dreamers.</span>
+        </p>
+      </div>
+
+      {/* Divider */}
+      <div className="w-full h-px bg-black/10 mb-16" />
+
+      {/* Products */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
+        {products.map((p) => (
+          <div key={p.name} className="border border-black/10 rounded-2xl p-6 hover:border-[color:var(--primary)] transition-colors duration-300">
+            <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-[color:var(--primary)] mb-2">{p.tag}</p>
+            <h2 className="heading-font text-2xl text-black mb-3">{p.name}</h2>
+            <p className="font-mono text-[11px] text-black/50 leading-relaxed uppercase tracking-[0.05em]">{p.desc}</p>
+            <p className="font-mono text-[9px] text-black/25 uppercase tracking-[0.2em] mt-4">Coming Soon</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer note */}
+      <p className="font-mono text-[10px] text-black/30 uppercase tracking-[0.2em] text-center">
+        A sub-brand of Altered Venganza — <Link to="/about" className="text-[color:var(--primary)] hover:text-black transition-colors">Who the f*ck is Rare?</Link>
       </p>
-      <div className="w-full max-w-2xl mt-auto"><SiteFooter light={true} /></div>
+
+      <div className="mt-12"><SiteFooter light={true} /></div>
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
@@ -967,11 +1515,15 @@ const PremadeModal = ({ premade, onClose, onAddToCart }) => {
 // CART SIDEBAR
 // ==========================================
 
-const CartSidebar = ({ cart, onRemove, onClose }) => {
+const CartSidebar = ({ onClose }) => {
+  const { cart, removeFromCart } = useCart();
   const overlayRef = useRef(null);
   const panelRef = useRef(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+  const premades = cart.filter(i => i.kind === 'premade');
+  const services = cart.filter(i => i.kind === 'service');
+  const totalEur = premades.reduce((s, i) => s + i.price, 0) + services.reduce((s, i) => s + (i.priceCents / 100), 0);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -984,36 +1536,19 @@ const CartSidebar = ({ cart, onRemove, onClose }) => {
 
   const handleOverlayClick = (e) => { if (e.target === overlayRef.current) onClose(); };
 
-  const dmNumbers = cart.map(item => `#${item.number}`).join(', ');
-
   const handleCheckout = async () => {
     setCheckoutLoading(true);
     try {
-      const res = await fetch('/api/create-checkout', {
+      const res = await fetch('/api/cart-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cart.map(item => ({
-            number: item.number,
-            price: item.price,
-            type: item.type,
-            imageUrl: item.imageUrl,
-          })),
-        }),
+        body: JSON.stringify({ items: cart }),
       });
       const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        console.error('Checkout error:', data.error);
-        alert('Checkout failed. Please try again or DM us on Instagram.');
-      }
-    } catch (err) {
-      console.error('Checkout error:', err);
-      alert('Checkout failed. Please try again or DM us on Instagram.');
-    } finally {
-      setCheckoutLoading(false);
-    }
+      if (data.url) { window.location.href = data.url; }
+      else { alert('Checkout failed. Please try again or DM us on Instagram.'); }
+    } catch { alert('Network error. Please try again.'); }
+    finally { setCheckoutLoading(false); }
   };
 
   return (
@@ -1021,27 +1556,43 @@ const CartSidebar = ({ cart, onRemove, onClose }) => {
       <div ref={panelRef} className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-black/10">
-          <h2 className="heading-font text-2xl tracking-widest text-black">Cart</h2>
+          <h2 className="heading-font text-2xl tracking-widest text-black">Cart ({cart.length})</h2>
           <button onClick={onClose} className="w-10 h-10 rounded-full border border-black/10 flex items-center justify-center text-black/60 hover:text-black transition-colors">
             <X size={18} />
           </button>
         </div>
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-3">
           {cart.length === 0 && (
             <p className="font-mono text-xs text-black/30 uppercase tracking-widest text-center py-12">Your cart is empty</p>
           )}
           {cart.map((item, idx) => (
             <div key={idx} className="flex items-center gap-4 p-3 rounded-xl border border-black/5 group hover:border-black/10 transition-colors">
-              <div className="w-16 h-16 rounded-lg overflow-hidden bg-neutral-100 flex-shrink-0">
-                <img src={item.imageUrl} alt={`Premade #${item.number}`} className="w-full h-full object-cover" />
-              </div>
+              {item.kind === 'premade' ? (
+                <div className="w-14 h-14 rounded-lg overflow-hidden bg-neutral-100 flex-shrink-0">
+                  <img src={item.imageUrl} alt={`Premade #${item.number}`} className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-14 h-14 rounded-lg bg-[color:var(--primary)] flex-shrink-0 flex items-center justify-center">
+                  <ShoppingBag size={18} className="text-white" />
+                </div>
+              )}
               <div className="flex-1 min-w-0">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">Premade #{item.number}</p>
-                <p className="text-sm font-semibold text-black">${item.price}</p>
+                {item.kind === 'premade' ? (
+                  <>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">Premade #{item.number}</p>
+                    <p className="text-sm font-semibold text-black">€{item.price}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">{item.title}</p>
+                    {item.tier && <p className="font-mono text-[9px] text-black/35 uppercase tracking-wider">{item.tier}</p>}
+                    <p className="text-sm font-semibold text-black">{item.priceDisplay}</p>
+                  </>
+                )}
               </div>
-              <button onClick={() => onRemove(idx)} className="w-8 h-8 rounded-full flex items-center justify-center text-black/30 hover:text-[color:var(--primary)] hover:bg-black/5 transition-all">
+              <button onClick={() => removeFromCart(idx)} className="w-8 h-8 rounded-full flex items-center justify-center text-black/30 hover:text-[color:var(--primary)] hover:bg-black/5 transition-all">
                 <Trash2 size={14} />
               </button>
             </div>
@@ -1053,25 +1604,26 @@ const CartSidebar = ({ cart, onRemove, onClose }) => {
           <div className="p-6 border-t border-black/10 space-y-4">
             <div className="flex items-center justify-between">
               <span className="font-mono text-xs uppercase tracking-widest text-black/50">Total</span>
-              <span className="text-xl font-semibold text-black">${total}</span>
+              <span className="text-xl font-semibold text-black">€{totalEur.toFixed(0)}</span>
             </div>
-
+            {services.length > 0 && (
+              <p className="font-mono text-[9px] text-black/40 uppercase tracking-wider">
+                Service orders: brief required after payment · studio@alteredvenganza.com
+              </p>
+            )}
             <button
               onClick={handleCheckout}
               disabled={checkoutLoading}
               className="w-full flex items-center justify-center gap-2 bg-black text-white px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg hover:bg-[color:var(--primary)] transition-colors disabled:opacity-50 disabled:cursor-wait"
             >
               <ExternalLink size={16} />
-              {checkoutLoading ? 'Processing...' : `Checkout — $${total}`}
+              {checkoutLoading ? 'Processing...' : `Checkout — €${totalEur.toFixed(0)}`}
             </button>
             <a href={INSTAGRAM_DM_URL} target="_blank" rel="noopener noreferrer"
                className="w-full flex items-center justify-center gap-2 bg-white text-black px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg border border-black/10 hover:border-black/30 transition-all">
               <MessageCircle size={16} />
-              Confirm via DM
+              Ask via DM
             </a>
-            <p className="text-center font-mono text-[10px] text-black/30 uppercase tracking-wider">
-              DM us: "I'd like premades {dmNumbers}"
-            </p>
           </div>
         )}
       </div>
@@ -1162,17 +1714,13 @@ const useInstagramPremades = () => {
 const PremadesPage = () => {
   const { premades, loading, error } = useInstagramPremades();
   const [selected, setSelected] = useState(null);
-  const [cart, setCart] = useState([]);
-  const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const containerRef = useRef(null);
+  const { cart, cartOpen, setCartOpen, addToCart, removeFromCart } = useCart();
 
-  const addToCart = (premade) => {
-    if (!cart.find(item => item.id === premade.id)) {
-      setCart(prev => [...prev, premade]);
-    }
+  const addPremadeToCart = (premade) => {
+    addToCart({ kind: 'premade', ...premade });
   };
-  const removeFromCart = (idx) => setCart(prev => prev.filter((_, i) => i !== idx));
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -1199,97 +1747,92 @@ const PremadesPage = () => {
         <Menu size={24} />
       </button>
 
-      {/* TOP — Same layout as Home */}
-      <div className="flex flex-col md:flex-row justify-between items-start w-full relative z-20">
-        <div className="premade-header max-w-3xl pr-14 md:pr-0">
-          <Link to="/" className="heading-font text-5xl md:text-[7rem] leading-none text-black tracking-widest mb-6 block hover:opacity-80 transition-opacity">
-            Altered Venganza
-          </Link>
-          <div className="space-y-1 mb-8 max-w-2xl">
-            <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed">
-              Pre-made clothing renders &bull; Production ready files
-            </p>
-            <p className="text-black/70 font-mono text-xs md:text-sm uppercase tracking-[0.1em] leading-relaxed pt-1">
-              Fully alterable &amp; customizable to your brand &bull; Numbered &amp; Ready to purchase
-            </p>
-          </div>
-          <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex flex-wrap items-center gap-2 mb-6">
-            <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]"></span>
-            {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
+      {/* TOP HEADER */}
+      <div className="premade-header w-full relative z-20 mb-10 pr-14 md:pr-0">
+        <Link to="/" className="heading-font text-[3.5rem] leading-none text-black tracking-widest block hover:opacity-80 transition-opacity">
+          Altered Venganza
+        </Link>
+        <div className="space-y-1 mt-4 mb-6">
+          <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
+            Pre-made clothing renders &bull; Production ready files
+          </p>
+          <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
+            Fully alterable &amp; customizable to your brand &bull; Numbered &amp; Ready to purchase
           </p>
         </div>
-
-        <div className="premade-header flex flex-col items-start md:items-end gap-3 mt-8 md:mt-0 text-left md:text-right">
-          <Link to="/" className="hidden md:flex group text-black/60 hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs items-center gap-3">
-            <span>Back to Home</span>
-            <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:-translate-x-2" />
+        <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex items-center gap-2 mb-8">
+          <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]"></span>
+          {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
+        </p>
+        <div className="flex flex-col gap-2">
+          <Link to="/" className="font-mono text-xs text-black/50 hover:text-black transition-colors uppercase tracking-[0.2em]">
+            Back to Home
           </Link>
           <button
             onClick={() => setCartOpen(true)}
-            className="group text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] font-mono text-xs flex items-center gap-3"
+            className="font-mono text-xs text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] flex items-center gap-2 w-fit"
           >
-            <span className="md:order-1">Cart ({cart.length})</span>
-            <ShoppingBag size={14} className="md:order-2" />
+            Cart ({cart.length}) <ShoppingBag size={13} />
           </button>
         </div>
       </div>
 
       {/* GALLERY GRID */}
-      <div className="flex-1 w-full mt-16 md:mt-12 relative z-10">
-        <div className="grid grid-cols-3 lg:grid-cols-4 gap-1 sm:gap-4 md:gap-6">
+      <div className="flex-1 w-full relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
           {premades.map((premade) => (
             <div key={premade.id} className="premade-item">
               <button
                 onClick={() => premade.available && setSelected(premade)}
-                className={`group text-left w-full bg-white/0 overflow-hidden transition-all duration-500 focus:outline-none ${!premade.available ? 'cursor-default' : ''}`}
+                className={`group text-left w-full overflow-hidden transition-all duration-500 focus:outline-none ${!premade.available ? 'cursor-default' : ''}`}
               >
-                <div className="relative aspect-[3/4] overflow-hidden bg-black/5 border border-black/10 rounded-none sm:rounded-xl hover:border-[color:var(--primary)] transition-colors duration-500">
+                <div className="relative aspect-[3/4] overflow-hidden bg-black/5 border border-black/10 rounded-2xl hover:border-[color:var(--primary)] transition-colors duration-500">
                   <img src={premade.imageUrl} alt={`Premade #${premade.number}`} loading="lazy" className={`w-full h-full object-cover transition-transform duration-700 ${premade.available ? 'group-hover:scale-105' : 'grayscale-[30%]'}`} />
 
-                  {/* Type badge: P = premium, B = basic, ARCHIVE = legacy */}
+                  {/* Type badge */}
                   {premade.type === 'legacy' ? (
-                    <span className="absolute top-1.5 left-1.5 sm:top-3 sm:left-3 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-mono text-[6px] sm:text-[8px] font-bold tracking-widest z-10 bg-black/70 text-white/90 backdrop-blur-sm uppercase">
+                    <span className="absolute top-3 left-3 px-2 py-1 rounded-full font-mono text-[8px] font-bold tracking-widest z-10 bg-black/70 text-white/90 backdrop-blur-sm uppercase">
                       Archive
                     </span>
                   ) : (
-                    <span className={`absolute top-1.5 left-1.5 sm:top-3 sm:left-3 w-5 h-5 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-mono text-[8px] sm:text-[10px] font-bold tracking-wider z-10 ${premade.type === 'premium' ? 'bg-[color:var(--primary)] text-white shadow-[0_0_10px_rgba(123,31,36,0.4)]' : 'bg-white/80 text-black/60 backdrop-blur-sm border border-black/10'}`}>
+                    <span className={`absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center font-mono text-[11px] font-bold tracking-wider z-10 ${premade.type === 'premium' ? 'bg-[color:var(--primary)] text-white shadow-[0_0_10px_rgba(123,31,36,0.4)]' : 'bg-white text-black/60 border border-black/15'}`}>
                       {premade.type === 'premium' ? 'P' : 'B'}
                     </span>
                   )}
 
                   {/* SOLD overlay */}
                   {!premade.available ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-[rgba(123,31,36,0.75)]">
+                    <div className="absolute inset-0 flex items-center justify-center bg-[rgba(123,31,36,0.75)] rounded-2xl">
                       <span className="font-mono text-sm text-white font-bold tracking-[0.3em] uppercase">Sold</span>
                     </div>
                   ) : (
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-500 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-500 flex items-center justify-center rounded-2xl">
                       <span className="font-mono text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-widest uppercase">View</span>
                     </div>
                   )}
                 </div>
-                <div className="mt-1 sm:mt-3 flex items-center justify-between px-0.5 sm:px-1">
-                  <span className={`font-mono text-[7px] sm:text-[10px] tracking-widest uppercase ${premade.available ? 'text-black/40' : 'text-black/25 line-through'}`}>#{premade.number}</span>
+                <div className="mt-2 flex items-center justify-between px-1">
+                  <span className={`font-mono text-[10px] tracking-widest uppercase ${premade.available ? 'text-black/40' : 'text-black/25 line-through'}`}>#{premade.number}</span>
                   {premade.type === 'legacy' ? (
-                    <span className="flex items-center gap-1 sm:gap-1.5">
-                      <span className="font-mono text-[7px] sm:text-[10px] text-black/30 line-through">${PREMADE_PRICE_BASIC}</span>
-                      <span className="font-mono text-[9px] sm:text-xs font-semibold text-[color:var(--primary)]">${premade.price}</span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="font-mono text-[10px] text-black/30 line-through">${PREMADE_PRICE_BASIC}</span>
+                      <span className="font-mono text-xs font-semibold text-[color:var(--primary)]">${premade.price}</span>
                     </span>
                   ) : (
-                    <span className={`font-mono text-[9px] sm:text-xs font-semibold ${premade.available ? 'text-black' : 'text-black/25'}`}>${premade.price}</span>
+                    <span className={`font-mono text-xs font-semibold ${premade.available ? 'text-black' : 'text-black/25'}`}>${premade.price}</span>
                   )}
                 </div>
               </button>
               {premade.available ? (
                 <button
-                  onClick={() => addToCart(premade)}
-                  disabled={cart.find(item => item.id === premade.id)}
-                  className="hidden sm:flex mt-2 w-full py-2 text-[10px] font-mono uppercase tracking-widest border border-black/10 rounded-lg text-black/50 hover:text-white hover:bg-black hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black/50 disabled:hover:border-black/10 items-center justify-center gap-1.5"
+                  onClick={() => addPremadeToCart(premade)}
+                  disabled={cart.find(item => item.kind === 'premade' && item.id === premade.id)}
+                  className="flex mt-2 w-full py-2.5 text-[10px] font-mono uppercase tracking-widest border border-black/10 rounded-xl text-black/50 hover:text-white hover:bg-black hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black/50 disabled:hover:border-black/10 items-center justify-center gap-1.5"
                 >
                   {cart.find(item => item.id === premade.id) ? 'In Cart' : <><Plus size={12} /> Add to Cart</>}
                 </button>
               ) : (
-                <span className="hidden sm:flex mt-2 w-full py-2 text-[10px] font-mono uppercase tracking-widest text-black/20 items-center justify-center">Sold</span>
+                <span className="flex mt-2 w-full py-2.5 text-[10px] font-mono uppercase tracking-widest text-black/20 items-center justify-center">Sold</span>
               )}
             </div>
           ))}
@@ -1331,9 +1874,9 @@ const PremadesPage = () => {
       </div>
 
       {/* Modal */}
-      {selected && <PremadeModal premade={selected} onClose={() => setSelected(null)} onAddToCart={addToCart} />}
+      {selected && <PremadeModal premade={selected} onClose={() => setSelected(null)} onAddToCart={addPremadeToCart} />}
       {/* Cart Sidebar */}
-      {cartOpen && <CartSidebar cart={cart} onRemove={removeFromCart} onClose={() => setCartOpen(false)} />}
+      {cartOpen && <CartSidebar onClose={() => setCartOpen(false)} />}
       {/* Mobile Menu */}
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
@@ -1408,24 +1951,51 @@ const AdminGuard = () => {
   return <AdminLayout />;
 };
 
+// Global cart button — visible when cart has items, on any page
+const GlobalCartButton = () => {
+  const { cart, setCartOpen, cartOpen } = useCart();
+  if (cart.length === 0) return null;
+  return (
+    <button
+      onClick={() => setCartOpen(true)}
+      className="fixed bottom-6 right-6 z-[90] flex items-center gap-2 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[10px] uppercase tracking-widest px-5 py-3 shadow-2xl hover:scale-105 transition-all duration-300"
+      style={{ display: cartOpen ? 'none' : 'flex' }}
+    >
+      <ShoppingBag size={14} />
+      Cart ({cart.length})
+    </button>
+  );
+};
+
+const GlobalCartSidebar = () => {
+  const { cartOpen, setCartOpen } = useCart();
+  if (!cartOpen) return null;
+  return <CartSidebar onClose={() => setCartOpen(false)} />;
+};
+
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <EditorProvider>
-          <ToastProvider>
-            <ThemeController />
-            <AnimatedBackground />
-            <EditorToolbar />
+      <CartProvider>
+        <AuthProvider>
+          <EditorProvider>
+            <ToastProvider>
+              <ThemeController />
+              <AnimatedBackground />
+              <GlobalCartButton />
+              <GlobalCartSidebar />
+              <EditorToolbar />
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<AboutPage />} />
+              <Route path="/materializing-ideas" element={<MaterializingIdeasPage />} />
               <Route path="/vag" element={<GalleryPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/archive" element={<ArchivePage />} />
               <Route path="/premades" element={<PremadesPage />} />
               <Route path="/service/:id" element={<ServiceDetail />} />
+              <Route path="/service/:id/order" element={<ServiceOrderPage />} />
               <Route path="/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
               <Route path="/designs" element={<ServicePage title="Clothing Design Service" services={designsData} />} />
 
@@ -1440,9 +2010,10 @@ export default function App() {
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
             </Routes>
-          </ToastProvider>
-        </EditorProvider>
-      </AuthProvider>
+            </ToastProvider>
+          </EditorProvider>
+        </AuthProvider>
+      </CartProvider>
     </BrowserRouter>
   );
 }
