@@ -514,22 +514,17 @@ const ServicePage = ({ title, services }) => {
          </div>
        </header>
 
-       {/* Decorative logo block — only shown when logo image exists */}
-       {hasLogo && (
-         <div className="relative mb-20 flex justify-center w-full max-w-lg header-element">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full lg:translate-x-[-120%] pr-4">
-               <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
-                  2026 PRICING
-               </span>
-            </div>
-            <img
-               src={theme.images.logo}
-               onError={() => setLogoError(true)}
-               className={`w-[200px] md:w-[280px] object-contain opacity-90 mx-auto${isTailored ? '' : ' filter invert'}`}
-               alt="Alter Logo"
-            />
-         </div>
-       )}
+       {/* Decorative logo block */}
+       <div className="relative mb-20 flex justify-center w-full max-w-lg header-element">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full lg:translate-x-[-120%] pr-4">
+             <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
+                2026 PRICING
+             </span>
+          </div>
+          <h1 className={`heading-font text-5xl md:text-7xl tracking-widest text-center opacity-90${isTailored ? ' text-black' : ' text-white'}`}>
+            Altered Venganza
+          </h1>
+       </div>
 
        <div className="header-element mb-16 text-center w-full max-w-2xl">
           <p className="text-white/80 font-mono text-xs uppercase tracking-[0.2em] mb-6">{title}</p>
@@ -612,22 +607,17 @@ const ServiceDetail = () => {
          </div>
        </header>
 
-       {/* Decorative logo block — only shown when logo image exists */}
-       {hasLogo && (
-         <div className="relative mb-20 flex justify-center w-full max-w-[480px] header-element">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-4 md:-translate-x-[110%]">
-               <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
-                  2026 PRICING
-               </span>
-            </div>
-            <img
-               src={theme.images.logo}
-               onError={() => setLogoError(true)}
-               className={`w-[200px] md:w-[260px] object-contain opacity-90 mx-auto${isTailored ? '' : ' filter invert'}`}
-               alt="Alter Logo"
-            />
-         </div>
-       )}
+       {/* Decorative logo block */}
+       <div className="relative mb-20 flex justify-center w-full max-w-[480px] header-element">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-4 md:-translate-x-[110%]">
+             <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
+                2026 PRICING
+             </span>
+          </div>
+          <h1 className={`heading-font text-5xl md:text-7xl tracking-widest text-center opacity-90${isTailored ? ' text-black' : ' text-white'}`}>
+            Altered Venganza
+          </h1>
+       </div>
       
       <div className="header-element mb-16 w-full max-w-[480px] text-left">
         <h1 className="serif-heading text-5xl md:text-6xl text-white mb-2 leading-none">{service.title}</h1>
