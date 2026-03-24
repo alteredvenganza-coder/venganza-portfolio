@@ -1709,46 +1709,106 @@ const PremadesPage = () => {
   }, [loading, premades]);
 
   return (
-    <div ref={containerRef} className="min-h-screen p-6 md:p-12 flex flex-col relative z-10">
+    <div ref={containerRef} className="min-h-screen flex relative z-10">
 
-      {/* Mobile burger — fixed top right */}
-      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
-        <Menu size={24} />
-      </button>
+      {/* ============ LEFT SIDEBAR — Glassmorphism ============ */}
+      <aside className="premade-header hidden md:flex flex-col fixed left-0 top-0 bottom-0 w-[260px] lg:w-[300px] z-[50] p-8 lg:p-10
+        bg-white/65 backdrop-blur-2xl border-r border-white/50 shadow-[4px_0_32px_rgba(0,0,0,0.06)]">
 
-      {/* TOP HEADER */}
-      <div className="premade-header w-full relative z-20 mb-10 pr-14 md:pr-0">
-        <Link to="/" className="heading-font text-[3.5rem] leading-none text-black tracking-widest block hover:opacity-80 transition-opacity">
-          Altered Venganza
+        {/* Brand */}
+        <Link to="/" className="heading-font text-[2rem] lg:text-[2.4rem] leading-[1.1] text-black tracking-widest block hover:opacity-70 transition-opacity mb-6">
+          Altered<br/>Venganza
         </Link>
-        <div className="space-y-1 mt-4 mb-6">
-          <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
-            Pre-made clothing renders &bull; Production ready files
+
+        {/* Divider */}
+        <div className="w-8 h-px bg-black/20 mb-6" />
+
+        {/* Description */}
+        <div className="space-y-2 mb-8">
+          <p className="text-black/55 font-mono text-[9px] uppercase tracking-[0.12em] leading-relaxed">
+            Pre-made clothing renders
           </p>
-          <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
-            Fully alterable &amp; customizable to your brand &bull; Numbered &amp; Ready to purchase
+          <p className="text-black/55 font-mono text-[9px] uppercase tracking-[0.12em] leading-relaxed">
+            Production ready files
+          </p>
+          <p className="text-black/55 font-mono text-[9px] uppercase tracking-[0.12em] leading-relaxed">
+            Fully alterable &amp; customizable
+          </p>
+          <p className="text-black/55 font-mono text-[9px] uppercase tracking-[0.12em] leading-relaxed">
+            Numbered &amp; ready to purchase
           </p>
         </div>
-        <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex items-center gap-2 mb-8">
-          <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]"></span>
-          {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
+
+        {/* Live count */}
+        <p className="font-mono text-[9px] text-black/50 uppercase tracking-[0.12em] flex items-center gap-2 mb-10">
+          <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_6px_rgba(123,31,36,0.5)]" />
+          {loading ? '...' : `${premades.filter(p => p.available).length} pieces available`}
         </p>
-        <div className="flex flex-col gap-2">
-          <Link to="/" className="font-mono text-xs text-black/50 hover:text-black transition-colors uppercase tracking-[0.2em]">
-            Back to Home
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Navigation */}
+        <div className="flex flex-col gap-3">
+          <Link to="/" className="font-mono text-[9px] text-black/40 hover:text-black transition-colors uppercase tracking-[0.2em]">
+            ← Back to Home
           </Link>
           <button
             onClick={() => setCartOpen(true)}
-            className="font-mono text-xs text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] flex items-center gap-2 w-fit"
+            className="font-mono text-[9px] text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] flex items-center gap-2 w-fit"
           >
-            Cart ({cart.length}) <ShoppingBag size={13} />
+            Cart ({cart.length}) <ShoppingBag size={11} />
+          </button>
+          {cart.length > 0 && (
+            <button
+              onClick={() => setCartOpen(true)}
+              className="mt-2 w-full py-2.5 text-[9px] font-mono uppercase tracking-widest border border-[color:var(--primary)] bg-[color:var(--primary)] text-white rounded-xl hover:bg-black hover:border-black transition-all flex items-center justify-center gap-1.5"
+            >
+              <ShoppingBag size={11} />
+              View Cart — ${cart.reduce((s, i) => s + i.price, 0)}
+            </button>
+          )}
+        </div>
+
+        {/* Instagram */}
+        <a href="https://www.instagram.com/rare______________________/" target="_blank" rel="noopener noreferrer"
+          className="mt-6 font-mono text-[8px] text-black/25 hover:text-black/50 uppercase tracking-[0.15em] transition-colors">
+          rare______________________
+        </a>
+      </aside>
+
+      {/* Mobile top bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-[50] px-5 py-4
+        bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-[0_2px_16px_rgba(0,0,0,0.05)]
+        flex items-center justify-between">
+        <Link to="/" className="heading-font text-xl text-black tracking-widest hover:opacity-70 transition-opacity">
+          Altered Venganza
+        </Link>
+        <div className="flex items-center gap-4">
+          <button onClick={() => setCartOpen(true)} className="font-mono text-[9px] text-[color:var(--primary)] uppercase tracking-widest flex items-center gap-1.5">
+            <ShoppingBag size={14} /> {cart.length > 0 && `(${cart.length})`}
+          </button>
+          <button onClick={() => setMenuOpen(true)} className="w-9 h-9 flex items-center justify-center text-black/70 hover:text-black transition-colors">
+            <Menu size={22} />
           </button>
         </div>
       </div>
 
-      {/* GALLERY GRID */}
-      <div className="flex-1 w-full relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
+      {/* ============ MAIN CONTENT ============ */}
+      <main className="flex-1 md:ml-[260px] lg:ml-[300px] flex flex-col min-h-screen pt-[72px] md:pt-0">
+        <div className="flex-1 p-5 md:p-8 lg:p-10">
+
+          {/* Mobile label */}
+          <div className="md:hidden mb-6">
+            <p className="font-mono text-[9px] text-black/40 uppercase tracking-[0.12em] flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--primary)] animate-pulse" />
+              {loading ? '...' : `${premades.filter(p => p.available).length} pieces available`}
+            </p>
+          </div>
+
+          {/* GALLERY GRID */}
+          <div className="w-full relative z-10">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
           {premades.map((premade) => (
             <div key={premade.id} className="premade-item">
               <button
@@ -1824,23 +1884,14 @@ const PremadesPage = () => {
             <p className="font-mono text-black/30 text-xs uppercase tracking-widest">No premades available yet. Check back soon.</p>
           </div>
         )}
-      </div>
-
-      {/* BOTTOM */}
-      <div className="w-full relative z-20 mt-20">
-        {cart.length > 0 && (
-          <div className="flex justify-center mb-6">
-            <button
-              onClick={() => setCartOpen(true)}
-              className="group text-[color:var(--btn-tx)] hover:text-white transition-colors uppercase tracking-[0.2em] font-mono text-[10px] sm:text-xs flex items-center gap-2 border border-[color:var(--primary)] bg-[color:var(--primary)] px-6 py-3 rounded-full hover:bg-black hover:border-black"
-            >
-              <ShoppingBag size={14} />
-              View Cart ({cart.length}) — ${cart.reduce((s, i) => s + i.price, 0)}
-            </button>
           </div>
-        )}
-        <SiteFooter light={true} />
-      </div>
+        </div>
+
+        {/* FOOTER */}
+        <div className="w-full mt-16 px-5 md:px-8 lg:px-10">
+          <SiteFooter light={true} />
+        </div>
+      </main>
 
       {/* Modal */}
       {selected && <PremadeModal premade={selected} onClose={() => setSelected(null)} onAddToCart={addPremadeToCart} />}
