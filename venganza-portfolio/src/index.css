@@ -42,6 +42,15 @@
   --btn-tx: #161616;
 }
 
+.theme-tailored {
+  --bg-color: #1c1917;
+  --glow-color-1: rgba(200, 30, 45, 0.28);
+  --glow-color-2: rgba(230, 25, 50, 0.52);
+  --glow-color-3: rgba(160, 22, 35, 0.22);
+  --primary: #ffffff;
+  --btn-tx: #1c1917;
+}
+
 body {
   background-color: var(--bg-color);
   color: #d4d4d4;

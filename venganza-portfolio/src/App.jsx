@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, createContext, useContext } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2, ChevronDown, Menu } from 'lucide-react';
 import gsap from 'gsap';
@@ -7,6 +7,36 @@ import { INSTAGRAM_DM_URL, INSTAGRAM_HANDLE, PREMADE_PRICE_PREMIUM, PREMADE_PRIC
 import { useTheme } from './hooks/useTheme';
 
 gsap.registerPlugin(ScrollTrigger);
+
+// ==========================================
+// GLOBAL CART CONTEXT
+// ==========================================
+
+const CartContext = createContext(null);
+
+const CartProvider = ({ children }) => {
+  const [cart, setCart] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
+
+  const addToCart = (item) => {
+    setCart(prev => {
+      const dup = item.kind === 'premade'
+        ? prev.some(i => i.kind === 'premade' && i.id === item.id)
+        : prev.some(i => i.kind === 'service' && i.title === item.title && i.tier === item.tier);
+      return dup ? prev : [...prev, item];
+    });
+  };
+  const removeFromCart = (idx) => setCart(p => p.filter((_, i) => i !== idx));
+  const clearCart = () => setCart([]);
+
+  return (
+    <CartContext.Provider value={{ cart, cartOpen, setCartOpen, addToCart, removeFromCart, clearCart }}>
+      {children}
+    </CartContext.Provider>
+  );
+};
+
+const useCart = () => useContext(CartContext);
 
 // ==========================================
 // DATA
@@ -192,11 +222,13 @@ const AnimatedBackground = () => {
   }, [location.pathname]);
 
   const path = location.pathname;
+  const decoded = decodeURIComponent(path);
   const isLightMode = path === '/' || path === '/archive';
+  const isTailored = decoded.includes('Tailored');
 
   return (
     <div ref={bgRef} className="fixed inset-0 pointer-events-none z-[0] overflow-hidden">
-      {!isLightMode && (
+      {(!isLightMode) && (
         <svg className="noise-overlay" xmlns="http://www.w3.org/2000/svg">
           <filter id="noiseFilter" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
             <feTurbulence
@@ -213,7 +245,7 @@ const AnimatedBackground = () => {
           <rect width="100%" height="100%" filter="url(#noiseFilter)" />
         </svg>
       )}
-      {!isLightMode ? (
+      {(!isLightMode || isTailored) ? (
         <>
           <div className="glow-wrapper glow-orb-wrapper-1" style={{ pointerEvents: 'none' }}><div className="glow-orb-1"></div></div>
           <div className="glow-wrapper glow-orb-wrapper-2" style={{ pointerEvents: 'none' }}><div className="glow-orb-2"></div></div>
@@ -231,16 +263,18 @@ const AnimatedBackground = () => {
 const ThemeController = () => {
   const location = useLocation();
   useEffect(() => {
-    document.body.classList.remove('theme-red', 'theme-light', 'theme-dark');
+    document.body.classList.remove('theme-red', 'theme-light', 'theme-dark', 'theme-tailored');
     const path = location.pathname;
-    
+    const decoded = decodeURIComponent(path);
+
     if (path === '/' || path === '/archive' || path === '/about' || path === '/premades' || path === '/materializing-ideas') {
       document.body.classList.add('theme-light');
-    } else if (path === '/designs' || decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Premade') || decodeURIComponent(path).includes('Techpack')) {
+    } else if (decoded.includes('Tailored')) {
+      document.body.classList.add('theme-tailored');
+    } else if (path === '/designs' || decoded.includes('E-commerce') || decoded.includes('Premade') || decoded.includes('Techpack')) {
       document.body.classList.add('theme-dark');
-    } else if (decodeURIComponent(path).includes('/order')) {
-      // Order pages inherit same dark/red logic as their service
-      if (decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Techpack')) {
+    } else if (decoded.includes('/order')) {
+      if (decoded.includes('E-commerce') || decoded.includes('Techpack')) {
         document.body.classList.add('theme-dark');
       } else {
         document.body.classList.add('theme-red');
@@ -576,6 +610,9 @@ const ServiceDetail = () => {
   const service = allData.find(s => s.title === decodeURIComponent(id));
   const containerRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cartTier, setCartTier] = useState(null);
+  const [cartAdded, setCartAdded] = useState(false);
+  const { addToCart, setCartOpen } = useCart();
   const theme = useTheme();
 
   useEffect(() => {
@@ -650,13 +687,49 @@ const ServiceDetail = () => {
       </div>
 
       {/* Footer Details */}
-      <div className="w-full max-w-[480px] text-center pb-4 pt-24 header-element mt-auto">
-         <p className="font-mono text-[8px] md:text-[10px] text-white/60 uppercase tracking-[0.2em] leading-loose max-w-sm mx-auto mb-10">
+      <div className="w-full max-w-[480px] pb-4 pt-24 header-element mt-auto flex flex-col gap-3">
+         <p className="font-mono text-[8px] md:text-[10px] text-white/60 uppercase tracking-[0.2em] leading-loose max-w-sm mx-auto mb-6 text-center">
             Includes: 2 rounds of revisions. Additional revisions are available at 20% of the project total per revision.
           </p>
+
+         {/* Add to Cart — tier picker for options layout */}
+         {service.layout === 'options' && (
+           <div className="flex flex-col gap-2 mb-2">
+             <p className="font-mono text-[10px] uppercase tracking-widest text-white/40 text-center">Select to add to cart</p>
+             <div className="flex flex-col gap-2">
+               {service.options.map((opt, i) => (
+                 <button key={i} type="button" onClick={() => setCartTier(i)}
+                   className={`text-left px-4 py-3 border transition-all duration-300 font-mono text-[10px] uppercase tracking-wider ${cartTier === i ? 'border-[color:var(--primary)] bg-white/5 text-white' : 'border-white/10 text-white/40 hover:border-white/25 hover:text-white/60'}`}>
+                   {opt.price} <span className="text-white/25">{opt.delivery}</span>
+                 </button>
+               ))}
+             </div>
+           </div>
+         )}
+
+         <button
+           onClick={() => {
+             const tier = service.layout === 'options' ? (cartTier !== null ? service.options[cartTier]?.price : null) : null;
+             if (service.layout === 'options' && cartTier === null) return;
+             const priceDef = SERVICE_PRICES[service.title];
+             let priceCents = typeof priceDef === 'number' ? priceDef : 0;
+             if (priceDef?.options && cartTier !== null) {
+               const key = Object.keys(priceDef.options).find(k => service.options[cartTier]?.price?.includes(k));
+               if (key) priceCents = priceDef.options[key];
+             }
+             addToCart({ kind: 'service', id: `${service.title}__${tier || ''}`, title: service.title, tier, priceDisplay: tier || service.price, priceCents });
+             setCartAdded(true);
+             setTimeout(() => setCartAdded(false), 2000);
+           }}
+           disabled={service.layout === 'options' && cartTier === null}
+           className="w-full py-4 border border-white/20 text-white/70 hover:border-white/50 hover:text-white transition-all duration-500 font-mono text-[10px] justify-center tracking-widest uppercase flex items-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed"
+         >
+           <ShoppingBag size={13} /> {cartAdded ? 'Added!' : 'Add to Cart'}
+         </button>
+
          <Link to={`/service/${encodeURIComponent(service.title)}/order`}
             className="w-full py-5 bg-[color:var(--primary)] text-[color:var(--btn-tx)] hover:bg-white hover:text-black transition-all duration-500 font-mono text-[10px] justify-center tracking-widest uppercase flex items-center gap-3">
-             Order This Service <ArrowRight size={14} />
+             Order &amp; Send Brief <ArrowRight size={14} />
           </Link>
       </div>
       <div className="w-full max-w-[480px]"><SiteFooter light={false} /></div>
@@ -693,8 +766,10 @@ const ServiceOrderPage = () => {
   const [success, setSuccess] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cartAdded, setCartAdded] = useState(false);
   const fileInputRef = useRef(null);
   const containerRef = useRef(null);
+  const { addToCart, setCartOpen } = useCart();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -897,6 +972,17 @@ const ServiceOrderPage = () => {
             <button type="submit" disabled={loading || (service.layout === 'options' && selectedTier === null)}
               className="w-full py-5 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[11px] uppercase tracking-widest hover:bg-white hover:text-black transition-colors duration-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3">
               {loading ? 'Processing...' : <><span>Proceed to Payment</span><ArrowRight size={12} /></>}
+            </button>
+            <button type="button"
+              disabled={service.layout === 'options' && selectedTier === null}
+              onClick={() => {
+                const tier = selectedTier !== null ? service.options[selectedTier]?.price : null;
+                addToCart({ kind: 'service', id: `${service.title}__${tier || ''}`, title: service.title, tier, priceDisplay: tier || service.price, priceCents: getPriceCents() });
+                setCartAdded(true);
+                setTimeout(() => { setCartAdded(false); setCartOpen(true); }, 400);
+              }}
+              className="w-full py-4 border border-white/20 text-white/60 font-mono text-[11px] uppercase tracking-widest hover:border-white/40 hover:text-white transition-all duration-500 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+              <ShoppingBag size={12} /> {cartAdded ? 'Added to Cart!' : 'Add to Cart'}
             </button>
             <p className="font-mono text-[9px] text-white/25 text-center uppercase tracking-wider">Secure checkout via Stripe · 2 revision rounds included</p>
           </div>
@@ -1382,11 +1468,15 @@ const PremadeModal = ({ premade, onClose, onAddToCart }) => {
 // CART SIDEBAR
 // ==========================================
 
-const CartSidebar = ({ cart, onRemove, onClose }) => {
+const CartSidebar = ({ onClose }) => {
+  const { cart, removeFromCart } = useCart();
   const overlayRef = useRef(null);
   const panelRef = useRef(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+  const premades = cart.filter(i => i.kind === 'premade');
+  const services = cart.filter(i => i.kind === 'service');
+  const totalEur = premades.reduce((s, i) => s + i.price, 0) + services.reduce((s, i) => s + (i.priceCents / 100), 0);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -1399,36 +1489,19 @@ const CartSidebar = ({ cart, onRemove, onClose }) => {
 
   const handleOverlayClick = (e) => { if (e.target === overlayRef.current) onClose(); };
 
-  const dmNumbers = cart.map(item => `#${item.number}`).join(', ');
-
   const handleCheckout = async () => {
     setCheckoutLoading(true);
     try {
-      const res = await fetch('/api/create-checkout', {
+      const res = await fetch('/api/cart-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cart.map(item => ({
-            number: item.number,
-            price: item.price,
-            type: item.type,
-            imageUrl: item.imageUrl,
-          })),
-        }),
+        body: JSON.stringify({ items: cart }),
       });
       const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        console.error('Checkout error:', data.error);
-        alert('Checkout failed. Please try again or DM us on Instagram.');
-      }
-    } catch (err) {
-      console.error('Checkout error:', err);
-      alert('Checkout failed. Please try again or DM us on Instagram.');
-    } finally {
-      setCheckoutLoading(false);
-    }
+      if (data.url) { window.location.href = data.url; }
+      else { alert('Checkout failed. Please try again or DM us on Instagram.'); }
+    } catch { alert('Network error. Please try again.'); }
+    finally { setCheckoutLoading(false); }
   };
 
   return (
@@ -1436,27 +1509,43 @@ const CartSidebar = ({ cart, onRemove, onClose }) => {
       <div ref={panelRef} className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-black/10">
-          <h2 className="heading-font text-2xl tracking-widest text-black">Cart</h2>
+          <h2 className="heading-font text-2xl tracking-widest text-black">Cart ({cart.length})</h2>
           <button onClick={onClose} className="w-10 h-10 rounded-full border border-black/10 flex items-center justify-center text-black/60 hover:text-black transition-colors">
             <X size={18} />
           </button>
         </div>
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-3">
           {cart.length === 0 && (
             <p className="font-mono text-xs text-black/30 uppercase tracking-widest text-center py-12">Your cart is empty</p>
           )}
           {cart.map((item, idx) => (
             <div key={idx} className="flex items-center gap-4 p-3 rounded-xl border border-black/5 group hover:border-black/10 transition-colors">
-              <div className="w-16 h-16 rounded-lg overflow-hidden bg-neutral-100 flex-shrink-0">
-                <img src={item.imageUrl} alt={`Premade #${item.number}`} className="w-full h-full object-cover" />
-              </div>
+              {item.kind === 'premade' ? (
+                <div className="w-14 h-14 rounded-lg overflow-hidden bg-neutral-100 flex-shrink-0">
+                  <img src={item.imageUrl} alt={`Premade #${item.number}`} className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-14 h-14 rounded-lg bg-[color:var(--primary)] flex-shrink-0 flex items-center justify-center">
+                  <ShoppingBag size={18} className="text-white" />
+                </div>
+              )}
               <div className="flex-1 min-w-0">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">Premade #{item.number}</p>
-                <p className="text-sm font-semibold text-black">${item.price}</p>
+                {item.kind === 'premade' ? (
+                  <>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">Premade #{item.number}</p>
+                    <p className="text-sm font-semibold text-black">€{item.price}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">{item.title}</p>
+                    {item.tier && <p className="font-mono text-[9px] text-black/35 uppercase tracking-wider">{item.tier}</p>}
+                    <p className="text-sm font-semibold text-black">{item.priceDisplay}</p>
+                  </>
+                )}
               </div>
-              <button onClick={() => onRemove(idx)} className="w-8 h-8 rounded-full flex items-center justify-center text-black/30 hover:text-[color:var(--primary)] hover:bg-black/5 transition-all">
+              <button onClick={() => removeFromCart(idx)} className="w-8 h-8 rounded-full flex items-center justify-center text-black/30 hover:text-[color:var(--primary)] hover:bg-black/5 transition-all">
                 <Trash2 size={14} />
               </button>
             </div>
@@ -1468,25 +1557,26 @@ const CartSidebar = ({ cart, onRemove, onClose }) => {
           <div className="p-6 border-t border-black/10 space-y-4">
             <div className="flex items-center justify-between">
               <span className="font-mono text-xs uppercase tracking-widest text-black/50">Total</span>
-              <span className="text-xl font-semibold text-black">${total}</span>
+              <span className="text-xl font-semibold text-black">€{totalEur.toFixed(0)}</span>
             </div>
-
+            {services.length > 0 && (
+              <p className="font-mono text-[9px] text-black/40 uppercase tracking-wider">
+                Service orders: brief required after payment · studio@alteredvenganza.com
+              </p>
+            )}
             <button
               onClick={handleCheckout}
               disabled={checkoutLoading}
               className="w-full flex items-center justify-center gap-2 bg-black text-white px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg hover:bg-[color:var(--primary)] transition-colors disabled:opacity-50 disabled:cursor-wait"
             >
               <ExternalLink size={16} />
-              {checkoutLoading ? 'Processing...' : `Checkout — $${total}`}
+              {checkoutLoading ? 'Processing...' : `Checkout — €${totalEur.toFixed(0)}`}
             </button>
             <a href={INSTAGRAM_DM_URL} target="_blank" rel="noopener noreferrer"
                className="w-full flex items-center justify-center gap-2 bg-white text-black px-6 py-4 text-xs font-mono uppercase tracking-widest rounded-lg border border-black/10 hover:border-black/30 transition-all">
               <MessageCircle size={16} />
-              Confirm via DM
+              Ask via DM
             </a>
-            <p className="text-center font-mono text-[10px] text-black/30 uppercase tracking-wider">
-              DM us: "I'd like premades {dmNumbers}"
-            </p>
           </div>
         )}
       </div>
@@ -1577,17 +1667,13 @@ const useInstagramPremades = () => {
 const PremadesPage = () => {
   const { premades, loading, error } = useInstagramPremades();
   const [selected, setSelected] = useState(null);
-  const [cart, setCart] = useState([]);
-  const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const containerRef = useRef(null);
+  const { cart, cartOpen, setCartOpen, addToCart, removeFromCart } = useCart();
 
-  const addToCart = (premade) => {
-    if (!cart.find(item => item.id === premade.id)) {
-      setCart(prev => [...prev, premade]);
-    }
+  const addPremadeToCart = (premade) => {
+    addToCart({ kind: 'premade', ...premade });
   };
-  const removeFromCart = (idx) => setCart(prev => prev.filter((_, i) => i !== idx));
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -1692,8 +1778,8 @@ const PremadesPage = () => {
               </button>
               {premade.available ? (
                 <button
-                  onClick={() => addToCart(premade)}
-                  disabled={cart.find(item => item.id === premade.id)}
+                  onClick={() => addPremadeToCart(premade)}
+                  disabled={cart.find(item => item.kind === 'premade' && item.id === premade.id)}
                   className="flex mt-2 w-full py-2.5 text-[10px] font-mono uppercase tracking-widest border border-black/10 rounded-xl text-black/50 hover:text-white hover:bg-black hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black/50 disabled:hover:border-black/10 items-center justify-center gap-1.5"
                 >
                   {cart.find(item => item.id === premade.id) ? 'In Cart' : <><Plus size={12} /> Add to Cart</>}
@@ -1741,9 +1827,9 @@ const PremadesPage = () => {
       </div>
 
       {/* Modal */}
-      {selected && <PremadeModal premade={selected} onClose={() => setSelected(null)} onAddToCart={addToCart} />}
+      {selected && <PremadeModal premade={selected} onClose={() => setSelected(null)} onAddToCart={addPremadeToCart} />}
       {/* Cart Sidebar */}
-      {cartOpen && <CartSidebar cart={cart} onRemove={removeFromCart} onClose={() => setCartOpen(false)} />}
+      {cartOpen && <CartSidebar onClose={() => setCartOpen(false)} />}
       {/* Mobile Menu */}
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
@@ -1818,15 +1904,40 @@ const AdminGuard = () => {
   return <AdminLayout />;
 };
 
+// Global cart button — visible when cart has items, on any page
+const GlobalCartButton = () => {
+  const { cart, setCartOpen, cartOpen } = useCart();
+  if (cart.length === 0) return null;
+  return (
+    <button
+      onClick={() => setCartOpen(true)}
+      className="fixed bottom-6 right-6 z-[90] flex items-center gap-2 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[10px] uppercase tracking-widest px-5 py-3 shadow-2xl hover:scale-105 transition-all duration-300"
+      style={{ display: cartOpen ? 'none' : 'flex' }}
+    >
+      <ShoppingBag size={14} />
+      Cart ({cart.length})
+    </button>
+  );
+};
+
+const GlobalCartSidebar = () => {
+  const { cartOpen, setCartOpen } = useCart();
+  if (!cartOpen) return null;
+  return <CartSidebar onClose={() => setCartOpen(false)} />;
+};
+
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <EditorProvider>
-          <ToastProvider>
-            <ThemeController />
-            <AnimatedBackground />
-            <EditorToolbar />
+      <CartProvider>
+        <AuthProvider>
+          <EditorProvider>
+            <ToastProvider>
+              <ThemeController />
+              <AnimatedBackground />
+              <GlobalCartButton />
+              <GlobalCartSidebar />
+              <EditorToolbar />
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<Home />} />
@@ -1852,9 +1963,10 @@ export default function App() {
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
             </Routes>
-          </ToastProvider>
-        </EditorProvider>
-      </AuthProvider>
+            </ToastProvider>
+          </EditorProvider>
+        </AuthProvider>
+      </CartProvider>
     </BrowserRouter>
   );
 }
