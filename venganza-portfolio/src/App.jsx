@@ -1201,8 +1201,8 @@ const PremadesPage = () => {
 
       {/* TOP — Same layout as Home */}
       <div className="flex flex-col md:flex-row justify-between items-start w-full relative z-20">
-        <div className="premade-header max-w-3xl">
-          <Link to="/" className="heading-font text-6xl md:text-[7rem] leading-none text-black tracking-widest mb-6 block hover:opacity-80 transition-opacity">
+        <div className="premade-header max-w-3xl pr-14 md:pr-0">
+          <Link to="/" className="heading-font text-5xl md:text-[7rem] leading-none text-black tracking-widest mb-6 block hover:opacity-80 transition-opacity">
             Altered Venganza
           </Link>
           <div className="space-y-1 mb-8 max-w-2xl">
