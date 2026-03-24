@@ -228,7 +228,7 @@ const AnimatedBackground = () => {
 
   return (
     <div ref={bgRef} className="fixed inset-0 pointer-events-none z-[0] overflow-hidden">
-      {(!isLightMode) && (
+      {!isLightMode && !isTailored && (
         <svg className="noise-overlay" xmlns="http://www.w3.org/2000/svg">
           <filter id="noiseFilter" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
             <feTurbulence
@@ -548,7 +548,10 @@ const ServiceItem = ({ title, subtitle, price, delivery, linkTo }) => {
 const ServicePage = ({ title, services }) => {
   const containerRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const theme = useTheme();
+  const location = useLocation();
+  const isTailored = decodeURIComponent(location.pathname).includes('Tailored');
 
   useEffect(() => {
     ScrollTrigger.refresh();
@@ -561,17 +564,38 @@ const ServicePage = ({ title, services }) => {
     return () => ctx.revert();
   }, [title]);
 
+  const hasLogo = theme.images?.logo && !logoError;
+
   return (
     <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center" ref={containerRef}>
-       
-       <div className="w-full max-w-2xl flex justify-between items-start mb-12 header-element relative">
-          <Link to="/" className="hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest mt-2 absolute right-0">
-            Back to Home <ArrowRight size={14} />
-          </Link>
-          <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
-            <Menu size={24} />
-          </button>
+
+       {/* Fixed header: logo/brand left, nav/burger right */}
+       <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-10 py-4 bg-[color:var(--bg-color)]/80 backdrop-blur-sm">
+         <Link to="/" className="opacity-80 hover:opacity-100 transition-opacity">
+           <span className={`heading-font text-xl tracking-widest${isTailored ? ' text-black' : ' text-white'}`}>Altered Venganza</span>
+         </Link>
+         <div className="flex items-center gap-4">
+           <Link to="/" className={`hidden md:inline-flex items-center gap-2 transition-colors text-[10px] font-mono uppercase tracking-widest${isTailored ? ' text-black/50 hover:text-black' : ' text-white/50 hover:text-white'}`}>
+             Back to Home <ArrowRight size={14} />
+           </Link>
+           <button onClick={() => setMenuOpen(true)} className={`md:hidden w-10 h-10 flex items-center justify-center transition-colors${isTailored ? ' text-black/70 hover:text-black' : ' text-white/70 hover:text-white'}`}>
+             <Menu size={24} />
+           </button>
+         </div>
+       </header>
+
+       {/* Decorative logo block */}
+       <div className="relative mb-20 flex justify-center w-full max-w-lg header-element">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full lg:translate-x-[-120%] pr-4">
+             <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
+                2026 PRICING
+             </span>
+          </div>
+          <h1 className={`heading-font text-5xl md:text-7xl tracking-widest text-center opacity-90${isTailored ? ' text-black' : ' text-white'}`}>
+            Altered Venganza
+          </h1>
        </div>
+
 
        <div className="header-element mb-16 text-center w-full max-w-2xl">
           <p className="text-white/80 font-mono text-xs uppercase tracking-[0.2em] mb-6">{title}</p>
@@ -614,6 +638,8 @@ const ServiceDetail = () => {
   const [cartAdded, setCartAdded] = useState(false);
   const { addToCart, setCartOpen } = useCart();
   const theme = useTheme();
+  const location = useLocation();
+  const isTailored = decodeURIComponent(location.pathname).includes('Tailored');
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -625,17 +651,38 @@ const ServiceDetail = () => {
 
   if (!service) return <div className="min-h-screen text-center text-white py-32 font-mono">Service not found.</div>;
 
+  const hasLogo = theme.images?.logo && !logoError;
+
   return (
     <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center w-full" ref={containerRef}>
-       
-       <div className="w-full max-w-[480px] flex justify-between items-start mb-8 header-element relative">
-          <button onClick={() => window.history.back()} className="hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-[10px] font-mono uppercase tracking-widest mt-2 absolute right-0">
-            Back <ArrowRight size={14} />
-          </button>
-          <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
-            <Menu size={24} />
-          </button>
+
+       {/* Fixed header: brand/logo left, back/burger right */}
+       <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-10 py-4 bg-[color:var(--bg-color)]/80 backdrop-blur-sm">
+         <Link to="/" className="opacity-80 hover:opacity-100 transition-opacity">
+           <span className={`heading-font text-xl tracking-widest${isTailored ? ' text-black' : ' text-white'}`}>Altered Venganza</span>
+         </Link>
+         <div className="flex items-center gap-4">
+           <button onClick={() => window.history.back()} className={`hidden md:inline-flex items-center gap-2 transition-colors text-[10px] font-mono uppercase tracking-widest${isTailored ? ' text-black/50 hover:text-black' : ' text-white/50 hover:text-white'}`}>
+             Back <ArrowRight size={14} />
+           </button>
+           <button onClick={() => setMenuOpen(true)} className={`md:hidden w-10 h-10 flex items-center justify-center transition-colors${isTailored ? ' text-black/70 hover:text-black' : ' text-white/70 hover:text-white'}`}>
+             <Menu size={24} />
+           </button>
+         </div>
+       </header>
+
+       {/* Decorative logo block */}
+       <div className="relative mb-20 flex justify-center w-full max-w-[480px] header-element">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-4 md:-translate-x-[110%]">
+             <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
+                2026 PRICING
+             </span>
+          </div>
+          <h1 className={`heading-font text-5xl md:text-7xl tracking-widest text-center opacity-90${isTailored ? ' text-black' : ' text-white'}`}>
+            Altered Venganza
+          </h1>
        </div>
+
 
       <div className="header-element mb-16 w-full max-w-[480px] text-left">
         <h1 className="serif-heading text-5xl md:text-6xl text-white mb-2 leading-none">{service.title}</h1>
@@ -732,7 +779,7 @@ const ServiceDetail = () => {
              Order &amp; Send Brief <ArrowRight size={14} />
           </Link>
       </div>
-      <div className="w-full max-w-[480px]"><SiteFooter light={false} /></div>
+      <div className="w-full max-w-[480px]"><SiteFooter light={isTailored} /></div>
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
@@ -1701,7 +1748,7 @@ const PremadesPage = () => {
       </button>
 
       {/* TOP HEADER */}
-      <div className="premade-header w-full relative z-20 mb-10">
+      <div className="premade-header w-full relative z-20 mb-10 pr-14 md:pr-0">
         <Link to="/" className="heading-font text-[3.5rem] leading-none text-black tracking-widest block hover:opacity-80 transition-opacity">
           Altered Venganza
         </Link>
