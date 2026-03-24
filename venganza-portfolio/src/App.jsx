@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { BrowserRouter, Routes, Route, Link, useLocation, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2, ChevronDown, Menu } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -190,6 +190,13 @@ const ThemeController = () => {
       document.body.classList.add('theme-light');
     } else if (path === '/designs' || decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Premade') || decodeURIComponent(path).includes('Techpack')) {
       document.body.classList.add('theme-dark');
+    } else if (decodeURIComponent(path).includes('/order')) {
+      // Order pages inherit same dark/red logic as their service
+      if (decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Techpack')) {
+        document.body.classList.add('theme-dark');
+      } else {
+        document.body.classList.add('theme-red');
+      }
     } else {
       document.body.classList.add('theme-red');
     }
@@ -599,11 +606,251 @@ const ServiceDetail = () => {
          <p className="font-mono text-[8px] md:text-[10px] text-white/60 uppercase tracking-[0.2em] leading-loose max-w-sm mx-auto mb-10">
             Includes: 2 rounds of revisions. Additional revisions are available at 20% of the project total per revision.
           </p>
-         <a href="https://instagram.com" target="_blank" rel="noreferrer" className="w-full py-5 bg-transparent border border-white/20 hover:bg-white hover:text-black hover:border-white transition-all duration-500 font-mono text-[10px] justify-center tracking-widest uppercase flex items-center gap-3">
-             <Instagram size={14} /> Book this service
-          </a>
+         <Link to={`/service/${encodeURIComponent(service.title)}/order`}
+            className="w-full py-5 bg-[color:var(--primary)] text-[color:var(--btn-tx)] hover:bg-white hover:text-black transition-all duration-500 font-mono text-[10px] justify-center tracking-widest uppercase flex items-center gap-3">
+             Order This Service <ArrowRight size={14} />
+          </Link>
       </div>
       <div className="w-full max-w-[480px]"><SiteFooter light={false} /></div>
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
+    </div>
+  );
+};
+
+// ==========================================
+// SERVICE ORDER PAGE
+// ==========================================
+
+const SERVICE_PRICES = {
+  'Packaging Design & Development': 90000,
+  'Clothing Brand': 350000,
+  'Drop Starter': 90000,
+  'RETAINER': 60000,
+  'Premade Design': 15000,
+  'E-commerce Visual Asset': { options: { 'Single View': 4500, 'Custom View': 6000, '360°': 14000 } },
+  'Techpack': 7000,
+};
+
+const ServiceOrderPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const service = allData.find(s => s.title === decodeURIComponent(id));
+  const [form, setForm] = useState({ name: '', email: '', brand: '', instagram: '', brief: '', referenceLinks: '' });
+  const [files, setFiles] = useState([]);
+  const [selectedTier, setSelectedTier] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const fileInputRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('success') === 'true') setSuccess(true);
+  }, [location.search]);
+
+  useEffect(() => {
+    if (success) return;
+    const ctx = gsap.context(() => {
+      gsap.from('.order-el', { y: 24, opacity: 0, stagger: 0.07, duration: 1, ease: 'power3.out' });
+    }, containerRef);
+    return () => ctx.revert();
+  }, [success]);
+
+  if (!service) return <div className="min-h-screen flex items-center justify-center text-white font-mono text-xs">Service not found.</div>;
+
+  const getPriceCents = () => {
+    if (service.layout === 'options' && selectedTier !== null) {
+      const tier = service.options[selectedTier];
+      const key = Object.keys(SERVICE_PRICES['E-commerce Visual Asset'].options).find(k => tier.price.includes(k));
+      return key ? SERVICE_PRICES['E-commerce Visual Asset'].options[key] : 4500;
+    }
+    const p = SERVICE_PRICES[service.title];
+    return typeof p === 'number' ? p : 0;
+  };
+
+  const addFiles = (incoming) => {
+    setFiles(prev => {
+      const merged = [...prev, ...Array.from(incoming)];
+      return merged.slice(0, 8);
+    });
+  };
+
+  const handleDrop = (e) => { e.preventDefault(); setDragging(false); addFiles(e.dataTransfer.files); };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (service.layout === 'options' && selectedTier === null) { setError('Please select a package.'); return; }
+    setLoading(true); setError('');
+    try {
+      const payload = {
+        service: service.title,
+        tier: selectedTier !== null ? service.options[selectedTier]?.price : null,
+        ...form,
+        fileNames: files.map(f => f.name),
+      };
+      const res = await fetch('/api/service-checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.url) { window.location.href = data.url; }
+      else setError(data.error || 'Something went wrong. Try again.');
+    } catch { setError('Network error. Please try again.'); }
+    setLoading(false);
+  };
+
+  if (success) return (
+    <div className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative z-10 gap-6">
+      <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">Order Confirmed</p>
+      <h1 className="serif-heading text-5xl md:text-6xl text-white">Payment received.</h1>
+      <p className="text-white/50 font-mono text-[11px] max-w-sm leading-relaxed">
+        Now send your files — mood boards, logos, references — to:<br />
+        <span className="text-white mt-2 block">studio@alteredvenganza.com</span>
+      </p>
+      <p className="text-white/30 font-mono text-[9px] uppercase tracking-widest max-w-xs">
+        Include your brand name and order email in the subject line.
+      </p>
+      <Link to="/" className="mt-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
+        Back to Home <ArrowRight size={12} />
+      </Link>
+    </div>
+  );
+
+  return (
+    <div ref={containerRef} className="min-h-screen pt-20 px-6 pb-28 relative z-10 flex flex-col items-center">
+      <div className="w-full max-w-[520px]">
+
+        {/* Nav row */}
+        <div className="flex justify-between items-center mb-10 order-el">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-white/40 hover:text-white transition-colors font-mono text-[10px] uppercase tracking-widest">
+            <ArrowLeft size={12} /> Back
+          </button>
+          <button onClick={() => setMenuOpen(true)} className="md:hidden text-white/60 hover:text-white"><Menu size={20} /></button>
+        </div>
+
+        {/* Header */}
+        <div className="mb-10 order-el">
+          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40 mb-2">Order · {service.price}</p>
+          <h1 className="serif-heading text-4xl md:text-5xl text-white leading-tight">{service.title}</h1>
+          <p className="text-white/50 font-light text-sm mt-1">{service.subtitle}</p>
+        </div>
+
+        {/* Tier selector */}
+        {service.layout === 'options' && (
+          <div className="mb-10 order-el">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-white/40 mb-4">Select Package *</p>
+            <div className="flex flex-col gap-2">
+              {service.options.map((opt, i) => (
+                <button key={i} type="button" onClick={() => setSelectedTier(i)}
+                  className={`text-left px-5 py-4 border transition-all duration-300 ${selectedTier === i ? 'border-[color:var(--primary)] bg-white/5 text-white' : 'border-white/10 text-white/50 hover:border-white/30 hover:text-white/70'}`}>
+                  <span className="font-medium text-sm">{opt.price}</span>
+                  <span className="text-white/30 text-xs font-mono ml-2">{opt.delivery}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+
+          {/* Name + Email */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 order-el">
+            {[['name', 'Name *', 'text'], ['email', 'Email *', 'email']].map(([key, label, type]) => (
+              <div key={key} className="flex flex-col gap-2">
+                <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">{label}</label>
+                <input type={type} required value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+                  className="bg-transparent border-b border-white/20 py-3 font-mono text-sm text-white outline-none focus:border-[color:var(--primary)] transition-colors placeholder:text-white/20" />
+              </div>
+            ))}
+          </div>
+
+          {/* Brand + Instagram */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 order-el">
+            <div className="flex flex-col gap-2">
+              <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">Brand / Label *</label>
+              <input type="text" required value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))}
+                className="bg-transparent border-b border-white/20 py-3 font-mono text-sm text-white outline-none focus:border-[color:var(--primary)] transition-colors" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">Instagram</label>
+              <input type="text" value={form.instagram} onChange={e => setForm(f => ({ ...f, instagram: e.target.value }))}
+                placeholder="@handle"
+                className="bg-transparent border-b border-white/20 py-3 font-mono text-sm text-white outline-none focus:border-[color:var(--primary)] transition-colors placeholder:text-white/20" />
+            </div>
+          </div>
+
+          {/* Brief */}
+          <div className="flex flex-col gap-2 order-el">
+            <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">Project Brief *</label>
+            <textarea rows={4} required value={form.brief} onChange={e => setForm(f => ({ ...f, brief: e.target.value }))}
+              placeholder="Describe your brand, vision, style, specific requirements..."
+              className="bg-transparent border border-white/15 p-4 font-mono text-sm text-white outline-none focus:border-[color:var(--primary)] transition-colors resize-none placeholder:text-white/20" />
+          </div>
+
+          {/* Reference links */}
+          <div className="flex flex-col gap-2 order-el">
+            <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+              Reference Links <span className="normal-case text-white/25 text-[9px]">(Pinterest, Instagram, etc.)</span>
+            </label>
+            <textarea rows={2} value={form.referenceLinks} onChange={e => setForm(f => ({ ...f, referenceLinks: e.target.value }))}
+              placeholder="https://pinterest.com/..."
+              className="bg-transparent border border-white/15 p-4 font-mono text-[11px] text-white outline-none focus:border-[color:var(--primary)] transition-colors resize-none placeholder:text-white/20" />
+          </div>
+
+          {/* File drop zone */}
+          <div className="flex flex-col gap-3 order-el">
+            <label className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+              Reference Files <span className="normal-case text-white/25 text-[9px]">(mood boards, logos, inspiration)</span>
+            </label>
+            <div
+              onDragOver={e => { e.preventDefault(); setDragging(true); }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`border border-dashed py-10 px-6 flex flex-col items-center gap-3 cursor-pointer transition-all duration-300 ${dragging ? 'border-[color:var(--primary)] bg-white/5' : 'border-white/15 hover:border-white/30'}`}
+            >
+              <FileImage size={22} className="text-white/25" />
+              <p className="font-mono text-[10px] uppercase tracking-widest text-white/30 text-center">Drop files here or click to browse</p>
+              <p className="font-mono text-[9px] text-white/20">JPG · PNG · PDF · up to 8 files</p>
+              <input ref={fileInputRef} type="file" multiple accept="image/*,.pdf" className="hidden" onChange={e => addFiles(e.target.files)} />
+            </div>
+            {files.length > 0 && (
+              <ul className="flex flex-col gap-1.5">
+                {files.map((f, i) => (
+                  <li key={i} className="flex items-center justify-between px-4 py-2.5 border border-white/10 bg-white/[0.02]">
+                    <span className="font-mono text-[10px] text-white/50 truncate max-w-[85%]">{f.name}</span>
+                    <button type="button" onClick={() => setFiles(p => p.filter((_, j) => j !== i))} className="text-white/25 hover:text-white/70 transition-colors ml-3 flex-shrink-0">
+                      <X size={11} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Price + CTA */}
+          <div className="flex flex-col gap-4 pt-6 border-t border-white/10 order-el">
+            <div className="flex justify-between items-baseline">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+                {service.layout === 'options' ? 'Package' : 'Starting From'}
+              </span>
+              <span className="text-xl text-white font-medium">
+                {service.layout === 'options'
+                  ? (selectedTier !== null ? service.options[selectedTier]?.price : '—')
+                  : service.price}
+              </span>
+            </div>
+            {error && <p className="font-mono text-[10px] text-red-400 uppercase tracking-widest">{error}</p>}
+            <button type="submit" disabled={loading || (service.layout === 'options' && selectedTier === null)}
+              className="w-full py-5 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[11px] uppercase tracking-widest hover:bg-white hover:text-black transition-colors duration-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+              {loading ? 'Processing...' : <><span>Proceed to Payment</span><ArrowRight size={12} /></>}
+            </button>
+            <p className="font-mono text-[9px] text-white/25 text-center uppercase tracking-wider">Secure checkout via Stripe · 2 revision rounds included</p>
+          </div>
+
+        </form>
+      </div>
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
@@ -1538,6 +1785,7 @@ export default function App() {
               <Route path="/archive" element={<ArchivePage />} />
               <Route path="/premades" element={<PremadesPage />} />
               <Route path="/service/:id" element={<ServiceDetail />} />
+              <Route path="/service/:id/order" element={<ServiceOrderPage />} />
               <Route path="/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
               <Route path="/designs" element={<ServicePage title="Clothing Design Service" services={designsData} />} />
 
