@@ -484,16 +484,6 @@ const ServicePage = ({ title, services }) => {
           </button>
        </div>
 
-       {/* Logo Block Restored */}
-       <div className="relative mb-20 flex justify-center w-full max-w-lg header-element">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full lg:translate-x-[-120%] pr-4">
-             <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
-                2026 PRICING
-             </span>
-          </div>
-          <img src={theme.images?.logo || '/logo.png'} className="w-[200px] md:w-[280px] object-contain filter invert opacity-90 mx-auto" alt="Alter Logo" />
-       </div>
-
        <div className="header-element mb-16 text-center w-full max-w-2xl">
           <p className="text-white/80 font-mono text-xs uppercase tracking-[0.2em] mb-6">{title}</p>
           <div className="flex flex-col gap-2 items-center">
@@ -555,16 +545,6 @@ const ServiceDetail = () => {
           </button>
        </div>
 
-       {/* Logo Block Restored */}
-       <div className="relative mb-20 flex justify-center w-full max-w-[480px] header-element">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-4 md:-translate-x-[110%]">
-             <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
-                2026 PRICING
-             </span>
-          </div>
-          <img src={theme.images?.logo || '/logo.png'} className="w-[200px] md:w-[260px] object-contain filter invert opacity-90 mx-auto" alt="Alter Logo" />
-       </div>
-      
       <div className="header-element mb-16 w-full max-w-[480px] text-left">
         <h1 className="serif-heading text-5xl md:text-6xl text-white mb-2 leading-none">{service.title}</h1>
         <h2 className="serif-heading text-lg md:text-xl text-white/90 font-light mb-8">{service.subtitle}</h2>
