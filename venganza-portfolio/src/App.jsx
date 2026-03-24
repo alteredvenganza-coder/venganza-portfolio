@@ -59,13 +59,29 @@ const brandIdentityData = [
 const designsData = [
   {
     title: "Premade Design",
-    subtitle: "Balanced identity system",
+    linkTo: "/premades",
+    subtitle: "Ready-to-buy clothing graphics",
     price: "EUR €150 – €250",
     delivery: "4h-1 day delivery",
     features: [
       "Personal or commercial use",
       "PNG/JPG/PSD/PDF",
       "Text & color can be altered",
+      "Free mockup",
+      "High resolution 300 ppi",
+      "Size Chart if required",
+      "Factory contact based in Portugal with MOQ of 50 pcs"
+    ],
+    layout: "bullets"
+  },
+  {
+    title: "Tailored Design",
+    subtitle: "Based on your references",
+    price: "EUR €190 – €350",
+    delivery: "3 to 7 days",
+    features: [
+      "Personal or commercial use",
+      "PNG/JPG/PSD/PDF",
       "Free mockup",
       "High resolution 300 ppi",
       "Size Chart if required",
@@ -90,9 +106,21 @@ const designsData = [
     subtitle: "Specification Sheet",
     price: "EUR €70 – €170",
     delivery: "1-2 days delivery",
-    layout: "bullets",
-    features: ["Flat technical drawing (front / back)", "Fabric & color specifications", "Print / embroidery placement", "Essential construction notes"],
-    details: "Simplified production guide for basic garments. Full Techpack — €170 include complete measurement chart, stitching & construction details, fabric specs, and packaging notes."
+    layout: "options",
+    options: [
+      {
+        price: "One Page — €70",
+        delivery: "(1 day delivery)",
+        features: ["Flat technical drawing (front / back)", "Fabric & color specifications", "Print / embroidery placement", "Essential construction notes"],
+        details: "Simplified production guide for basic garments."
+      },
+      {
+        price: "Full Techpack — €170",
+        delivery: "(1-2 days delivery)",
+        features: ["Complete measurement chart", "Stitching & construction details", "Fabric & color specifications", "Print / embroidery placement", "Packaging notes"],
+        details: "Complete specification sheet ready for factory production."
+      }
+    ]
   }
 ];
 
@@ -188,11 +216,11 @@ const ThemeController = () => {
     
     if (path === '/' || path === '/archive' || path === '/about' || path === '/premades' || path === '/materializing-ideas') {
       document.body.classList.add('theme-light');
-    } else if (path === '/designs' || decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Premade') || decodeURIComponent(path).includes('Techpack')) {
+    } else if (path === '/designs' || decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Premade') || decodeURIComponent(path).includes('Techpack') || decodeURIComponent(path).includes('Tailored')) {
       document.body.classList.add('theme-dark');
     } else if (decodeURIComponent(path).includes('/order')) {
       // Order pages inherit same dark/red logic as their service
-      if (decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Techpack')) {
+      if (decodeURIComponent(path).includes('E-commerce') || decodeURIComponent(path).includes('Techpack') || decodeURIComponent(path).includes('Tailored')) {
         document.body.classList.add('theme-dark');
       } else {
         document.body.classList.add('theme-red');
@@ -432,10 +460,10 @@ const Home = () => {
 // SERVICE PAGES (DARK THEMES & EDITORIAL LAYOUT)
 // ==========================================
 
-const ServiceItem = ({ title, subtitle, price, delivery }) => {
+const ServiceItem = ({ title, subtitle, price, delivery, linkTo }) => {
   return (
     <Link
-      to={`/service/${encodeURIComponent(title)}`}
+      to={linkTo || `/service/${encodeURIComponent(title)}`}
       className="block py-10 border-b border-white/10 group last:border-0 opacity-0 translate-y-8 service-item transition-all duration-500 relative overflow-hidden text-center"
     >
       {/* Hover tint that sweeps in */}
@@ -627,8 +655,9 @@ const SERVICE_PRICES = {
   'Drop Starter': 90000,
   'RETAINER': 60000,
   'Premade Design': 15000,
+  'Tailored Design': 19000,
   'E-commerce Visual Asset': { options: { 'Single View': 4500, 'Custom View': 6000, '360°': 14000 } },
-  'Techpack': 7000,
+  'Techpack': { options: { 'One Page': 7000, 'Full Techpack': 17000 } },
 };
 
 const ServiceOrderPage = () => {
@@ -665,8 +694,11 @@ const ServiceOrderPage = () => {
   const getPriceCents = () => {
     if (service.layout === 'options' && selectedTier !== null) {
       const tier = service.options[selectedTier];
-      const key = Object.keys(SERVICE_PRICES['E-commerce Visual Asset'].options).find(k => tier.price.includes(k));
-      return key ? SERVICE_PRICES['E-commerce Visual Asset'].options[key] : 4500;
+      const priceDef = SERVICE_PRICES[service.title];
+      if (priceDef?.options) {
+        const key = Object.keys(priceDef.options).find(k => tier.price.includes(k));
+        return key ? priceDef.options[key] : Object.values(priceDef.options)[0];
+      }
     }
     const p = SERVICE_PRICES[service.title];
     return typeof p === 'number' ? p : 0;

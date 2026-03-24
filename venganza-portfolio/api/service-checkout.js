@@ -8,11 +8,15 @@ const SERVICE_PRICES = {
   'Drop Starter': { priceCents: 90000, label: 'Drop Starter Package — Starting From €900' },
   'RETAINER': { priceCents: 60000, label: 'Monthly Retainer — Starting From €600' },
   'Premade Design': { priceCents: 15000, label: 'Premade Design — Starting From €150' },
+  'Tailored Design': { priceCents: 19000, label: 'Tailored Design — Starting From €190' },
   'E-commerce Visual Asset': {
     options: { 'Single View': 4500, 'Custom View': 6000, '360°': 14000 },
     label: 'E-commerce Visual Asset',
   },
-  'Techpack': { priceCents: 7000, label: 'Techpack — Starting From €70' },
+  'Techpack': {
+    options: { 'One Page': 7000, 'Full Techpack': 17000 },
+    label: 'Techpack',
+  },
 };
 
 export default async function handler(req, res) {
