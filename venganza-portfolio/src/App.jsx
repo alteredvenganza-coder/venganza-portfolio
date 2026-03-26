@@ -267,18 +267,12 @@ const ThemeController = () => {
     const path = location.pathname;
     const decoded = decodeURIComponent(path);
 
-    if (path === '/' || path === '/archive' || path === '/about' || path === '/premades' || path === '/materializing-ideas') {
-      document.body.classList.add('theme-light');
-    } else if (decoded.includes('Tailored')) {
-      document.body.classList.add('theme-tailored');
-    } else if (path === '/designs' || decoded.includes('E-commerce') || decoded.includes('Premade') || decoded.includes('Techpack')) {
+    if (path === '/mat-renders') {
       document.body.classList.add('theme-dark');
-    } else if (decoded.includes('/order')) {
-      if (decoded.includes('E-commerce') || decoded.includes('Techpack')) {
-        document.body.classList.add('theme-dark');
-      } else {
-        document.body.classList.add('theme-red');
-      }
+    } else if (path === '/' || path === '/archive' || path === '/about' || path === '/premades' || path === '/materializing-ideas') {
+      document.body.classList.add('theme-light');
+    } else if (decoded.includes('Tailored') || path === '/designs' || decoded.includes('E-commerce') || decoded.includes('Techpack')) {
+      document.body.classList.add('theme-tailored');
     } else {
       document.body.classList.add('theme-red');
     }
@@ -364,45 +358,79 @@ const SiteFooter = ({ light = true }) => {
 // LATEST PREMADE SHOWCASE (for Homepage)
 // ==========================================
 
-const useLatestPremade = () => {
-  const [latest, setLatest] = useState(null);
+// Returns first N premade images for the hero slideshow
+const useHeroSlides = (count = 5) => {
+  const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchLatest = async () => {
+    const fetch_ = async () => {
       try {
         const res = await fetch('/api/instagram-feed');
         if (!res.ok) throw new Error('API error');
         const { data } = await res.json();
-
-        const post = data?.[0]; // Already filtered by #premade, first = newest
-
-        if (post) {
-          setLatest({
-            imageUrl: post.media_type === 'VIDEO' ? post.thumbnail_url : post.media_url,
-            permalink: post.permalink,
-            caption: (post.caption || '').split('\n')[0].replace(/#\w+/g, '').trim(),
-          });
-        }
+        setSlides(
+          (data || []).slice(0, count).map(p => ({
+            imageUrl: p.media_type === 'VIDEO' ? p.thumbnail_url : p.media_url,
+            permalink: p.permalink,
+          }))
+        );
       } catch (err) {
-        console.error('Failed to fetch latest premade:', err);
+        console.error('Failed to fetch hero slides:', err);
       } finally {
         setLoading(false);
       }
     };
+    fetch_();
+  }, [count]);
 
-    fetchLatest();
+  return { slides, loading };
+};
+
+// Returns the latest Instagram reel/video
+const useLatestReel = () => {
+  const [reel, setReel] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetch_ = async () => {
+      try {
+        const res = await fetch('/api/instagram-reel');
+        if (!res.ok) throw new Error('API error');
+        const { reel: r } = await res.json();
+        setReel(r || null);
+      } catch (err) {
+        console.error('Failed to fetch latest reel:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch_();
   }, []);
 
-  return { latest, loading };
+  return { reel, loading };
+};
+
+// Keep for backwards compat
+const useLatestPremade = () => {
+  const { slides, loading } = useHeroSlides(1);
+  return { latest: slides[0] || null, loading };
 };
 
 const Home = () => {
   const containerRef = useRef();
-  const { latest, loading: premadeLoading } = useLatestPremade();
+  const { slides, loading: slidesLoading } = useHeroSlides(6);
   const theme = useTheme();
   const [servicesOpen, setServicesOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [slideIndex, setSlideIndex] = useState(0);
+
+  // Auto-advance slideshow
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const id = setInterval(() => setSlideIndex(i => (i + 1) % slides.length), 4000);
+    return () => clearInterval(id);
+  }, [slides.length]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -416,7 +444,7 @@ const Home = () => {
     <div className="min-h-screen flex flex-col relative z-10" ref={containerRef}>
 
       {/* ============ TOP NAV BAR — ERD Style ============ */}
-      <header className="flex items-start justify-between px-6 md:px-10 pt-6 md:pt-8 pb-4 relative z-20">
+      <header className="flex items-start px-6 md:px-10 pt-6 md:pt-8 pb-4 relative z-20">
 
         {/* Left — Logo + Handle + Description */}
         <div className="nav-item flex-shrink-0">
@@ -433,8 +461,8 @@ const Home = () => {
           </p>
         </div>
 
-        {/* Center — Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8 pt-2">
+        {/* Center — Desktop Navigation (truly centered) */}
+        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8 pt-2">
           <div className="relative pb-2 -mb-2" onMouseEnter={() => setServicesOpen(true)} onMouseLeave={() => setServicesOpen(false)}>
             <button onClick={() => setServicesOpen(o => !o)} className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors flex items-center gap-1">
               Services <ChevronDown size={12} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
@@ -453,7 +481,7 @@ const Home = () => {
         </nav>
 
         {/* Right — Contact + Cart + Burger */}
-        <div className="flex items-center gap-6 pt-2">
+        <div className="flex items-center gap-6 pt-2 ml-auto">
           <Link to="/contact" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden md:block">Contact</Link>
           <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden md:block">Cart (0)</Link>
           <button onClick={() => setMenuOpen(true)} className="md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
@@ -463,40 +491,57 @@ const Home = () => {
       </header>
 
       {/* ============ HERO — Two panels side by side ============ */}
-      <div className="flex-1 flex flex-col md:flex-row w-full relative z-10">
+      <div className="flex flex-col md:flex-row w-full relative z-10" style={{ minHeight: '70vh' }}>
+        {/* Left — Premades Slideshow */}
         <Link to="/premades" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer">
-          {premadeLoading && (
+          {slidesLoading && (
             <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
               <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs animate-pulse">Loading...</span>
             </div>
           )}
-          {!premadeLoading && latest && (
-            <img src={latest.imageUrl} alt="Latest Premade" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+          {/* Slideshow images */}
+          {slides.map((slide, i) => (
+            <img
+              key={slide.imageUrl}
+              src={slide.imageUrl}
+              alt={`Premade ${i + 1}`}
+              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+              style={{ opacity: i === slideIndex ? 1 : 0 }}
+            />
+          ))}
+          {!slidesLoading && slides.length === 0 && theme.images?.heroLeft && (
+            <img src={theme.images.heroLeft} alt="Hero" className="absolute inset-0 w-full h-full object-cover" />
           )}
-          {!premadeLoading && !latest && theme.images?.heroLeft && (
-            <img src={theme.images.heroLeft} alt="Hero" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
-          )}
-          {!premadeLoading && !latest && !theme.images?.heroLeft && (
+          {!slidesLoading && slides.length === 0 && !theme.images?.heroLeft && (
             <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
               <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs">Coming Soon</span>
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          {/* Slide dots */}
+          {slides.length > 1 && (
+            <div className="absolute bottom-14 left-6 md:bottom-16 md:left-8 flex gap-1.5 z-10">
+              {slides.map((_, i) => (
+                <span key={i} className={`w-1 h-1 rounded-full transition-all duration-500 ${i === slideIndex ? 'bg-white w-3' : 'bg-white/40'}`} />
+              ))}
+            </div>
+          )}
           <span className="absolute bottom-6 left-6 md:bottom-8 md:left-8 font-mono text-[11px] md:text-xs text-white uppercase tracking-[0.25em] group-hover:tracking-[0.35em] transition-all duration-500">
             Shop Premades
           </span>
         </Link>
 
-        <div className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden bg-neutral-100 flex items-center justify-center">
+        {/* Right — MAT Renders (clickable) */}
+        <Link to="/mat-renders" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden bg-neutral-900 flex items-center justify-center group cursor-pointer">
           {theme.images?.heroRight && (
-            <img src={theme.images.heroRight} alt="MAT Renders" className="absolute inset-0 w-full h-full object-cover" />
+            <img src={theme.images.heroRight} alt="MAT Renders" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
           <div className="relative z-10 text-center flex flex-col items-center justify-center">
             <h2 className="heading-font text-4xl md:text-6xl tracking-widest text-white">MAT RENDERS</h2>
-            <p className="font-mono text-[10px] md:text-xs text-white/70 uppercase tracking-[0.3em] mt-3">Coming Soon</p>
+            <p className="font-mono text-[10px] md:text-xs text-white/70 uppercase tracking-[0.3em] mt-3 group-hover:tracking-[0.45em] transition-all duration-500">Explore →</p>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Footer */}
@@ -548,10 +593,10 @@ const ServiceItem = ({ title, subtitle, price, delivery, linkTo }) => {
 const ServicePage = ({ title, services }) => {
   const containerRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [logoError, setLogoError] = useState(false);
   const theme = useTheme();
   const location = useLocation();
-  const isTailored = decodeURIComponent(location.pathname).includes('Tailored');
+  const _p = decodeURIComponent(location.pathname);
+  const isTailored = _p.includes('Tailored') || location.pathname === '/designs' || _p.includes('E-commerce') || _p.includes('Techpack');
 
   useEffect(() => {
     ScrollTrigger.refresh();
@@ -563,8 +608,6 @@ const ServicePage = ({ title, services }) => {
     }, containerRef);
     return () => ctx.revert();
   }, [title]);
-
-  const hasLogo = theme.images?.logo && !logoError;
 
   return (
     <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center" ref={containerRef}>
@@ -583,19 +626,6 @@ const ServicePage = ({ title, services }) => {
            </button>
          </div>
        </header>
-
-       {/* Decorative logo block */}
-       <div className="relative mb-20 flex justify-center w-full max-w-lg header-element">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full lg:translate-x-[-120%] pr-4">
-             <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
-                2026 PRICING
-             </span>
-          </div>
-          <h1 className={`heading-font text-5xl md:text-7xl tracking-widest text-center opacity-90${isTailored ? ' text-black' : ' text-white'}`}>
-            Altered Venganza
-          </h1>
-       </div>
-
 
        <div className="header-element mb-16 text-center w-full max-w-2xl">
           <p className="text-white/80 font-mono text-xs uppercase tracking-[0.2em] mb-6">{title}</p>
@@ -639,7 +669,8 @@ const ServiceDetail = () => {
   const { addToCart, setCartOpen } = useCart();
   const theme = useTheme();
   const location = useLocation();
-  const isTailored = decodeURIComponent(location.pathname).includes('Tailored');
+  const _p = decodeURIComponent(location.pathname);
+  const isTailored = _p.includes('Tailored') || location.pathname === '/designs' || _p.includes('E-commerce') || _p.includes('Techpack');
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -650,8 +681,6 @@ const ServiceDetail = () => {
   }, [id]);
 
   if (!service) return <div className="min-h-screen text-center text-white py-32 font-mono">Service not found.</div>;
-
-  const hasLogo = theme.images?.logo && !logoError;
 
   return (
     <div className="min-h-screen pt-20 px-6 pb-24 relative z-10 flex flex-col justify-start items-center w-full" ref={containerRef}>
@@ -670,19 +699,6 @@ const ServiceDetail = () => {
            </button>
          </div>
        </header>
-
-       {/* Decorative logo block */}
-       <div className="relative mb-20 flex justify-center w-full max-w-[480px] header-element">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-4 md:-translate-x-[110%]">
-             <span className="transform -rotate-90 block origin-right font-mono text-[10px] tracking-[0.2em] text-white/50 whitespace-nowrap">
-                2026 PRICING
-             </span>
-          </div>
-          <h1 className={`heading-font text-5xl md:text-7xl tracking-widest text-center opacity-90${isTailored ? ' text-black' : ' text-white'}`}>
-            Altered Venganza
-          </h1>
-       </div>
-
 
       <div className="header-element mb-16 w-full max-w-[480px] text-left">
         <h1 className="serif-heading text-5xl md:text-6xl text-white mb-2 leading-none">{service.title}</h1>
@@ -1710,6 +1726,178 @@ const useInstagramPremades = () => {
 // ==========================================
 // PREMADES GALLERY PAGE
 // ==========================================
+// MAT RENDERS PAGE
+// ==========================================
+
+const MatRendersPage = () => {
+  const containerRef = useRef(null);
+  const theme = useTheme();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const ctx = gsap.context(() => {
+      gsap.from('.mat-header', { y: 40, opacity: 0, stagger: 0.12, duration: 1.4, ease: 'power3.out' });
+      gsap.from('.mat-card', { y: 60, opacity: 0, stagger: 0.08, duration: 1, ease: 'power3.out', delay: 0.4 });
+    }, containerRef);
+    return () => ctx.revert();
+  }, []);
+
+  // Sample render results — admin can set heroRight image; here we show gallery slots
+  const gallerySlots = [
+    { key: 'matRender1', label: 'Render 01' },
+    { key: 'matRender2', label: 'Render 02' },
+    { key: 'matRender3', label: 'Render 03' },
+    { key: 'matRender4', label: 'Render 04' },
+    { key: 'matRender5', label: 'Render 05' },
+    { key: 'matRender6', label: 'Render 06' },
+  ];
+
+  return (
+    <div ref={containerRef} className="min-h-screen bg-[#0a0a0a] flex flex-col relative z-10">
+
+      {/* Mobile burger */}
+      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/60 hover:text-white transition-colors">
+        <Menu size={24} />
+      </button>
+
+      {/* ── HEADER ── */}
+      <header className="flex items-center justify-between px-6 md:px-12 pt-8 pb-6">
+        <Link to="/" className="mat-header heading-font text-white/30 hover:text-white transition-colors tracking-widest text-sm uppercase font-mono">
+          ← Altered Venganza
+        </Link>
+        <span className="mat-header font-mono text-[9px] text-white/20 uppercase tracking-[0.3em]">
+          MAT Renders
+        </span>
+      </header>
+
+      {/* ── HERO ── */}
+      <div className="relative px-6 md:px-12 pt-6 pb-16">
+        <h1 className="mat-header heading-font text-[4rem] md:text-[7rem] lg:text-[10rem] leading-none text-white tracking-widest">
+          MAT
+        </h1>
+        <h1 className="mat-header heading-font text-[4rem] md:text-[7rem] lg:text-[10rem] leading-none text-white/20 tracking-widest -mt-4 md:-mt-8">
+          RENDERS
+        </h1>
+        <p className="mat-header font-mono text-xs text-white/40 uppercase tracking-[0.25em] mt-6 max-w-md">
+          Materialized clothing renders. Production-ready 3D results for your brand — from our in-house rendering pipeline.
+        </p>
+
+        {/* Hero image */}
+        {theme.images?.heroRight && (
+          <div className="mt-10 relative rounded-2xl overflow-hidden aspect-[16/7]">
+            <img src={theme.images.heroRight} alt="MAT Renders" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-transparent" />
+          </div>
+        )}
+      </div>
+
+      {/* ── GALLERY GRID ── */}
+      <div className="px-6 md:px-12 pb-16">
+        <p className="mat-header font-mono text-[9px] text-white/25 uppercase tracking-[0.3em] mb-8">Results</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+          {gallerySlots.map((slot, i) => (
+            <div key={slot.key} className="mat-card relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5 border border-white/5 group">
+              {theme.images?.[slot.key] ? (
+                <img src={theme.images[slot.key]} alt={slot.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                    <span className="font-mono text-[10px] text-white/20">{String(i + 1).padStart(2, '0')}</span>
+                  </div>
+                  <span className="font-mono text-[8px] text-white/15 uppercase tracking-widest">{slot.label}</span>
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <span className="absolute bottom-4 left-4 font-mono text-[9px] text-white/70 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300">{slot.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── APP NOT AVAILABLE YET ── */}
+      <div className="mx-6 md:mx-12 mb-16 rounded-2xl border border-amber-500/15 bg-amber-500/[0.04] px-6 md:px-10 py-7 flex flex-col md:flex-row items-start md:items-center gap-5">
+        <span className="flex-shrink-0 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          <span className="font-mono text-[9px] text-amber-400 uppercase tracking-[0.2em]">App Coming Soon</span>
+        </span>
+        <p className="font-mono text-[11px] text-white/55 leading-relaxed">
+          The <span className="text-white/90">MAT public app</span> is not yet available. In the meantime, order your renders directly via DM — we'll produce them manually through our in-house pipeline at the same quality.
+        </p>
+      </div>
+
+      {/* ── PRICING ── */}
+      <div className="px-6 md:px-12 pb-20">
+        <p className="font-mono text-[9px] text-white/25 uppercase tracking-[0.3em] mb-8">Pricing</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { tier: 'Single View', price: '€45', delivery: '4 h delivery', features: ['High-resolution studio lighting render', 'Optimized for product page or social feed'] },
+            { tier: 'Custom View', price: '€60', delivery: '6 h delivery', features: ['Specific camera angle requested by you', 'Lighting & shadow refined to your brief'] },
+            { tier: '360°', price: '€140', delivery: '1 day delivery', features: ['Full rotational sequence', 'Ready for interactive e-commerce integration'] },
+          ].map(({ tier, price, delivery, features }) => (
+            <div key={tier} className="mat-card rounded-2xl border border-white/8 bg-white/[0.03] p-6 flex flex-col gap-5 hover:border-white/15 hover:bg-white/[0.05] transition-all duration-300">
+              <div>
+                <p className="font-mono text-[9px] text-white/30 uppercase tracking-[0.25em] mb-2">{tier}</p>
+                <p className="heading-font text-5xl text-white tracking-widest">{price}</p>
+                <p className="font-mono text-[9px] text-white/30 mt-1.5 uppercase tracking-widest">{delivery}</p>
+              </div>
+              <div className="flex-1 space-y-2 border-t border-white/5 pt-4">
+                {features.map(f => (
+                  <p key={f} className="font-mono text-[10px] text-white/45 flex items-start gap-2 leading-relaxed">
+                    <span className="text-white/20 flex-shrink-0 mt-0.5">—</span>{f}
+                  </p>
+                ))}
+              </div>
+              <a
+                href="https://www.instagram.com/rare______________________/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-white/10 font-mono text-[10px] text-white/50 hover:text-white hover:border-white/25 hover:bg-white/5 uppercase tracking-widest transition-all duration-300"
+              >
+                <Instagram size={11} /> Order this
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── CTA ── */}
+      <div className="px-6 md:px-12 py-20 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div>
+          <h2 className="heading-font text-3xl md:text-5xl text-white tracking-widest mb-3">Get Your Renders</h2>
+          <p className="font-mono text-xs text-white/40 uppercase tracking-[0.2em] max-w-sm">
+            Upload your designs — we materialize them into production-ready clothing renders for your brand.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 flex-shrink-0">
+          <a
+            href="https://www.instagram.com/rare______________________/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-8 py-4 bg-white text-black font-mono text-xs uppercase tracking-widest rounded-full hover:bg-white/90 transition-all"
+          >
+            <Instagram size={14} /> Order via DM
+          </a>
+          <Link
+            to="/contact"
+            className="flex items-center justify-center gap-3 px-8 py-4 border border-white/20 text-white font-mono text-xs uppercase tracking-widest rounded-full hover:border-white/40 hover:bg-white/5 transition-all"
+          >
+            Contact Us
+          </Link>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="px-6 md:px-12">
+        <SiteFooter />
+      </div>
+
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
+    </div>
+  );
+};
+
+// ==========================================
 
 const PremadesPage = () => {
   const { premades, loading, error } = useInstagramPremades();
@@ -1742,42 +1930,69 @@ const PremadesPage = () => {
   return (
     <div ref={containerRef} className="min-h-screen p-6 md:p-12 flex flex-col relative z-10">
 
-      {/* Mobile burger — fixed top right */}
+      {/* Mobile burger */}
       <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
         <Menu size={24} />
       </button>
 
-      {/* TOP HEADER */}
-      <div className="premade-header w-full relative z-20 mb-10 pr-14 md:pr-0">
-        <Link to="/" className="heading-font text-[3.5rem] leading-none text-black tracking-widest block hover:opacity-80 transition-opacity">
-          Altered Venganza
-        </Link>
-        <div className="space-y-1 mt-4 mb-6">
-          <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
-            Pre-made clothing renders &bull; Production ready files
-          </p>
-          <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
-            Fully alterable &amp; customizable to your brand &bull; Numbered &amp; Ready to purchase
+      {/* ============ TOP HEADER — Logo left, nav left below logo ============ */}
+      <div className="premade-header w-full mb-10 pr-14 md:pr-0">
+
+        {/* Row 1: Brand + right count */}
+        <div className="flex items-start justify-between">
+          <Link to="/" className="heading-font text-[3rem] md:text-[3.5rem] leading-none text-black tracking-widest block hover:opacity-80 transition-opacity">
+            Altered Venganza
+          </Link>
+          <p className="hidden md:flex text-black/60 font-mono text-xs uppercase tracking-[0.1em] items-center gap-2 pt-3 flex-shrink-0">
+            <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]" />
+            {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
           </p>
         </div>
-        <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex items-center gap-2 mb-8">
-          <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]"></span>
-          {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
-        </p>
-        <div className="flex flex-col gap-2">
-          <Link to="/" className="font-mono text-xs text-black/50 hover:text-black transition-colors uppercase tracking-[0.2em]">
-            Back to Home
-          </Link>
-          <button
-            onClick={() => setCartOpen(true)}
-            className="font-mono text-xs text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] flex items-center gap-2 w-fit"
-          >
-            Cart ({cart.length}) <ShoppingBag size={13} />
-          </button>
+
+        {/* Row 2: description (left) + nav links (left) */}
+        <div className="mt-4 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div className="space-y-1">
+            <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
+              Pre-made clothing renders &bull; Production ready files
+            </p>
+            <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
+              Fully alterable &amp; customizable to your brand &bull; Numbered &amp; Ready to purchase
+            </p>
+            {/* Mobile count */}
+            <p className="md:hidden text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex items-center gap-2 pt-1">
+              <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse" />
+              {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
+            </p>
+          </div>
+
+          {/* Nav links on the LEFT side below description */}
+          <div className="flex items-center gap-6 flex-shrink-0">
+            <Link to="/" className="font-mono text-[11px] text-black/50 hover:text-black transition-colors uppercase tracking-[0.2em]">
+              ← Home
+            </Link>
+            <button
+              onClick={() => setCartOpen(true)}
+              className="font-mono text-[11px] text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] flex items-center gap-2"
+            >
+              Cart ({cart.length}) <ShoppingBag size={13} />
+            </button>
+            {cart.length > 0 && (
+              <button
+                onClick={() => setCartOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 text-[10px] font-mono uppercase tracking-widest rounded-xl
+                  bg-white/60 backdrop-blur-md border border-black/12 shadow-sm
+                  text-[color:var(--primary)] hover:bg-[color:var(--primary)] hover:text-white hover:border-[color:var(--primary)]
+                  transition-all duration-300"
+              >
+                <ShoppingBag size={12} />
+                View Cart — ${cart.reduce((s, i) => s + i.price, 0)}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* GALLERY GRID */}
+      {/* ============ GALLERY GRID ============ */}
       <div className="flex-1 w-full relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
           {premades.map((premade) => (
@@ -1823,11 +2038,18 @@ const PremadesPage = () => {
                   )}
                 </div>
               </button>
+
+              {/* Add to Cart — Glassmorphism button */}
               {premade.available ? (
                 <button
                   onClick={() => addPremadeToCart(premade)}
                   disabled={cart.find(item => item.kind === 'premade' && item.id === premade.id)}
-                  className="flex mt-2 w-full py-2.5 text-[10px] font-mono uppercase tracking-widest border border-black/10 rounded-xl text-black/50 hover:text-white hover:bg-black hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black/50 disabled:hover:border-black/10 items-center justify-center gap-1.5"
+                  className="flex mt-2 w-full py-2.5 text-[10px] font-mono uppercase tracking-widest rounded-xl
+                    bg-white/60 backdrop-blur-md border border-black/10 shadow-sm
+                    text-black/60 hover:bg-black hover:text-white hover:border-black hover:shadow-md
+                    transition-all duration-300
+                    disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white/60 disabled:hover:text-black/60 disabled:hover:border-black/10 disabled:hover:shadow-sm
+                    items-center justify-center gap-1.5"
                 >
                   {cart.find(item => item.id === premade.id) ? 'In Cart' : <><Plus size={12} /> Add to Cart</>}
                 </button>
@@ -1843,13 +2065,11 @@ const PremadesPage = () => {
             <p className="font-mono text-black/30 text-xs uppercase tracking-widest animate-pulse">Loading premades from Instagram...</p>
           </div>
         )}
-
         {!loading && error && (
           <div className="text-center py-24">
             <p className="font-mono text-black/30 text-xs uppercase tracking-widest">Could not load premades. {error}</p>
           </div>
         )}
-
         {!loading && !error && premades.length === 0 && (
           <div className="text-center py-24">
             <p className="font-mono text-black/30 text-xs uppercase tracking-widest">No premades available yet. Check back soon.</p>
@@ -1857,13 +2077,16 @@ const PremadesPage = () => {
         )}
       </div>
 
-      {/* BOTTOM */}
+      {/* BOTTOM — View Cart CTA + Footer */}
       <div className="w-full relative z-20 mt-20">
         {cart.length > 0 && (
           <div className="flex justify-center mb-6">
             <button
               onClick={() => setCartOpen(true)}
-              className="group text-[color:var(--btn-tx)] hover:text-white transition-colors uppercase tracking-[0.2em] font-mono text-[10px] sm:text-xs flex items-center gap-2 border border-[color:var(--primary)] bg-[color:var(--primary)] px-6 py-3 rounded-full hover:bg-black hover:border-black"
+              className="flex items-center gap-2 px-8 py-3.5 font-mono text-xs uppercase tracking-widest rounded-full
+                bg-white/70 backdrop-blur-md border border-black/12 shadow-md
+                text-[color:var(--primary)] hover:bg-[color:var(--primary)] hover:text-white hover:border-[color:var(--primary)] hover:shadow-lg
+                transition-all duration-300"
             >
               <ShoppingBag size={14} />
               View Cart ({cart.length}) — ${cart.reduce((s, i) => s + i.price, 0)}
@@ -1994,6 +2217,7 @@ export default function App() {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/archive" element={<ArchivePage />} />
               <Route path="/premades" element={<PremadesPage />} />
+              <Route path="/mat-renders" element={<MatRendersPage />} />
               <Route path="/service/:id" element={<ServiceDetail />} />
               <Route path="/service/:id/order" element={<ServiceOrderPage />} />
               <Route path="/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
