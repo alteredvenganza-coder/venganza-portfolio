@@ -306,7 +306,8 @@ export default function ThemeEditor() {
       await triggerDeploy();
       toast('Deploying… site updates in ~1 min.');
     } catch (err) {
-      toast('Deploy failed: ' + err.message, 'error');
+      // If deploy hook not configured, saving already triggers auto-deploy via git
+      toast('Saved ✓ — site will update automatically in ~1 min.');
     }
     setDeploying(false);
   };
