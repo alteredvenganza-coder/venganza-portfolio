@@ -267,7 +267,9 @@ const ThemeController = () => {
     const path = location.pathname;
     const decoded = decodeURIComponent(path);
 
-    if (path === '/' || path === '/archive' || path === '/about' || path === '/premades' || path === '/materializing-ideas') {
+    if (path === '/mat-renders') {
+      document.body.classList.add('theme-dark');
+    } else if (path === '/' || path === '/archive' || path === '/about' || path === '/premades' || path === '/materializing-ideas') {
       document.body.classList.add('theme-light');
     } else if (decoded.includes('Tailored') || path === '/designs' || decoded.includes('E-commerce') || decoded.includes('Techpack')) {
       document.body.classList.add('theme-tailored');
@@ -418,7 +420,6 @@ const useLatestPremade = () => {
 const Home = () => {
   const containerRef = useRef();
   const { slides, loading: slidesLoading } = useHeroSlides(6);
-  const { reel, loading: reelLoading } = useLatestReel();
   const theme = useTheme();
   const [servicesOpen, setServicesOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -530,62 +531,18 @@ const Home = () => {
           </span>
         </Link>
 
-        {/* Right — MAT Renders */}
-        <div className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden bg-neutral-100 flex items-center justify-center">
+        {/* Right — MAT Renders (clickable) */}
+        <Link to="/mat-renders" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden bg-neutral-900 flex items-center justify-center group cursor-pointer">
           {theme.images?.heroRight && (
-            <img src={theme.images.heroRight} alt="MAT Renders" className="absolute inset-0 w-full h-full object-cover" />
+            <img src={theme.images.heroRight} alt="MAT Renders" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
           <div className="relative z-10 text-center flex flex-col items-center justify-center">
             <h2 className="heading-font text-4xl md:text-6xl tracking-widest text-white">MAT RENDERS</h2>
-            <p className="font-mono text-[10px] md:text-xs text-white/70 uppercase tracking-[0.3em] mt-3">Coming Soon</p>
+            <p className="font-mono text-[10px] md:text-xs text-white/70 uppercase tracking-[0.3em] mt-3 group-hover:tracking-[0.45em] transition-all duration-500">Explore →</p>
           </div>
-        </div>
+        </Link>
       </div>
-
-      {/* ============ LATEST REEL ============ */}
-      {!reelLoading && reel && (
-        <div className="w-full px-6 md:px-10 py-10 md:py-14 flex flex-col md:flex-row items-center gap-8 md:gap-12 border-t border-black/8">
-          {/* Video thumbnail / player */}
-          <a
-            href={reel.permalink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative flex-shrink-0 w-full md:w-[220px] aspect-[9/16] rounded-2xl overflow-hidden bg-black/5 shadow-lg hover:shadow-2xl transition-shadow duration-500"
-          >
-            {reel.thumbnail_url && (
-              <img src={reel.thumbnail_url} alt="Latest Reel" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-            )}
-            <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors duration-300">
-              {/* Play icon */}
-              <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
-              </div>
-            </div>
-            <span className="absolute top-3 left-3 px-2 py-1 rounded-full font-mono text-[8px] font-bold tracking-widest bg-white/20 backdrop-blur-sm border border-white/30 text-white uppercase">
-              Reel
-            </span>
-          </a>
-
-          {/* Text */}
-          <div className="flex flex-col gap-4 max-w-sm">
-            <p className="font-mono text-[9px] text-black/40 uppercase tracking-[0.2em]">Latest on Instagram</p>
-            {reel.caption && (
-              <p className="font-mono text-xs text-black/70 leading-relaxed line-clamp-3">
-                {reel.caption.split('\n')[0].replace(/#\w+/g, '').trim()}
-              </p>
-            )}
-            <a
-              href={reel.permalink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 font-mono text-[10px] text-black/50 hover:text-black uppercase tracking-[0.2em] transition-colors w-fit"
-            >
-              <Instagram size={12} /> Watch on Instagram
-            </a>
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <div className="px-6 md:px-10">
@@ -1769,6 +1726,132 @@ const useInstagramPremades = () => {
 // ==========================================
 // PREMADES GALLERY PAGE
 // ==========================================
+// MAT RENDERS PAGE
+// ==========================================
+
+const MatRendersPage = () => {
+  const containerRef = useRef(null);
+  const theme = useTheme();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const ctx = gsap.context(() => {
+      gsap.from('.mat-header', { y: 40, opacity: 0, stagger: 0.12, duration: 1.4, ease: 'power3.out' });
+      gsap.from('.mat-card', { y: 60, opacity: 0, stagger: 0.08, duration: 1, ease: 'power3.out', delay: 0.4 });
+    }, containerRef);
+    return () => ctx.revert();
+  }, []);
+
+  // Sample render results — admin can set heroRight image; here we show gallery slots
+  const gallerySlots = [
+    { key: 'matRender1', label: 'Render 01' },
+    { key: 'matRender2', label: 'Render 02' },
+    { key: 'matRender3', label: 'Render 03' },
+    { key: 'matRender4', label: 'Render 04' },
+    { key: 'matRender5', label: 'Render 05' },
+    { key: 'matRender6', label: 'Render 06' },
+  ];
+
+  return (
+    <div ref={containerRef} className="min-h-screen bg-[#0a0a0a] flex flex-col relative z-10">
+
+      {/* Mobile burger */}
+      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/60 hover:text-white transition-colors">
+        <Menu size={24} />
+      </button>
+
+      {/* ── HEADER ── */}
+      <header className="flex items-center justify-between px-6 md:px-12 pt-8 pb-6">
+        <Link to="/" className="mat-header heading-font text-white/30 hover:text-white transition-colors tracking-widest text-sm uppercase font-mono">
+          ← Altered Venganza
+        </Link>
+        <span className="mat-header font-mono text-[9px] text-white/20 uppercase tracking-[0.3em]">
+          MAT Renders
+        </span>
+      </header>
+
+      {/* ── HERO ── */}
+      <div className="relative px-6 md:px-12 pt-6 pb-16">
+        <h1 className="mat-header heading-font text-[4rem] md:text-[7rem] lg:text-[10rem] leading-none text-white tracking-widest">
+          MAT
+        </h1>
+        <h1 className="mat-header heading-font text-[4rem] md:text-[7rem] lg:text-[10rem] leading-none text-white/20 tracking-widest -mt-4 md:-mt-8">
+          RENDERS
+        </h1>
+        <p className="mat-header font-mono text-xs text-white/40 uppercase tracking-[0.25em] mt-6 max-w-md">
+          Materialized clothing renders. Production-ready 3D results for your brand — from our in-house rendering pipeline.
+        </p>
+
+        {/* Hero image */}
+        {theme.images?.heroRight && (
+          <div className="mt-10 relative rounded-2xl overflow-hidden aspect-[16/7]">
+            <img src={theme.images.heroRight} alt="MAT Renders" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-transparent" />
+          </div>
+        )}
+      </div>
+
+      {/* ── GALLERY GRID ── */}
+      <div className="px-6 md:px-12 pb-16">
+        <p className="mat-header font-mono text-[9px] text-white/25 uppercase tracking-[0.3em] mb-8">Results</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+          {gallerySlots.map((slot, i) => (
+            <div key={slot.key} className="mat-card relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5 border border-white/5 group">
+              {theme.images?.[slot.key] ? (
+                <img src={theme.images[slot.key]} alt={slot.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                    <span className="font-mono text-[10px] text-white/20">{String(i + 1).padStart(2, '0')}</span>
+                  </div>
+                  <span className="font-mono text-[8px] text-white/15 uppercase tracking-widest">{slot.label}</span>
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <span className="absolute bottom-4 left-4 font-mono text-[9px] text-white/70 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300">{slot.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── CTA ── */}
+      <div className="px-6 md:px-12 py-20 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div>
+          <h2 className="heading-font text-3xl md:text-5xl text-white tracking-widest mb-3">Get Your Renders</h2>
+          <p className="font-mono text-xs text-white/40 uppercase tracking-[0.2em] max-w-sm">
+            Upload your designs — we materialize them into production-ready clothing renders for your brand.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 flex-shrink-0">
+          <a
+            href="https://www.instagram.com/rare______________________/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-8 py-4 bg-white text-black font-mono text-xs uppercase tracking-widest rounded-full hover:bg-white/90 transition-all"
+          >
+            <Instagram size={14} /> Order via DM
+          </a>
+          <Link
+            to="/contact"
+            className="flex items-center justify-center gap-3 px-8 py-4 border border-white/20 text-white font-mono text-xs uppercase tracking-widest rounded-full hover:border-white/40 hover:bg-white/5 transition-all"
+          >
+            Contact Us
+          </Link>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="px-6 md:px-12">
+        <SiteFooter />
+      </div>
+
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
+    </div>
+  );
+};
+
+// ==========================================
 
 const PremadesPage = () => {
   const { premades, loading, error } = useInstagramPremades();
@@ -1806,51 +1889,60 @@ const PremadesPage = () => {
         <Menu size={24} />
       </button>
 
-      {/* ============ TOP HEADER — like Home but nav on the RIGHT ============ */}
-      <div className="premade-header w-full flex items-start justify-between mb-10 pr-14 md:pr-0">
+      {/* ============ TOP HEADER — Logo left, nav left below logo ============ */}
+      <div className="premade-header w-full mb-10 pr-14 md:pr-0">
 
-        {/* Left — Brand + description + count */}
-        <div>
+        {/* Row 1: Brand + right count */}
+        <div className="flex items-start justify-between">
           <Link to="/" className="heading-font text-[3rem] md:text-[3.5rem] leading-none text-black tracking-widest block hover:opacity-80 transition-opacity">
             Altered Venganza
           </Link>
-          <div className="space-y-1 mt-4 mb-4">
+          <p className="hidden md:flex text-black/60 font-mono text-xs uppercase tracking-[0.1em] items-center gap-2 pt-3 flex-shrink-0">
+            <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]" />
+            {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
+          </p>
+        </div>
+
+        {/* Row 2: description (left) + nav links (left) */}
+        <div className="mt-4 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div className="space-y-1">
             <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
               Pre-made clothing renders &bull; Production ready files
             </p>
             <p className="text-black/70 font-mono text-xs uppercase tracking-[0.1em] leading-relaxed">
               Fully alterable &amp; customizable to your brand &bull; Numbered &amp; Ready to purchase
             </p>
+            {/* Mobile count */}
+            <p className="md:hidden text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex items-center gap-2 pt-1">
+              <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse" />
+              {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
+            </p>
           </div>
-          <p className="text-black/60 font-mono text-xs uppercase tracking-[0.1em] flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[color:var(--primary)] animate-pulse shadow-[0_0_8px_rgba(123,31,36,0.6)]" />
-            {loading ? '...' : `${premades.filter(p => p.available).length} Pieces Available`}
-          </p>
-        </div>
 
-        {/* Right — Navigation (like Home page right side) */}
-        <div className="hidden md:flex flex-col items-end gap-3 pt-2 flex-shrink-0">
-          <Link to="/" className="font-mono text-[11px] text-black/50 hover:text-black transition-colors uppercase tracking-[0.2em]">
-            ← Back to Home
-          </Link>
-          <button
-            onClick={() => setCartOpen(true)}
-            className="font-mono text-[11px] text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] flex items-center gap-2"
-          >
-            Cart ({cart.length}) <ShoppingBag size={13} />
-          </button>
-          {cart.length > 0 && (
+          {/* Nav links on the LEFT side below description */}
+          <div className="flex items-center gap-6 flex-shrink-0">
+            <Link to="/" className="font-mono text-[11px] text-black/50 hover:text-black transition-colors uppercase tracking-[0.2em]">
+              ← Home
+            </Link>
             <button
               onClick={() => setCartOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 text-[10px] font-mono uppercase tracking-widest rounded-xl
-                bg-white/60 backdrop-blur-md border border-black/12 shadow-sm
-                text-[color:var(--primary)] hover:bg-[color:var(--primary)] hover:text-white hover:border-[color:var(--primary)]
-                transition-all duration-300"
+              className="font-mono text-[11px] text-[color:var(--primary)] hover:text-black transition-colors uppercase tracking-[0.2em] flex items-center gap-2"
             >
-              <ShoppingBag size={12} />
-              View Cart — ${cart.reduce((s, i) => s + i.price, 0)}
+              Cart ({cart.length}) <ShoppingBag size={13} />
             </button>
-          )}
+            {cart.length > 0 && (
+              <button
+                onClick={() => setCartOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 text-[10px] font-mono uppercase tracking-widest rounded-xl
+                  bg-white/60 backdrop-blur-md border border-black/12 shadow-sm
+                  text-[color:var(--primary)] hover:bg-[color:var(--primary)] hover:text-white hover:border-[color:var(--primary)]
+                  transition-all duration-300"
+              >
+                <ShoppingBag size={12} />
+                View Cart — ${cart.reduce((s, i) => s + i.price, 0)}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -2079,6 +2171,7 @@ export default function App() {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/archive" element={<ArchivePage />} />
               <Route path="/premades" element={<PremadesPage />} />
+              <Route path="/mat-renders" element={<MatRendersPage />} />
               <Route path="/service/:id" element={<ServiceDetail />} />
               <Route path="/service/:id/order" element={<ServiceOrderPage />} />
               <Route path="/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
