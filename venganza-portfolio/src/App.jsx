@@ -1815,6 +1815,52 @@ const MatRendersPage = () => {
         </div>
       </div>
 
+      {/* ── APP NOT AVAILABLE YET ── */}
+      <div className="mx-6 md:mx-12 mb-16 rounded-2xl border border-amber-500/15 bg-amber-500/[0.04] px-6 md:px-10 py-7 flex flex-col md:flex-row items-start md:items-center gap-5">
+        <span className="flex-shrink-0 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          <span className="font-mono text-[9px] text-amber-400 uppercase tracking-[0.2em]">App Coming Soon</span>
+        </span>
+        <p className="font-mono text-[11px] text-white/55 leading-relaxed">
+          The <span className="text-white/90">MAT public app</span> is not yet available. In the meantime, order your renders directly via DM — we'll produce them manually through our in-house pipeline at the same quality.
+        </p>
+      </div>
+
+      {/* ── PRICING ── */}
+      <div className="px-6 md:px-12 pb-20">
+        <p className="font-mono text-[9px] text-white/25 uppercase tracking-[0.3em] mb-8">Pricing</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { tier: 'Single View', price: '€45', delivery: '4 h delivery', features: ['High-resolution studio lighting render', 'Optimized for product page or social feed'] },
+            { tier: 'Custom View', price: '€60', delivery: '6 h delivery', features: ['Specific camera angle requested by you', 'Lighting & shadow refined to your brief'] },
+            { tier: '360°', price: '€140', delivery: '1 day delivery', features: ['Full rotational sequence', 'Ready for interactive e-commerce integration'] },
+          ].map(({ tier, price, delivery, features }) => (
+            <div key={tier} className="mat-card rounded-2xl border border-white/8 bg-white/[0.03] p-6 flex flex-col gap-5 hover:border-white/15 hover:bg-white/[0.05] transition-all duration-300">
+              <div>
+                <p className="font-mono text-[9px] text-white/30 uppercase tracking-[0.25em] mb-2">{tier}</p>
+                <p className="heading-font text-5xl text-white tracking-widest">{price}</p>
+                <p className="font-mono text-[9px] text-white/30 mt-1.5 uppercase tracking-widest">{delivery}</p>
+              </div>
+              <div className="flex-1 space-y-2 border-t border-white/5 pt-4">
+                {features.map(f => (
+                  <p key={f} className="font-mono text-[10px] text-white/45 flex items-start gap-2 leading-relaxed">
+                    <span className="text-white/20 flex-shrink-0 mt-0.5">—</span>{f}
+                  </p>
+                ))}
+              </div>
+              <a
+                href="https://www.instagram.com/rare______________________/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-white/10 font-mono text-[10px] text-white/50 hover:text-white hover:border-white/25 hover:bg-white/5 uppercase tracking-widest transition-all duration-300"
+              >
+                <Instagram size={11} /> Order this
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* ── CTA ── */}
       <div className="px-6 md:px-12 py-20 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
         <div>
