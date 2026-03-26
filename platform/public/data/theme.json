@@ -1,0 +1,37 @@
+{
+  "images": {
+    "heroLeft": "",
+    "heroRight": "/theme/heroRight.jpeg",
+    "logo": "/logo.png",
+    "aboutHero": "",
+    "galleryBg": "",
+    "ogImage": "",
+    "matRender1": "/theme/matRender1.jpeg",
+    "matRender2": "/theme/matRender2.png",
+    "matRender3": "/theme/matRender3.png"
+  },
+  "colors": {
+    "primary": "#7b1f24",
+    "background": "#f5f0eb",
+    "text": "#000000",
+    "accent": "#7b1f24"
+  },
+  "fonts": {
+    "heading": "Bebas Neue",
+    "body": "Inter",
+    "mono": "Space Mono"
+  },
+  "texts": {
+    "siteTitle": "Altered Venganza",
+    "subtitle": "Multi-disciplinary studio made for brands that builds.",
+    "tagline": "Premium branding • Custom designs • Pre-mades & softwares for fashion designers and creatives",
+    "location": "Trieste, Italy / by Rare Martinez",
+    "premadeSubtitle1": "Pre-made clothing renders • Production ready files",
+    "premadeSubtitle2": "Fully alterable & customizable to your brand • Numbered & Ready to purchase"
+  },
+  "instagram": {
+    "handle": "alteredvenganza",
+    "hashtag": "#premade"
+  },
+  "premadePrice": 200
+}
