@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import {
   Save, Monitor, Smartphone, RefreshCw, ChevronRight, ChevronDown,
   Plus, ImageIcon, Palette, Type, FileText, Layout, Grid,
-  Upload, X, Link as LinkIcon, Check, Settings, Eye
+  Upload, X, Link as LinkIcon, Check, Settings, Eye, Layers, SlidersHorizontal
 } from 'lucide-react';
 import { getTheme, saveTheme, triggerDeploy, uploadImage } from '../lib/github';
 import { useToast } from '../lib/toast';
@@ -311,6 +311,7 @@ export default function ThemeEditor() {
     setDeploying(false);
   };
 
+  const [mobilePanel, setMobilePanel] = useState('sections'); // 'sections' | 'settings' | 'preview'
   const selectedSection = flatSections().find(s => s.id === selectedId);
 
   function renderField(setting) {
@@ -358,172 +359,168 @@ export default function ThemeEditor() {
     { label: 'About', path: '/about' },
   ];
 
-  return (
-    <div className="flex h-[calc(100vh-73px)] -m-8 bg-[#0a0a0a]">
+  // ─── Shared: Section tree content ───────────────────────────────────────
+  const SectionTree = ({ onSelect }) => (
+    <>
+      <div className="flex-1 overflow-y-auto py-2">
+        {SECTIONS.map(section => {
+          const Icon = section.icon;
+          const isOpen = expanded[section.id];
+          const isActive = selectedId === section.id;
+          return (
+            <div key={section.id}>
+              <button
+                onClick={() => {
+                  setSelectedId(section.id);
+                  if (section.children) setExpanded(e => ({ ...e, [section.id]: !e[section.id] }));
+                  onSelect?.();
+                }}
+                className={`w-full flex items-center gap-2.5 px-4 py-3 text-left transition-colors ${
+                  isActive ? 'bg-white/8 text-white' : 'text-white/50 hover:text-white/80 hover:bg-white/4'
+                }`}
+              >
+                {section.children ? (
+                  isOpen ? <ChevronDown size={11} className="flex-shrink-0 text-white/30" /> : <ChevronRight size={11} className="flex-shrink-0 text-white/30" />
+                ) : <span className="w-[11px]" />}
+                <Icon size={12} className="flex-shrink-0" />
+                <span className="font-mono text-[10px] uppercase tracking-widest">{section.label}</span>
+              </button>
+              {section.children && isOpen && (
+                <div className="ml-4 border-l border-white/5">
+                  {section.children.map(child => (
+                    <button
+                      key={child.id}
+                      onClick={() => { setSelectedId(child.id); onSelect?.(); }}
+                      className={`w-full flex items-center gap-2.5 pl-4 pr-4 py-2.5 text-left transition-colors ${
+                        selectedId === child.id ? 'bg-white/8 text-white' : 'text-white/40 hover:text-white/70 hover:bg-white/4'
+                      }`}
+                    >
+                      <span className="w-[11px]" />
+                      <span className="font-mono text-[10px] uppercase tracking-widest">{child.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div className="p-3 border-t border-white/5 space-y-2">
+        <button onClick={handleSave} disabled={saving || !dirty}
+          className="w-full flex items-center justify-center gap-2 bg-white text-black py-2.5 rounded-lg font-mono text-[10px] uppercase tracking-widest hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+          <Save size={12} />
+          {saving ? 'Saving...' : dirty ? 'Save' : 'Saved'}
+        </button>
+        <button onClick={handleDeploy} disabled={deploying || dirty}
+          className="w-full flex items-center justify-center gap-2 bg-green-600/80 text-white py-2.5 rounded-lg font-mono text-[10px] uppercase tracking-widest hover:bg-green-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+          <RefreshCw size={12} className={deploying ? 'animate-spin' : ''} />
+          {deploying ? 'Deploying...' : 'Publish'}
+        </button>
+      </div>
+    </>
+  );
 
-      {/* ═══════════ LEFT — Section Tree ═══════════ */}
-      <div className="w-[240px] flex-shrink-0 bg-[#111] border-r border-white/5 flex flex-col overflow-hidden">
-        <div className="px-4 py-3 border-b border-white/5 flex items-center gap-2">
-          <Settings size={13} className="text-white/30" />
-          <span className="font-mono text-[10px] text-white/40 uppercase tracking-widest">Sections</span>
+  // ─── Shared: Settings panel content ─────────────────────────────────────
+  const SettingsPanel = () => (
+    <>
+      <div className="px-4 py-3 border-b border-white/5 flex items-center gap-2">
+        {selectedSection?.icon && <selectedSection.icon size={13} className="text-white/40" />}
+        <span className="font-mono text-[10px] text-white/60 uppercase tracking-widest">
+          {selectedSection?.label ?? 'Select a section'}
+        </span>
+        {dirty && <span className="ml-auto font-mono text-[9px] text-amber-400 animate-pulse">Unsaved</span>}
+      </div>
+      <div className="flex-1 overflow-y-auto p-4">
+        {selectedSection?.settings?.map(s => renderField(s))}
+        {selectedSection && !selectedSection.settings?.length && (
+          <p className="font-mono text-[10px] text-white/20 uppercase tracking-widest text-center py-8">Select a subsection</p>
+        )}
+      </div>
+    </>
+  );
+
+  // ─── Shared: Preview panel content ──────────────────────────────────────
+  const PreviewPanel = () => (
+    <>
+      <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/5 gap-2">
+        <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar">
+          {PREVIEW_PAGES.map(p => (
+            <button key={p.path} onClick={() => setPreviewPath(p.path)}
+              className={`flex-shrink-0 px-2.5 py-1 rounded-lg font-mono text-[9px] uppercase tracking-widest transition-colors ${
+                previewPath === p.path ? 'bg-white/10 text-white' : 'text-white/30 hover:text-white/60 hover:bg-white/5'
+              }`}>{p.label}</button>
+          ))}
+        </div>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <button onClick={() => setPreviewDevice('desktop')} className={`p-1.5 rounded-lg transition-colors ${previewDevice === 'desktop' ? 'bg-white/10 text-white' : 'text-white/30'}`}><Monitor size={13} /></button>
+          <button onClick={() => setPreviewDevice('mobile')} className={`p-1.5 rounded-lg transition-colors ${previewDevice === 'mobile' ? 'bg-white/10 text-white' : 'text-white/30'}`}><Smartphone size={13} /></button>
+          <button onClick={() => iframeRef.current?.contentWindow?.location?.reload()} className="p-1.5 rounded-lg text-white/30 hover:text-white/60"><Eye size={13} /></button>
+        </div>
+      </div>
+      <div className="flex-1 flex items-start justify-center p-3 overflow-auto bg-[#1c1c1c]">
+        <div className={`bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-300 ${previewDevice === 'mobile' ? 'w-[390px] h-[844px]' : 'w-full h-full'}`}
+          style={previewDevice === 'desktop' ? { minHeight: '500px' } : {}}>
+          <iframe ref={iframeRef} src={previewPath} className="w-full h-full border-0" title="Site Preview" />
+        </div>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* ══════════════════════════════════════════════
+          DESKTOP LAYOUT (md+): 3 columns side by side
+      ══════════════════════════════════════════════ */}
+      <div className="hidden md:flex h-[calc(100vh-73px)] -m-8 bg-[#0a0a0a]">
+        {/* Left */}
+        <div className="w-[240px] flex-shrink-0 bg-[#111] border-r border-white/5 flex flex-col overflow-hidden">
+          <div className="px-4 py-3 border-b border-white/5 flex items-center gap-2">
+            <Settings size={13} className="text-white/30" />
+            <span className="font-mono text-[10px] text-white/40 uppercase tracking-widest">Sections</span>
+          </div>
+          <SectionTree />
+        </div>
+        {/* Center */}
+        <div className="flex-1 flex flex-col bg-[#1c1c1c] overflow-hidden">
+          <PreviewPanel />
+        </div>
+        {/* Right */}
+        <div className="w-[280px] flex-shrink-0 bg-[#111] border-l border-white/5 flex flex-col overflow-hidden">
+          <SettingsPanel />
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════
+          MOBILE LAYOUT (<md): full-screen panels + tab bar
+      ══════════════════════════════════════════════ */}
+      <div className="flex md:hidden flex-col -m-8 bg-[#0a0a0a]" style={{ height: 'calc(100vh - 73px)' }}>
+
+        {/* Active panel */}
+        <div className="flex-1 flex flex-col overflow-hidden bg-[#111]">
+          {mobilePanel === 'sections' && <SectionTree onSelect={() => setMobilePanel('settings')} />}
+          {mobilePanel === 'settings' && <SettingsPanel />}
+          {mobilePanel === 'preview' && <PreviewPanel />}
         </div>
 
-        <div className="flex-1 overflow-y-auto py-2">
-          {SECTIONS.map(section => {
-            const Icon = section.icon;
-            const isOpen = expanded[section.id];
-            const isActive = selectedId === section.id;
-
+        {/* Bottom tab bar */}
+        <div className="flex-shrink-0 flex items-center border-t border-white/10 bg-[#0d0d0d]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          {[
+            { id: 'sections', icon: Layers, label: 'Sections' },
+            { id: 'settings', icon: SlidersHorizontal, label: 'Settings' },
+            { id: 'preview', icon: Eye, label: 'Preview' },
+          ].map(tab => {
+            const Icon = tab.icon;
+            const active = mobilePanel === tab.id;
             return (
-              <div key={section.id}>
-                {/* Section row */}
-                <button
-                  onClick={() => {
-                    setSelectedId(section.id);
-                    if (section.children) setExpanded(e => ({ ...e, [section.id]: !e[section.id] }));
-                  }}
-                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-colors group ${
-                    isActive ? 'bg-white/8 text-white' : 'text-white/50 hover:text-white/80 hover:bg-white/4'
-                  }`}
-                >
-                  {section.children ? (
-                    isOpen
-                      ? <ChevronDown size={11} className="flex-shrink-0 text-white/30" />
-                      : <ChevronRight size={11} className="flex-shrink-0 text-white/30" />
-                  ) : (
-                    <span className="w-[11px]" />
-                  )}
-                  <Icon size={12} className="flex-shrink-0" />
-                  <span className="font-mono text-[10px] uppercase tracking-widest">{section.label}</span>
-                </button>
-
-                {/* Children */}
-                {section.children && isOpen && (
-                  <div className="ml-4 border-l border-white/5">
-                    {section.children.map(child => (
-                      <button
-                        key={child.id}
-                        onClick={() => setSelectedId(child.id)}
-                        className={`w-full flex items-center gap-2.5 pl-4 pr-4 py-2 text-left transition-colors ${
-                          selectedId === child.id ? 'bg-white/8 text-white' : 'text-white/40 hover:text-white/70 hover:bg-white/4'
-                        }`}
-                      >
-                        <span className="w-[11px]" />
-                        <span className="font-mono text-[10px] uppercase tracking-widest">{child.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <button key={tab.id} onClick={() => setMobilePanel(tab.id)}
+                className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors ${active ? 'text-white' : 'text-white/30'}`}>
+                <Icon size={18} />
+                <span className="font-mono text-[8px] uppercase tracking-widest">{tab.label}</span>
+              </button>
             );
           })}
         </div>
-
-        {/* Save / Deploy */}
-        <div className="p-3 border-t border-white/5 space-y-2">
-          <button
-            onClick={handleSave}
-            disabled={saving || !dirty}
-            className="w-full flex items-center justify-center gap-2 bg-white text-black py-2 rounded-lg font-mono text-[10px] uppercase tracking-widest hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-          >
-            <Save size={12} />
-            {saving ? 'Saving...' : dirty ? 'Save' : 'Saved'}
-          </button>
-          <button
-            onClick={handleDeploy}
-            disabled={deploying || dirty}
-            className="w-full flex items-center justify-center gap-2 bg-green-600/80 text-white py-2 rounded-lg font-mono text-[10px] uppercase tracking-widest hover:bg-green-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-          >
-            <RefreshCw size={12} className={deploying ? 'animate-spin' : ''} />
-            {deploying ? 'Deploying...' : 'Publish'}
-          </button>
-        </div>
       </div>
-
-      {/* ═══════════ CENTER — Preview ═══════════ */}
-      <div className="flex-1 flex flex-col bg-[#1c1c1c] overflow-hidden">
-        {/* Preview toolbar */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5 gap-3">
-          {/* Page selector */}
-          <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar">
-            {PREVIEW_PAGES.map(p => (
-              <button
-                key={p.path}
-                onClick={() => setPreviewPath(p.path)}
-                className={`flex-shrink-0 px-3 py-1 rounded-lg font-mono text-[9px] uppercase tracking-widest transition-colors ${
-                  previewPath === p.path ? 'bg-white/10 text-white' : 'text-white/30 hover:text-white/60 hover:bg-white/5'
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Device toggle + dirty indicator */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {dirty && <span className="font-mono text-[9px] text-amber-400 uppercase tracking-widest animate-pulse">Unsaved</span>}
-            <button
-              onClick={() => setPreviewDevice('desktop')}
-              className={`p-1.5 rounded-lg transition-colors ${previewDevice === 'desktop' ? 'bg-white/10 text-white' : 'text-white/30 hover:text-white/60'}`}
-            >
-              <Monitor size={14} />
-            </button>
-            <button
-              onClick={() => setPreviewDevice('mobile')}
-              className={`p-1.5 rounded-lg transition-colors ${previewDevice === 'mobile' ? 'bg-white/10 text-white' : 'text-white/30 hover:text-white/60'}`}
-            >
-              <Smartphone size={14} />
-            </button>
-            <button
-              onClick={() => iframeRef.current?.contentWindow?.location?.reload()}
-              className="p-1.5 rounded-lg text-white/30 hover:text-white/60 transition-colors"
-              title="Refresh preview"
-            >
-              <Eye size={14} />
-            </button>
-          </div>
-        </div>
-
-        {/* iframe */}
-        <div className="flex-1 flex items-start justify-center p-4 overflow-auto">
-          <div
-            className={`bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-300 ${
-              previewDevice === 'mobile' ? 'w-[390px] h-[844px]' : 'w-full h-full'
-            }`}
-            style={previewDevice === 'desktop' ? { minHeight: '600px' } : {}}
-          >
-            <iframe
-              ref={iframeRef}
-              src={previewPath}
-              className="w-full h-full border-0"
-              title="Site Preview"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* ═══════════ RIGHT — Settings Panel ═══════════ */}
-      <div className="w-[280px] flex-shrink-0 bg-[#111] border-l border-white/5 flex flex-col overflow-hidden">
-        <div className="px-4 py-3 border-b border-white/5">
-          {selectedSection ? (
-            <div className="flex items-center gap-2">
-              {selectedSection.icon && <selectedSection.icon size={13} className="text-white/40" />}
-              <span className="font-mono text-[10px] text-white/60 uppercase tracking-widest">{selectedSection.label}</span>
-            </div>
-          ) : (
-            <span className="font-mono text-[10px] text-white/30 uppercase tracking-widest">Select a section</span>
-          )}
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4">
-          {selectedSection?.settings?.map(s => renderField(s))}
-          {selectedSection && !selectedSection.settings?.length && (
-            <p className="font-mono text-[10px] text-white/20 uppercase tracking-widest text-center py-8">
-              Select a subsection
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
