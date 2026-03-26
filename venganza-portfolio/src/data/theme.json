@@ -1,13 +1,14 @@
 {
   "images": {
     "heroLeft": "",
-    "heroRight": "",
+    "heroRight": "/theme/heroRight.jpeg",
     "logo": "/logo.png",
     "aboutHero": "",
     "galleryBg": "",
     "ogImage": "",
     "matRender1": "/theme/matRender1.jpeg",
-    "matRender2": "/theme/matRender2.png"
+    "matRender2": "/theme/matRender2.png",
+    "matRender3": "/theme/matRender3.png"
   },
   "colors": {
     "primary": "#7b1f24",
