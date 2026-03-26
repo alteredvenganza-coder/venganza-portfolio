@@ -12,7 +12,7 @@ const REPO_OWNER = process.env.GITHUB_OWNER || 'alteredvenganza-coder';
 const REPO_NAME = process.env.GITHUB_REPO || 'venganza-portfolio';
 const BRANCH = 'main';
 const API_BASE = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}`;
-const THEME_PATH = 'venganza-portfolio/src/data/theme.json';
+const THEME_PATH = 'venganza-portfolio/public/data/theme.json';
 const TOKEN_SECRET = process.env.TOKEN_SECRET || 'av-secret-change-me';
 
 function parseCookies(cookieHeader) {
