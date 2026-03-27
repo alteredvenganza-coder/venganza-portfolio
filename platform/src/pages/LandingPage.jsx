@@ -3,68 +3,89 @@ import { Link } from 'react-router-dom';
 export default function LandingPage() {
   return (
     <div
-      className="min-h-screen"
       style={{
-        backgroundColor: '#ffffff',
-        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        color: '#1d1d1f',
+        minHeight: '100vh',
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        background: 'linear-gradient(135deg, #0f0c29 0%, #1a1040 30%, #0d1f3c 60%, #0a0a1a 100%)',
+        position: 'relative',
+        overflowX: 'hidden',
+        color: '#ffffff',
       }}
     >
 
+      {/* ── Background orbs ── */}
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+        <div style={{
+          position: 'absolute', top: '-10%', left: '20%',
+          width: '600px', height: '600px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(120, 60, 255, 0.25) 0%, transparent 70%)',
+          filter: 'blur(40px)',
+        }} />
+        <div style={{
+          position: 'absolute', top: '30%', right: '-5%',
+          width: '500px', height: '500px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(0, 120, 255, 0.2) 0%, transparent 70%)',
+          filter: 'blur(50px)',
+        }} />
+        <div style={{
+          position: 'absolute', bottom: '10%', left: '10%',
+          width: '400px', height: '400px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(180, 60, 255, 0.15) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+        }} />
+        <div style={{
+          position: 'absolute', top: '60%', left: '50%',
+          width: '700px', height: '300px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(0, 200, 255, 0.08) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+        }} />
+      </div>
+
       {/* ── Navigation ── */}
       <nav
-        className="sticky top-0 z-50 flex items-center justify-between"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'saturate(180%) blur(20px)',
-          WebkitBackdropFilter: 'saturate(180%) blur(20px)',
-          borderBottom: '1px solid #d2d2d7',
-          padding: '0 48px',
-          height: '52px',
+          position: 'sticky', top: 0, zIndex: 100,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 48px', height: '64px',
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         }}
       >
-        <span
-          style={{
-            fontSize: '17px',
-            fontWeight: '600',
-            letterSpacing: '-0.02em',
-            color: '#1d1d1f',
-            userSelect: 'none',
-          }}
-        >
-          Folio
+        <span style={{
+          fontSize: '18px', fontWeight: '700',
+          letterSpacing: '0.15em', textTransform: 'uppercase',
+          background: 'linear-gradient(135deg, #ffffff, rgba(255,255,255,0.7))',
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+          userSelect: 'none',
+        }}>
+          FOLIO
         </span>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-          <Link
-            to="/login"
-            style={{
-              fontSize: '13px',
-              color: '#6e6e73',
-              textDecoration: 'none',
-              letterSpacing: '-0.01em',
-              transition: 'color 0.15s ease',
-            }}
-            onMouseEnter={e => (e.target.style.color = '#1d1d1f')}
-            onMouseLeave={e => (e.target.style.color = '#6e6e73')}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Link to="/login" style={{
+            fontSize: '14px', color: 'rgba(255,255,255,0.65)',
+            textDecoration: 'none', padding: '8px 16px', borderRadius: '12px',
+            transition: 'all 0.2s ease',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.65)'; e.currentTarget.style.background = 'transparent'; }}
           >
             Sign In
           </Link>
-          <Link
-            to="/signup"
-            style={{
-              fontSize: '13px',
-              fontWeight: '500',
-              color: '#ffffff',
-              backgroundColor: '#0071e3',
-              textDecoration: 'none',
-              padding: '7px 16px',
-              borderRadius: '980px',
-              letterSpacing: '-0.01em',
-              transition: 'background-color 0.15s ease',
-            }}
-            onMouseEnter={e => (e.target.style.backgroundColor = '#0077ed')}
-            onMouseLeave={e => (e.target.style.backgroundColor = '#0071e3')}
+          <Link to="/signup" style={{
+            fontSize: '14px', fontWeight: '500',
+            color: '#ffffff', textDecoration: 'none',
+            padding: '9px 20px', borderRadius: '980px',
+            background: 'linear-gradient(135deg, rgba(120,80,255,0.9), rgba(0,120,255,0.9))',
+            border: '1px solid rgba(255,255,255,0.2)',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 4px 20px rgba(120,80,255,0.3)',
+            transition: 'all 0.2s ease',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 30px rgba(120,80,255,0.5)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 4px 20px rgba(120,80,255,0.3)'; e.currentTarget.style.transform = 'translateY(0)'; }}
           >
             Get Started
           </Link>
@@ -72,227 +93,174 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ── */}
-      <section
-        style={{
-          backgroundColor: '#ffffff',
-          textAlign: 'center',
-          padding: '120px 24px 128px',
-        }}
-      >
-        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
+      <section style={{
+        position: 'relative', zIndex: 1,
+        textAlign: 'center', padding: '140px 24px 120px',
+      }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
 
-          {/* Eyebrow label */}
-          <p
-            style={{
-              fontSize: '13px',
-              fontWeight: '500',
-              color: '#0071e3',
-              letterSpacing: '0.02em',
-              textTransform: 'uppercase',
-              marginBottom: '20px',
-            }}
-          >
-            Introducing Folio
-          </p>
+          {/* Badge */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '980px', padding: '6px 16px',
+            marginBottom: '32px',
+          }}>
+            <span style={{
+              width: '6px', height: '6px', borderRadius: '50%',
+              background: 'linear-gradient(135deg, #a855f7, #3b82f6)',
+              boxShadow: '0 0 8px rgba(168,85,247,0.8)',
+              flexShrink: 0,
+            }} />
+            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              Creator Portfolio Platform
+            </span>
+          </div>
 
           {/* Headline */}
-          <h1
-            style={{
-              fontSize: 'clamp(48px, 7vw, 80px)',
-              fontWeight: '700',
-              lineHeight: '1.05',
-              letterSpacing: '-0.04em',
-              color: '#1d1d1f',
-              marginBottom: '24px',
-            }}
-          >
-            <span style={{ display: 'block' }}>Your portfolio.</span>
-            <span style={{ display: 'block', color: '#6e6e73' }}>Live in 5 minutes.</span>
+          <h1 style={{
+            fontSize: 'clamp(52px, 8vw, 96px)',
+            fontWeight: '800',
+            lineHeight: '1.0',
+            letterSpacing: '-0.04em',
+            marginBottom: '28px',
+          }}>
+            <span style={{
+              display: 'block',
+              background: 'linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.85) 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            }}>Your portfolio.</span>
+            <span style={{
+              display: 'block',
+              background: 'linear-gradient(135deg, rgba(168,85,247,0.9) 0%, rgba(59,130,246,0.9) 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            }}>Live in 5 minutes.</span>
           </h1>
 
-          {/* Sub-headline */}
-          <p
-            style={{
-              fontSize: '19px',
-              fontWeight: '400',
-              lineHeight: '1.6',
-              color: '#6e6e73',
-              letterSpacing: '-0.01em',
-              maxWidth: '480px',
-              margin: '0 auto 44px',
-            }}
-          >
+          {/* Sub */}
+          <p style={{
+            fontSize: '18px', lineHeight: '1.65',
+            color: 'rgba(255,255,255,0.5)',
+            maxWidth: '460px', margin: '0 auto 48px',
+            letterSpacing: '-0.01em',
+          }}>
             Connect Instagram. Set your brand. Start selling.
-            No code. No friction. Just you and your work.
+            No code, no friction — just your work, live.
           </p>
 
           {/* CTAs */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '16px',
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', alignItems: 'center' }}>
+            <Link to="/signup" style={{
+              display: 'inline-block',
+              fontSize: '16px', fontWeight: '600', color: '#ffffff',
+              textDecoration: 'none', padding: '16px 36px', borderRadius: '980px',
+              background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+              boxShadow: '0 8px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+              border: '1px solid rgba(255,255,255,0.15)',
+              transition: 'all 0.25s ease',
             }}
-          >
-            <Link
-              to="/signup"
-              style={{
-                display: 'inline-block',
-                fontSize: '17px',
-                fontWeight: '500',
-                color: '#ffffff',
-                backgroundColor: '#0071e3',
-                textDecoration: 'none',
-                padding: '14px 28px',
-                borderRadius: '980px',
-                letterSpacing: '-0.01em',
-                transition: 'background-color 0.15s ease',
-              }}
-              onMouseEnter={e => (e.target.style.backgroundColor = '#0077ed')}
-              onMouseLeave={e => (e.target.style.backgroundColor = '#0071e3')}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.2)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; }}
             >
               Create your free portfolio
             </Link>
-            <Link
-              to="/login"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '17px',
-                fontWeight: '400',
-                color: '#0071e3',
-                textDecoration: 'none',
-                letterSpacing: '-0.01em',
-                transition: 'color 0.15s ease',
-              }}
-              onMouseEnter={e => (e.target.style.color = '#0077ed')}
-              onMouseLeave={e => (e.target.style.color = '#0071e3')}
+            <Link to="/login" style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              fontSize: '16px', color: 'rgba(255,255,255,0.6)',
+              textDecoration: 'none', padding: '16px 24px', borderRadius: '980px',
+              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(255,255,255,0.04)',
+              backdropFilter: 'blur(8px)',
+              transition: 'all 0.2s ease',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
             >
-              Already have an account <span style={{ fontSize: '20px', lineHeight: 1 }}>›</span>
+              Sign in <span>›</span>
             </Link>
           </div>
 
         </div>
       </section>
 
-      {/* ── Tagline strip ── */}
-      <section
-        style={{
-          backgroundColor: '#f5f5f7',
-          borderTop: '1px solid #d2d2d7',
-          borderBottom: '1px solid #d2d2d7',
-          padding: '40px 24px',
+      {/* ── Tagline glass strip ── */}
+      <section style={{ position: 'relative', zIndex: 1, padding: '0 24px 80px' }}>
+        <div style={{
+          maxWidth: '800px', margin: '0 auto',
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '24px',
+          backdropFilter: 'blur(20px)',
+          padding: '40px 48px',
           textAlign: 'center',
-        }}
-      >
-        <p
-          style={{
+          boxShadow: '0 8px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)',
+        }}>
+          <p style={{
             fontSize: 'clamp(20px, 3vw, 28px)',
             fontWeight: '600',
             letterSpacing: '-0.025em',
-            color: '#1d1d1f',
-            maxWidth: '700px',
-            margin: '0 auto',
-            lineHeight: '1.3',
-          }}
-        >
-          The only portfolio platform built for fashion creators.
-        </p>
+            lineHeight: '1.35',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.6))',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+          }}>
+            The only portfolio platform built for fashion creators.
+          </p>
+        </div>
       </section>
 
       {/* ── How it works ── */}
-      <section
-        style={{
-          backgroundColor: '#ffffff',
-          padding: '112px 48px',
-        }}
-      >
+      <section style={{ position: 'relative', zIndex: 1, padding: '80px 48px' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
 
-          <p
-            style={{
-              fontSize: '13px',
-              fontWeight: '500',
-              color: '#86868b',
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              textAlign: 'center',
-              marginBottom: '72px',
-            }}
-          >
+          <p style={{
+            fontSize: '11px', fontWeight: '600', letterSpacing: '0.12em',
+            textTransform: 'uppercase', textAlign: 'center',
+            color: 'rgba(255,255,255,0.35)', marginBottom: '64px',
+          }}>
             How it works
           </p>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: '0',
-            }}
-          >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
             {[
-              {
-                number: '01',
-                title: 'Connect Instagram',
-                desc: 'We pull your latest work automatically. Your feed becomes your portfolio — always fresh, always current.',
-              },
-              {
-                number: '02',
-                title: 'Set your brand',
-                desc: 'Choose your colors, name, and pricing in minutes. Make it unmistakably, entirely yours.',
-              },
-              {
-                number: '03',
-                title: 'Go live',
-                desc: 'Share your link and start taking orders. Your audience is already waiting for you.',
-              },
+              { number: '01', title: 'Connect Instagram', desc: 'We pull your latest work automatically. Your feed becomes your portfolio — always fresh, always live.' },
+              { number: '02', title: 'Set your brand', desc: 'Pick your colors, name, and pricing in minutes. Make it unmistakably, entirely yours.' },
+              { number: '03', title: 'Go live', desc: 'Share your link and start taking orders. Your audience is already waiting.' },
             ].map((step, i) => (
-              <div
-                key={step.number}
-                style={{
-                  padding: '0 40px',
-                  borderLeft: i > 0 ? '1px solid #d2d2d7' : 'none',
-                  textAlign: 'center',
-                }}
+              <div key={step.number} style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.09)',
+                borderRadius: '20px',
+                backdropFilter: 'blur(16px)',
+                padding: '36px 32px',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
+                transition: 'all 0.25s ease',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.transform = 'translateY(-3px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.09)'; e.currentTarget.style.transform = 'translateY(0)'; }}
               >
-                <span
-                  style={{
-                    display: 'block',
-                    fontSize: '12px',
-                    fontWeight: '500',
-                    color: '#86868b',
-                    letterSpacing: '0.08em',
-                    fontVariantNumeric: 'tabular-nums',
-                    marginBottom: '16px',
-                  }}
-                >
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  width: '36px', height: '36px', borderRadius: '10px', marginBottom: '20px',
+                  background: `linear-gradient(135deg, ${i===0 ? 'rgba(124,58,237,0.4), rgba(37,99,235,0.4)' : i===1 ? 'rgba(37,99,235,0.4), rgba(0,180,200,0.4)' : 'rgba(180,60,255,0.4), rgba(124,58,237,0.4)'})`,
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  fontSize: '12px', fontWeight: '700', color: 'rgba(255,255,255,0.8)',
+                  letterSpacing: '0.05em',
+                }}>
                   {step.number}
                 </span>
-                <h3
-                  style={{
-                    fontSize: '19px',
-                    fontWeight: '600',
-                    letterSpacing: '-0.02em',
-                    color: '#1d1d1f',
-                    marginBottom: '12px',
-                    lineHeight: '1.3',
-                  }}
-                >
+                <h3 style={{
+                  fontSize: '17px', fontWeight: '600',
+                  letterSpacing: '-0.02em', color: '#ffffff',
+                  marginBottom: '10px', lineHeight: '1.3',
+                }}>
                   {step.title}
                 </h3>
-                <p
-                  style={{
-                    fontSize: '15px',
-                    fontWeight: '400',
-                    lineHeight: '1.65',
-                    color: '#6e6e73',
-                    letterSpacing: '-0.005em',
-                  }}
-                >
+                <p style={{
+                  fontSize: '14px', lineHeight: '1.65',
+                  color: 'rgba(255,255,255,0.45)', letterSpacing: '-0.005em',
+                }}>
                   {step.desc}
                 </p>
               </div>
@@ -303,133 +271,72 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features grid ── */}
-      <section
-        style={{
-          backgroundColor: '#f5f5f7',
-          borderTop: '1px solid #d2d2d7',
-          padding: '112px 48px',
-        }}
-      >
+      <section style={{ position: 'relative', zIndex: 1, padding: '80px 48px' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
 
-          <p
-            style={{
-              fontSize: '13px',
-              fontWeight: '500',
-              color: '#86868b',
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              textAlign: 'center',
-              marginBottom: '16px',
-            }}
-          >
+          <p style={{
+            fontSize: '11px', fontWeight: '600', letterSpacing: '0.12em',
+            textTransform: 'uppercase', textAlign: 'center',
+            color: 'rgba(255,255,255,0.35)', marginBottom: '16px',
+          }}>
             Everything you need
           </p>
-
-          <h2
-            style={{
-              fontSize: 'clamp(32px, 4vw, 48px)',
-              fontWeight: '700',
-              letterSpacing: '-0.035em',
-              color: '#1d1d1f',
-              textAlign: 'center',
-              marginBottom: '72px',
-              lineHeight: '1.1',
-            }}
-          >
+          <h2 style={{
+            fontSize: 'clamp(30px, 4vw, 44px)', fontWeight: '700',
+            letterSpacing: '-0.035em', textAlign: 'center',
+            marginBottom: '56px', lineHeight: '1.1',
+            background: 'linear-gradient(135deg, #ffffff, rgba(255,255,255,0.65))',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+          }}>
             All the tools. None of the noise.
           </h2>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '2px',
-              backgroundColor: '#d2d2d7',
-              borderRadius: '18px',
-              overflow: 'hidden',
-            }}
-          >
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '12px',
+          }}>
             {[
-              {
-                symbol: '↗',
-                title: 'Portfolio & shop in one',
-                desc: 'Showcase your work and sell your services from a single, cohesive link. One URL, full story.',
-              },
-              {
-                symbol: '⟳',
-                title: 'Instagram auto-sync',
-                desc: 'Your portfolio stays fresh without lifting a finger. Post on Instagram — your portfolio updates itself.',
-              },
-              {
-                symbol: '$',
-                title: 'Stripe payments built-in',
-                desc: 'Accept payments securely from day one. No third-party setup, no redirects, no friction.',
-              },
-              {
-                symbol: '◻',
-                title: 'Render gallery',
-                desc: 'Show clients polished, finished-look previews with a curated library of render templates.',
-              },
-              {
-                symbol: '◑',
-                title: 'Custom brand & fonts',
-                desc: 'Your brand, your rules. Dial in your palette and typography in seconds, not hours.',
-              },
-              {
-                symbol: '⊞',
-                title: 'Unified admin panel',
-                desc: 'Orders, inquiries, portfolio — all in one clean dashboard designed for working creators.',
-              },
+              { symbol: '↗', title: 'Portfolio & shop in one', desc: 'Showcase your work and sell from a single cohesive link. One URL, full story.', gradient: 'rgba(124,58,237,0.25), rgba(37,99,235,0.15)' },
+              { symbol: '⟳', title: 'Instagram auto-sync', desc: 'Post on Instagram — your portfolio updates itself. Always fresh, zero effort.', gradient: 'rgba(37,99,235,0.25), rgba(0,180,200,0.15)' },
+              { symbol: '$', title: 'Stripe payments built-in', desc: 'Accept payments from day one. No third-party setup, no redirects.', gradient: 'rgba(0,180,200,0.2), rgba(0,120,255,0.15)' },
+              { symbol: '⬡', title: 'Render gallery', desc: 'Show clients polished previews with a curated library of render templates.', gradient: 'rgba(180,60,255,0.25), rgba(124,58,237,0.15)' },
+              { symbol: '◑', title: 'Custom brand & fonts', desc: 'Your brand, your rules. Dial in your palette and typography in seconds.', gradient: 'rgba(124,58,237,0.2), rgba(180,60,255,0.15)' },
+              { symbol: '⊞', title: 'Unified admin panel', desc: 'Orders, inquiries, portfolio — all in one dashboard built for creators.', gradient: 'rgba(37,99,235,0.25), rgba(124,58,237,0.15)' },
             ].map((feature) => (
-              <div
-                key={feature.title}
-                style={{
-                  backgroundColor: '#ffffff',
-                  padding: '40px 36px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '12px',
-                }}
+              <div key={feature.title} style={{
+                background: `linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))`,
+                border: '1px solid rgba(255,255,255,0.09)',
+                borderRadius: '20px',
+                backdropFilter: 'blur(20px)',
+                padding: '32px 28px',
+                display: 'flex', flexDirection: 'column', gap: '10px',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06)',
+                transition: 'all 0.25s ease',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04))'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.16)'; e.currentTarget.style.transform = 'translateY(-3px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.09)'; e.currentTarget.style.transform = 'translateY(0)'; }}
               >
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '8px',
-                    backgroundColor: '#f5f5f7',
-                    fontSize: '16px',
-                    color: '#1d1d1f',
-                    fontWeight: '400',
-                    marginBottom: '4px',
-                    flexShrink: 0,
-                  }}
-                >
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  width: '40px', height: '40px', borderRadius: '10px',
+                  background: `linear-gradient(135deg, ${feature.gradient})`,
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  fontSize: '17px', color: 'rgba(255,255,255,0.85)',
+                  marginBottom: '4px', flexShrink: 0,
+                }}>
                   {feature.symbol}
                 </span>
-                <h4
-                  style={{
-                    fontSize: '17px',
-                    fontWeight: '600',
-                    letterSpacing: '-0.02em',
-                    color: '#1d1d1f',
-                    lineHeight: '1.3',
-                  }}
-                >
+                <h4 style={{
+                  fontSize: '15px', fontWeight: '600',
+                  letterSpacing: '-0.02em', color: '#ffffff', lineHeight: '1.3',
+                }}>
                   {feature.title}
                 </h4>
-                <p
-                  style={{
-                    fontSize: '14px',
-                    fontWeight: '400',
-                    lineHeight: '1.65',
-                    color: '#6e6e73',
-                    letterSpacing: '-0.003em',
-                  }}
-                >
+                <p style={{
+                  fontSize: '13px', lineHeight: '1.65',
+                  color: 'rgba(255,255,255,0.42)', letterSpacing: '-0.003em',
+                }}>
                   {feature.desc}
                 </p>
               </div>
@@ -440,126 +347,82 @@ export default function LandingPage() {
       </section>
 
       {/* ── Bottom CTA ── */}
-      <section
-        style={{
-          backgroundColor: '#ffffff',
-          borderTop: '1px solid #d2d2d7',
-          padding: '120px 24px',
+      <section style={{ position: 'relative', zIndex: 1, padding: '80px 24px 120px' }}>
+        <div style={{
+          maxWidth: '700px', margin: '0 auto',
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '28px',
+          backdropFilter: 'blur(24px)',
+          padding: '72px 48px',
           textAlign: 'center',
-        }}
-      >
-        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-
-          <h2
-            style={{
-              fontSize: 'clamp(36px, 5vw, 56px)',
-              fontWeight: '700',
-              letterSpacing: '-0.04em',
-              color: '#1d1d1f',
-              lineHeight: '1.08',
-              marginBottom: '24px',
-            }}
-          >
+          boxShadow: '0 16px 60px rgba(124,58,237,0.15), 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)',
+        }}>
+          <h2 style={{
+            fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: '700',
+            letterSpacing: '-0.04em', lineHeight: '1.08',
+            marginBottom: '20px',
+            background: 'linear-gradient(135deg, #ffffff, rgba(255,255,255,0.75))',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+          }}>
             Ready to own your presence?
           </h2>
-
-          <p
-            style={{
-              fontSize: '19px',
-              fontWeight: '400',
-              lineHeight: '1.6',
-              color: '#6e6e73',
-              letterSpacing: '-0.01em',
-              marginBottom: '44px',
-            }}
-          >
+          <p style={{
+            fontSize: '17px', lineHeight: '1.65',
+            color: 'rgba(255,255,255,0.45)', letterSpacing: '-0.01em', marginBottom: '40px',
+          }}>
             Join fashion creators who use Folio to turn their work into a business.
-            Free to start — no credit card required.
+            <br />Free to start — no credit card required.
           </p>
-
-          <Link
-            to="/signup"
-            style={{
-              display: 'inline-block',
-              fontSize: '17px',
-              fontWeight: '500',
-              color: '#ffffff',
-              backgroundColor: '#0071e3',
-              textDecoration: 'none',
-              padding: '16px 32px',
-              borderRadius: '980px',
-              letterSpacing: '-0.01em',
-              transition: 'background-color 0.15s ease',
-            }}
-            onMouseEnter={e => (e.target.style.backgroundColor = '#0077ed')}
-            onMouseLeave={e => (e.target.style.backgroundColor = '#0071e3')}
+          <Link to="/signup" style={{
+            display: 'inline-block', fontSize: '16px', fontWeight: '600',
+            color: '#ffffff', textDecoration: 'none', padding: '16px 36px', borderRadius: '980px',
+            background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+            boxShadow: '0 8px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            transition: 'all 0.25s ease',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.2)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; }}
           >
             Create your free portfolio
           </Link>
-
         </div>
       </section>
 
       {/* ── Footer ── */}
-      <footer
-        style={{
-          backgroundColor: '#f5f5f7',
-          borderTop: '1px solid #d2d2d7',
-          padding: '32px 48px',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: '1000px',
-            margin: '0 auto',
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '12px',
-          }}
-        >
-          <span
-            style={{
-              fontSize: '13px',
-              fontWeight: '500',
-              color: '#86868b',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            Folio — Creator Portfolio Platform
+      <footer style={{
+        position: 'relative', zIndex: 1,
+        borderTop: '1px solid rgba(255,255,255,0.07)',
+        padding: '32px 48px',
+        background: 'rgba(0,0,0,0.2)',
+        backdropFilter: 'blur(12px)',
+      }}>
+        <div style={{
+          maxWidth: '1000px', margin: '0 auto',
+          display: 'flex', flexWrap: 'wrap',
+          alignItems: 'center', justifyContent: 'space-between', gap: '12px',
+        }}>
+          <span style={{
+            fontSize: '13px', fontWeight: '600', letterSpacing: '0.1em',
+            textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)',
+          }}>
+            Folio
           </span>
-
           <div style={{ display: 'flex', gap: '24px' }}>
-            {[
-              { label: 'Sign In', to: '/login' },
-              { label: 'Get Started', to: '/signup' },
-            ].map(link => (
-              <Link
-                key={link.to}
-                to={link.to}
-                style={{
-                  fontSize: '13px',
-                  color: '#6e6e73',
-                  textDecoration: 'none',
-                  letterSpacing: '-0.01em',
-                  transition: 'color 0.15s ease',
-                }}
-                onMouseEnter={e => (e.target.style.color = '#1d1d1f')}
-                onMouseLeave={e => (e.target.style.color = '#6e6e73')}
+            {[{ label: 'Sign In', to: '/login' }, { label: 'Get Started', to: '/signup' }].map(link => (
+              <Link key={link.to} to={link.to} style={{
+                fontSize: '13px', color: 'rgba(255,255,255,0.4)',
+                textDecoration: 'none', transition: 'color 0.15s ease',
+              }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}
               >
                 {link.label}
               </Link>
             ))}
           </div>
-
-          <span
-            style={{
-              fontSize: '12px',
-              color: '#86868b',
-              letterSpacing: '-0.005em',
-            }}
-          >
+          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)' }}>
             Built for fashion creators
           </span>
         </div>
