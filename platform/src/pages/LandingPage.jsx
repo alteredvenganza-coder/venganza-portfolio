@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 
-const ACCENT        = '#7b1f24';
-const ACCENT_HOVER  = '#9b2830';
-const ACCENT_DIM    = 'rgba(123,31,36,0.08)';
-const ACCENT_BORDER = 'rgba(123,31,36,0.18)';
+const ACCENT       = '#7b1f24';
+const ACCENT_HOVER = '#9b2830';
+const ACCENT_DIM   = 'rgba(123,31,36,0.07)';
+const ACCENT_BORDER= 'rgba(123,31,36,0.15)';
 
 export default function LandingPage() {
   const [cursor, setCursor] = useState({ x: -999, y: -999 });
@@ -29,171 +29,124 @@ export default function LandingPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+      fontFamily: "-apple-system, 'SF Pro Display', BlinkMacSystemFont, 'Inter', sans-serif",
       background: '#ffffff',
       position: 'relative',
       overflowX: 'hidden',
       color: '#1d1d1f',
     }}>
 
-      {/* ── Ambient background ── */}
-      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-        {/* Base */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, #fdf8f8 0%, #fff5f5 40%, #fefefe 100%)' }} />
-        {/* Orb top-left */}
-        <div style={{ position: 'absolute', top: '-8%', left: '8%', width: '700px', height: '700px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(123,31,36,0.07) 0%, transparent 65%)', filter: 'blur(70px)' }} />
-        {/* Orb bottom-right */}
-        <div style={{ position: 'absolute', bottom: '-5%', right: '-5%', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(123,31,36,0.05) 0%, transparent 65%)', filter: 'blur(80px)' }} />
-        {/* Grid */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: 'linear-gradient(rgba(123,31,36,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(123,31,36,0.04) 1px, transparent 1px)',
-          backgroundSize: '64px 64px',
-        }} />
-        {/* Cursor spotlight */}
-        <div style={{
-          position: 'fixed',
-          left: cursor.x - 300, top: cursor.y - 300,
-          width: '600px', height: '600px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(123,31,36,0.08) 0%, rgba(123,31,36,0.03) 40%, transparent 70%)',
-          filter: 'blur(20px)',
-          pointerEvents: 'none',
-          mixBlendMode: 'multiply',
-        }} />
-      </div>
+      {/* Subtle cursor glow */}
+      <div style={{
+        position: 'fixed',
+        left: cursor.x - 250, top: cursor.y - 250,
+        width: '500px', height: '500px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(123,31,36,0.06) 0%, transparent 70%)',
+        pointerEvents: 'none',
+        zIndex: 0,
+        mixBlendMode: 'multiply',
+      }} />
 
       {/* ── Navigation ── */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 56px', height: '60px',
-        background: 'rgba(255,255,255,0.78)',
-        backdropFilter: 'saturate(200%) blur(28px)',
-        WebkitBackdropFilter: 'saturate(200%) blur(28px)',
-        borderBottom: '1px solid rgba(123,31,36,0.08)',
-        boxShadow: '0 1px 0 rgba(255,255,255,0.9)',
+        background: 'rgba(255,255,255,0.85)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(0,0,0,0.06)',
       }}>
-        <span style={{
-          fontSize: '16px', fontWeight: '700', letterSpacing: '0.28em',
-          textTransform: 'uppercase', color: '#1d1d1f', userSelect: 'none',
-        }}>
+        <span style={{ fontSize: '15px', fontWeight: '700', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#1d1d1f', userSelect: 'none' }}>
           FOLIO
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <Link to="/login" style={{
             fontSize: '13px', fontWeight: '500', color: '#6e6e73',
             textDecoration: 'none', padding: '7px 14px', borderRadius: '10px',
-            transition: 'all 0.15s ease',
+            transition: 'all 0.15s',
           }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#1d1d1f'; e.currentTarget.style.background = 'rgba(0,0,0,0.04)'; }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#1d1d1f'; e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; }}
             onMouseLeave={e => { e.currentTarget.style.color = '#6e6e73'; e.currentTarget.style.background = 'transparent'; }}
           >Sign In</Link>
           <Link to="/signup" style={{
-            fontSize: '13px', fontWeight: '600', color: '#ffffff',
+            fontSize: '13px', fontWeight: '600', color: '#fff',
             textDecoration: 'none', padding: '8px 18px', borderRadius: '980px',
             background: ACCENT,
-            boxShadow: '0 2px 12px rgba(123,31,36,0.25)',
-            transition: 'all 0.2s ease',
+            transition: 'all 0.2s',
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = ACCENT_HOVER; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 18px rgba(123,31,36,0.35)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(123,31,36,0.25)'; }}
+            onMouseEnter={e => { e.currentTarget.style.background = ACCENT_HOVER; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.transform = 'translateY(0)'; }}
           >Get Started</Link>
         </div>
       </nav>
 
       {/* ── Hero ── */}
-      <section style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '130px 24px 100px' }}>
-        <div style={{ maxWidth: '820px', margin: '0 auto' }}>
+      <section style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '120px 24px 96px' }}>
+        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
 
           {/* Badge */}
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '8px',
-            background: 'rgba(255,255,255,0.75)',
-            backdropFilter: 'blur(16px)',
+            display: 'inline-flex', alignItems: 'center', gap: '7px',
             border: `1px solid ${ACCENT_BORDER}`,
-            borderRadius: '980px', padding: '5px 14px 5px 8px',
-            marginBottom: '40px',
-            boxShadow: '0 2px 12px rgba(123,31,36,0.08), inset 0 1px 0 rgba(255,255,255,0.9)',
+            borderRadius: '980px', padding: '4px 12px 4px 7px',
+            marginBottom: '36px',
+            background: ACCENT_DIM,
           }}>
             <span style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              width: '20px', height: '20px', borderRadius: '50%',
-              background: ACCENT, fontSize: '10px', color: '#fff', fontWeight: '700',
+              width: '18px', height: '18px', borderRadius: '50%',
+              background: ACCENT, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '9px', color: '#fff', fontWeight: '700',
             }}>✦</span>
-            <span style={{ fontSize: '12px', fontWeight: '600', color: ACCENT, letterSpacing: '0.05em' }}>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: ACCENT, letterSpacing: '0.04em' }}>
               Creator Portfolio Platform
             </span>
           </div>
 
           {/* Headline */}
-          <h1 style={{
-            fontSize: 'clamp(52px, 8vw, 92px)', fontWeight: '800',
-            lineHeight: '1.02', letterSpacing: '-0.04em', marginBottom: '24px',
-          }}>
-            <span style={{ display: 'block', color: '#1d1d1f' }}>Your portfolio.</span>
-            <span style={{
-              display: 'block',
-              background: `linear-gradient(135deg, ${ACCENT} 0%, #c44050 60%, #e8a0a4 100%)`,
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            }}>
-              Live in 5 minutes.
-            </span>
+          <h1 style={{ fontSize: 'clamp(48px, 7.5vw, 88px)', fontWeight: '700', lineHeight: '1.04', letterSpacing: '-0.04em', color: '#1d1d1f', marginBottom: '20px' }}>
+            Your portfolio.<br />
+            <span style={{ color: ACCENT }}>Live in 5 minutes.</span>
           </h1>
 
-          {/* Subtext */}
-          <p style={{
-            fontSize: '19px', lineHeight: '1.65', color: '#6e6e73',
-            maxWidth: '460px', margin: '0 auto 52px', letterSpacing: '-0.01em',
-          }}>
-            Connect Instagram. Set your brand. Start selling.
-            No code, no friction — just your work, live.
+          {/* Sub */}
+          <p style={{ fontSize: '19px', lineHeight: '1.6', color: '#6e6e73', maxWidth: '420px', margin: '0 auto 44px', letterSpacing: '-0.01em' }}>
+            Connect Instagram. Set your brand. Start selling — no code, no friction.
           </p>
 
           {/* CTAs */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
             <Link to="/signup" style={{
               fontSize: '15px', fontWeight: '600', color: '#fff',
-              textDecoration: 'none', padding: '15px 34px', borderRadius: '980px',
+              textDecoration: 'none', padding: '14px 32px', borderRadius: '980px',
               background: ACCENT,
-              boxShadow: '0 6px 24px rgba(123,31,36,0.30), inset 0 1px 0 rgba(255,255,255,0.15)',
-              transition: 'all 0.25s ease',
+              boxShadow: '0 4px 20px rgba(123,31,36,0.25)',
+              transition: 'all 0.2s',
             }}
-              onMouseEnter={e => { e.currentTarget.style.background = ACCENT_HOVER; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(123,31,36,0.40)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(123,31,36,0.30), inset 0 1px 0 rgba(255,255,255,0.15)'; }}
-            >
-              Create your free portfolio
-            </Link>
+              onMouseEnter={e => { e.currentTarget.style.background = ACCENT_HOVER; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(123,31,36,0.32)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(123,31,36,0.25)'; }}
+            >Create your free portfolio</Link>
             <Link to="/login" style={{
               fontSize: '15px', fontWeight: '500', color: '#6e6e73',
-              textDecoration: 'none', padding: '15px 28px', borderRadius: '980px',
-              background: 'rgba(255,255,255,0.7)',
-              backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(0,0,0,0.08)',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9)',
-              transition: 'all 0.2s ease',
+              textDecoration: 'none', padding: '14px 24px', borderRadius: '980px',
+              border: '1px solid rgba(0,0,0,0.1)',
+              transition: 'all 0.2s',
             }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#1d1d1f'; e.currentTarget.style.background = 'rgba(255,255,255,0.9)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = '#6e6e73'; e.currentTarget.style.background = 'rgba(255,255,255,0.7)'; e.currentTarget.style.transform = 'translateY(0)'; }}
-            >
-              Sign in →
-            </Link>
+              onMouseEnter={e => { e.currentTarget.style.color = '#1d1d1f'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.2)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#6e6e73'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >Sign in →</Link>
           </div>
-
         </div>
       </section>
 
-      {/* ── Stats strip ── */}
+      {/* ── Stats ── */}
       <section style={{ position: 'relative', zIndex: 1, padding: '0 48px 80px' }}>
         <div style={{
-          maxWidth: '860px', margin: '0 auto',
+          maxWidth: '760px', margin: '0 auto',
           display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-          background: 'rgba(255,255,255,0.65)',
-          backdropFilter: 'saturate(180%) blur(24px)',
-          WebkitBackdropFilter: 'saturate(180%) blur(24px)',
-          border: '1px solid rgba(255,255,255,0.9)',
-          borderRadius: '24px', overflow: 'hidden',
-          boxShadow: '0 4px 32px rgba(123,31,36,0.06), inset 0 1px 0 rgba(255,255,255,1)',
+          border: '1px solid rgba(0,0,0,0.08)',
+          borderRadius: '20px', overflow: 'hidden',
         }}>
           {[
             { stat: '5 min', label: 'Setup time' },
@@ -201,57 +154,38 @@ export default function LandingPage() {
             { stat: '∞',    label: 'Customizable' },
           ].map((item, i) => (
             <div key={item.stat} style={{
-              padding: '32px 24px', textAlign: 'center',
-              borderLeft: i > 0 ? '1px solid rgba(123,31,36,0.08)' : 'none',
+              padding: '28px 20px', textAlign: 'center',
+              borderLeft: i > 0 ? '1px solid rgba(0,0,0,0.08)' : 'none',
             }}>
-              <div style={{
-                fontSize: '36px', fontWeight: '800', letterSpacing: '-0.04em',
-                color: ACCENT, marginBottom: '4px',
-              }}>{item.stat}</div>
-              <div style={{ fontSize: '13px', color: '#86868b', letterSpacing: '0.02em' }}>{item.label}</div>
+              <div style={{ fontSize: '34px', fontWeight: '700', letterSpacing: '-0.03em', color: ACCENT, marginBottom: '2px' }}>{item.stat}</div>
+              <div style={{ fontSize: '13px', color: '#86868b' }}>{item.label}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── How it works ── */}
-      <section style={{ position: 'relative', zIndex: 1, padding: '80px 48px' }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.14em', textTransform: 'uppercase', textAlign: 'center', color: '#aeaeb2', marginBottom: '56px' }}>
-            How it works
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+      <section style={{ position: 'relative', zIndex: 1, padding: '60px 48px' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.12em', textTransform: 'uppercase', textAlign: 'center', color: '#aeaeb2', marginBottom: '48px' }}>How it works</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1px', background: 'rgba(0,0,0,0.08)', borderRadius: '20px', overflow: 'hidden' }}>
             {[
-              { number: '01', title: 'Connect Instagram', desc: 'We pull your latest work automatically. Your feed becomes your portfolio — always fresh, always current.' },
-              { number: '02', title: 'Set your brand',    desc: 'Choose your colors, name, and pricing in minutes. Make it unmistakably, entirely yours.' },
-              { number: '03', title: 'Go live',           desc: 'Share your link and start taking orders. Your audience is already waiting for you.' },
+              { number: '01', title: 'Connect Instagram', desc: 'Your feed becomes your portfolio — always fresh, always current.' },
+              { number: '02', title: 'Set your brand',    desc: 'Colors, name, and pricing in minutes. Make it entirely yours.' },
+              { number: '03', title: 'Go live',           desc: 'Share your link. Your audience is already waiting.' },
             ].map((step) => (
-              <div key={step.number} style={{
-                background: 'rgba(255,255,255,0.65)',
-                backdropFilter: 'saturate(180%) blur(20px)',
-                WebkitBackdropFilter: 'saturate(180%) blur(20px)',
-                border: '1px solid rgba(255,255,255,0.9)',
-                borderRadius: '20px', padding: '32px 28px',
-                boxShadow: '0 4px 20px rgba(123,31,36,0.04), inset 0 1px 0 rgba(255,255,255,1)',
-                transition: 'all 0.25s ease',
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = `0 12px 36px rgba(123,31,36,0.10), inset 0 1px 0 rgba(255,255,255,1)`; e.currentTarget.style.borderColor = ACCENT_BORDER; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(123,31,36,0.04), inset 0 1px 0 rgba(255,255,255,1)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.9)'; }}
+              <div key={step.number} style={{ padding: '36px 28px', background: '#ffffff', transition: 'background 0.2s' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#fafafa'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; }}
               >
                 <div style={{
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  width: '36px', height: '36px', borderRadius: '10px', marginBottom: '20px',
+                  width: '32px', height: '32px', borderRadius: '8px', marginBottom: '18px',
                   background: ACCENT_DIM, border: `1px solid ${ACCENT_BORDER}`,
-                  fontSize: '12px', fontWeight: '700', color: ACCENT, letterSpacing: '0.05em',
-                }}>
-                  {step.number}
-                </div>
-                <h3 style={{ fontSize: '17px', fontWeight: '600', letterSpacing: '-0.02em', color: '#1d1d1f', marginBottom: '10px', lineHeight: '1.3' }}>
-                  {step.title}
-                </h3>
-                <p style={{ fontSize: '14px', lineHeight: '1.65', color: '#6e6e73', letterSpacing: '-0.005em' }}>
-                  {step.desc}
-                </p>
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '11px', fontWeight: '700', color: ACCENT, letterSpacing: '0.04em',
+                }}>{step.number}</div>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1d1d1f', marginBottom: '8px', letterSpacing: '-0.02em' }}>{step.title}</h3>
+                <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#6e6e73' }}>{step.desc}</p>
               </div>
             ))}
           </div>
@@ -259,53 +193,37 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features ── */}
-      <section style={{ position: 'relative', zIndex: 1, padding: '80px 48px' }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.14em', textTransform: 'uppercase', textAlign: 'center', color: '#aeaeb2', marginBottom: '12px' }}>
-            Everything you need
-          </p>
-          <h2 style={{
-            fontSize: 'clamp(30px, 4vw, 44px)', fontWeight: '700',
-            letterSpacing: '-0.035em', textAlign: 'center', marginBottom: '52px', lineHeight: '1.1', color: '#1d1d1f',
-          }}>
+      <section style={{ position: 'relative', zIndex: 1, padding: '60px 48px' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.12em', textTransform: 'uppercase', textAlign: 'center', color: '#aeaeb2', marginBottom: '10px' }}>Everything you need</p>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: '700', letterSpacing: '-0.03em', textAlign: 'center', color: '#1d1d1f', marginBottom: '44px', lineHeight: '1.1' }}>
             All the tools. None of the noise.
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '8px' }}>
             {[
-              { symbol: '↗', title: 'Portfolio & shop in one', desc: 'One URL, full story. Showcase your work and sell your services from a single cohesive link.' },
-              { symbol: '⟳', title: 'Instagram auto-sync',     desc: 'Post on Instagram — your portfolio updates itself. Always fresh, zero effort.' },
-              { symbol: '$', title: 'Stripe payments',         desc: 'Accept payments from day one. No third-party setup, no redirects, no friction.' },
-              { symbol: '⬡', title: 'Render gallery',          desc: 'Show clients polished previews with a curated library of render templates.' },
-              { symbol: '◑', title: 'Brand customization',     desc: 'Your brand, your rules. Dial in your palette and typography in seconds.' },
-              { symbol: '⊞', title: 'Unified admin',           desc: 'Orders, inquiries, portfolio — one clean dashboard built for working creators.' },
-            ].map((feature) => (
-              <div key={feature.title} style={{
-                background: 'rgba(255,255,255,0.6)',
-                backdropFilter: 'saturate(180%) blur(20px)',
-                WebkitBackdropFilter: 'saturate(180%) blur(20px)',
-                border: '1px solid rgba(255,255,255,0.88)',
-                borderRadius: '18px', padding: '28px 24px',
-                display: 'flex', flexDirection: 'column', gap: '10px',
-                boxShadow: '0 2px 14px rgba(123,31,36,0.04), inset 0 1px 0 rgba(255,255,255,1)',
-                transition: 'all 0.22s ease',
+              { symbol: '↗', title: 'Portfolio & shop in one', desc: 'One URL. Showcase work and sell services from a single cohesive link.' },
+              { symbol: '⟳', title: 'Instagram auto-sync',     desc: 'Post on Instagram — your portfolio updates itself. Zero effort.' },
+              { symbol: '$', title: 'Stripe payments',         desc: 'Accept payments from day one. No redirects, no friction.' },
+              { symbol: '⬡', title: 'Render gallery',          desc: 'Show clients polished previews with curated render templates.' },
+              { symbol: '◑', title: 'Brand customization',     desc: 'Your palette and typography, dialed in within seconds.' },
+              { symbol: '⊞', title: 'Unified admin',           desc: 'Orders, inquiries, portfolio — one dashboard for creators.' },
+            ].map((f) => (
+              <div key={f.title} style={{
+                padding: '24px', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '16px',
+                display: 'flex', flexDirection: 'column', gap: '8px',
+                transition: 'all 0.2s',
               }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = ACCENT_BORDER; e.currentTarget.style.boxShadow = `0 8px 28px rgba(123,31,36,0.10), inset 0 1px 0 rgba(255,255,255,1)`; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.88)'; e.currentTarget.style.boxShadow = '0 2px 14px rgba(123,31,36,0.04), inset 0 1px 0 rgba(255,255,255,1)'; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = ACCENT_BORDER; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(123,31,36,0.08)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.08)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
               >
                 <div style={{
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  width: '38px', height: '38px', borderRadius: '10px',
+                  width: '36px', height: '36px', borderRadius: '9px',
                   background: ACCENT_DIM, border: `1px solid ${ACCENT_BORDER}`,
-                  fontSize: '16px', color: ACCENT, flexShrink: 0, marginBottom: '2px',
-                }}>
-                  {feature.symbol}
-                </div>
-                <h4 style={{ fontSize: '15px', fontWeight: '600', letterSpacing: '-0.02em', color: '#1d1d1f', lineHeight: '1.3' }}>
-                  {feature.title}
-                </h4>
-                <p style={{ fontSize: '13px', lineHeight: '1.65', color: '#6e6e73', letterSpacing: '-0.003em' }}>
-                  {feature.desc}
-                </p>
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '15px', color: ACCENT,
+                }}>{f.symbol}</div>
+                <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#1d1d1f', letterSpacing: '-0.01em' }}>{f.title}</h4>
+                <p style={{ fontSize: '13px', lineHeight: '1.6', color: '#6e6e73' }}>{f.desc}</p>
               </div>
             ))}
           </div>
@@ -313,66 +231,49 @@ export default function LandingPage() {
       </section>
 
       {/* ── Bottom CTA ── */}
-      <section style={{ position: 'relative', zIndex: 1, padding: '80px 24px 120px' }}>
+      <section style={{ position: 'relative', zIndex: 1, padding: '60px 24px 100px' }}>
         <div style={{
-          maxWidth: '680px', margin: '0 auto',
-          background: 'rgba(255,255,255,0.7)',
-          backdropFilter: 'saturate(200%) blur(32px)',
-          WebkitBackdropFilter: 'saturate(200%) blur(32px)',
+          maxWidth: '600px', margin: '0 auto',
           border: `1px solid ${ACCENT_BORDER}`,
-          borderRadius: '28px', padding: '72px 48px', textAlign: 'center',
-          boxShadow: '0 20px 60px rgba(123,31,36,0.08), 0 4px 16px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,1)',
+          borderRadius: '24px', padding: '64px 40px', textAlign: 'center',
+          background: ACCENT_DIM,
         }}>
-          <h2 style={{
-            fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: '700',
-            letterSpacing: '-0.04em', lineHeight: '1.08', color: '#1d1d1f', marginBottom: '20px',
-          }}>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: '700', letterSpacing: '-0.035em', color: '#1d1d1f', marginBottom: '16px', lineHeight: '1.1' }}>
             Ready to own your presence?
           </h2>
-          <p style={{
-            fontSize: '17px', lineHeight: '1.65', color: '#6e6e73',
-            letterSpacing: '-0.01em', marginBottom: '40px',
-          }}>
-            Join fashion creators who use Folio to turn their work into a business.
-            <br />Free to start — no credit card required.
+          <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#6e6e73', marginBottom: '36px' }}>
+            Join fashion creators who use Folio to turn their work into a business.<br />
+            Free to start — no credit card required.
           </p>
           <Link to="/signup" style={{
             display: 'inline-block', fontSize: '15px', fontWeight: '600', color: '#fff',
-            textDecoration: 'none', padding: '15px 36px', borderRadius: '980px',
+            textDecoration: 'none', padding: '14px 32px', borderRadius: '980px',
             background: ACCENT,
-            boxShadow: '0 6px 24px rgba(123,31,36,0.30), inset 0 1px 0 rgba(255,255,255,0.15)',
-            transition: 'all 0.25s ease',
+            boxShadow: '0 4px 20px rgba(123,31,36,0.25)',
+            transition: 'all 0.2s',
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = ACCENT_HOVER; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(123,31,36,0.40)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(123,31,36,0.30), inset 0 1px 0 rgba(255,255,255,0.15)'; }}
-          >
-            Create your free portfolio
-          </Link>
+            onMouseEnter={e => { e.currentTarget.style.background = ACCENT_HOVER; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(123,31,36,0.32)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(123,31,36,0.25)'; }}
+          >Create your free portfolio</Link>
         </div>
       </section>
 
       {/* ── Footer ── */}
       <footer style={{
         position: 'relative', zIndex: 1,
-        borderTop: `1px solid ${ACCENT_BORDER}`,
-        padding: '28px 56px',
-        background: 'rgba(255,255,255,0.5)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(0,0,0,0.07)',
+        padding: '24px 56px',
       }}>
         <div style={{
-          maxWidth: '1000px', margin: '0 auto',
-          display: 'flex', flexWrap: 'wrap',
-          alignItems: 'center', justifyContent: 'space-between', gap: '12px',
+          maxWidth: '900px', margin: '0 auto',
+          display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '12px',
         }}>
-          <span style={{ fontSize: '13px', fontWeight: '700', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#86868b' }}>FOLIO</span>
+          <span style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#aeaeb2' }}>FOLIO</span>
           <div style={{ display: 'flex', gap: '24px' }}>
             {[{ label: 'Sign In', to: '/login' }, { label: 'Get Started', to: '/signup' }].map(link => (
-              <Link key={link.to} to={link.to} style={{
-                fontSize: '13px', color: '#86868b', textDecoration: 'none', transition: 'color 0.15s ease',
-              }}
+              <Link key={link.to} to={link.to} style={{ fontSize: '13px', color: '#aeaeb2', textDecoration: 'none', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#1d1d1f')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#86868b')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#aeaeb2')}
               >{link.label}</Link>
             ))}
           </div>
