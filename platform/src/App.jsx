@@ -2,7 +2,7 @@
 // In production, siteConfig is fetched from Supabase based on creator's subdomain.
 import React, { useEffect, useRef, useState, createContext, useContext } from 'react';
 import siteConfig from './config/siteConfig';
-import { BrowserRouter, Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { Camera, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2, ChevronDown, Menu } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -2246,11 +2246,13 @@ export default function App() {
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
 
-              {/* Platform auth routes */}
-              <Route path="/signup" element={<SupabaseAuthProvider><SignupPage /></SupabaseAuthProvider>} />
-              <Route path="/login" element={<SupabaseAuthProvider><LoginPage /></SupabaseAuthProvider>} />
-              <Route path="/onboarding" element={<SupabaseAuthProvider><OnboardingPage /></SupabaseAuthProvider>} />
-              <Route path="/dashboard" element={<SupabaseAuthProvider><DashboardPage /></SupabaseAuthProvider>} />
+              {/* Platform auth routes — single shared SupabaseAuthProvider so session persists across navigation */}
+              <Route element={<SupabaseAuthProvider><Outlet /></SupabaseAuthProvider>}>
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/onboarding" element={<OnboardingPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+              </Route>
             </Routes>
             </ToastProvider>
           </EditorProvider>
