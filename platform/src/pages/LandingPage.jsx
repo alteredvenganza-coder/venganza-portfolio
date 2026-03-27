@@ -2,217 +2,565 @@ import { Link } from 'react-router-dom';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen text-white" style={{ backgroundColor: '#0a0a0a' }}>
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: '#ffffff',
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        color: '#1d1d1f',
+      }}
+    >
 
-      {/* Nav */}
+      {/* ── Navigation ── */}
       <nav
-        className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-white/10"
+        className="sticky top-0 z-50 flex items-center justify-between"
         style={{
-          background: 'rgba(10, 10, 10, 0.7)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'saturate(180%) blur(20px)',
+          WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+          borderBottom: '1px solid #d2d2d7',
+          padding: '0 48px',
+          height: '52px',
         }}
       >
         <span
-          className="text-xl tracking-widest font-bold uppercase select-none"
-          style={{ fontFamily: 'var(--font-heading, serif)', letterSpacing: '0.25em' }}
+          style={{
+            fontSize: '17px',
+            fontWeight: '600',
+            letterSpacing: '-0.02em',
+            color: '#1d1d1f',
+            userSelect: 'none',
+          }}
         >
-          FOLIO
+          Folio
         </span>
-        <div className="flex items-center gap-3">
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
           <Link
             to="/login"
-            className="text-sm text-white/70 hover:text-white transition-colors duration-200 px-4 py-2"
+            style={{
+              fontSize: '13px',
+              color: '#6e6e73',
+              textDecoration: 'none',
+              letterSpacing: '-0.01em',
+              transition: 'color 0.15s ease',
+            }}
+            onMouseEnter={e => (e.target.style.color = '#1d1d1f')}
+            onMouseLeave={e => (e.target.style.color = '#6e6e73')}
           >
-            Login
+            Sign In
           </Link>
           <Link
             to="/signup"
-            className="text-sm font-medium bg-white text-black px-5 py-2 hover:bg-white/90 transition-colors duration-200"
+            style={{
+              fontSize: '13px',
+              fontWeight: '500',
+              color: '#ffffff',
+              backgroundColor: '#0071e3',
+              textDecoration: 'none',
+              padding: '7px 16px',
+              borderRadius: '980px',
+              letterSpacing: '-0.01em',
+              transition: 'background-color 0.15s ease',
+            }}
+            onMouseEnter={e => (e.target.style.backgroundColor = '#0077ed')}
+            onMouseLeave={e => (e.target.style.backgroundColor = '#0071e3')}
           >
-            Get Started →
+            Get Started
           </Link>
         </div>
       </nav>
 
-      {/* Hero */}
+      {/* ── Hero ── */}
       <section
-        className="relative flex flex-col items-center justify-center text-center px-6 py-32 overflow-hidden"
-        style={{ minHeight: '90vh' }}
+        style={{
+          backgroundColor: '#ffffff',
+          textAlign: 'center',
+          padding: '120px 24px 128px',
+        }}
       >
-        {/* Background glow */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(255,255,255,0.05) 0%, transparent 70%)',
-          }}
-        />
-        <div
-          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full pointer-events-none"
-          style={{
-            background: 'rgba(255, 240, 220, 0.04)',
-            filter: 'blur(80px)',
-          }}
-        />
+        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
 
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <h1
-            className="text-6xl md:text-8xl font-bold uppercase leading-none tracking-tight mb-6"
-            style={{ fontFamily: 'var(--font-heading, serif)' }}
+          {/* Eyebrow label */}
+          <p
+            style={{
+              fontSize: '13px',
+              fontWeight: '500',
+              color: '#0071e3',
+              letterSpacing: '0.02em',
+              textTransform: 'uppercase',
+              marginBottom: '20px',
+            }}
           >
-            <span className="block">Your portfolio.</span>
-            <span className="block text-white/50">Live in 5 minutes.</span>
+            Introducing Folio
+          </p>
+
+          {/* Headline */}
+          <h1
+            style={{
+              fontSize: 'clamp(48px, 7vw, 80px)',
+              fontWeight: '700',
+              lineHeight: '1.05',
+              letterSpacing: '-0.04em',
+              color: '#1d1d1f',
+              marginBottom: '24px',
+            }}
+          >
+            <span style={{ display: 'block' }}>Your portfolio.</span>
+            <span style={{ display: 'block', color: '#6e6e73' }}>Live in 5 minutes.</span>
           </h1>
 
-          <p className="text-base md:text-lg text-white/50 mb-10 max-w-md mx-auto leading-relaxed">
-            Connect Instagram. Set your brand. Start selling.
-            <br />
-            No code needed.
-          </p>
-
-          <Link
-            to="/signup"
-            className="inline-block bg-white text-black text-sm font-semibold px-8 py-4 hover:bg-white/90 transition-colors duration-200 tracking-wide"
+          {/* Sub-headline */}
+          <p
+            style={{
+              fontSize: '19px',
+              fontWeight: '400',
+              lineHeight: '1.6',
+              color: '#6e6e73',
+              letterSpacing: '-0.01em',
+              maxWidth: '480px',
+              margin: '0 auto 44px',
+            }}
           >
-            Create Your Free Portfolio →
-          </Link>
-
-          <p className="mt-5 text-xs text-white/30">
-            Already have an account?{' '}
-            <Link to="/login" className="text-white/60 hover:text-white underline underline-offset-2 transition-colors duration-200">
-              Login →
-            </Link>
+            Connect Instagram. Set your brand. Start selling.
+            No code. No friction. Just you and your work.
           </p>
+
+          {/* CTAs */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '16px',
+            }}
+          >
+            <Link
+              to="/signup"
+              style={{
+                display: 'inline-block',
+                fontSize: '17px',
+                fontWeight: '500',
+                color: '#ffffff',
+                backgroundColor: '#0071e3',
+                textDecoration: 'none',
+                padding: '14px 28px',
+                borderRadius: '980px',
+                letterSpacing: '-0.01em',
+                transition: 'background-color 0.15s ease',
+              }}
+              onMouseEnter={e => (e.target.style.backgroundColor = '#0077ed')}
+              onMouseLeave={e => (e.target.style.backgroundColor = '#0071e3')}
+            >
+              Create your free portfolio
+            </Link>
+            <Link
+              to="/login"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '17px',
+                fontWeight: '400',
+                color: '#0071e3',
+                textDecoration: 'none',
+                letterSpacing: '-0.01em',
+                transition: 'color 0.15s ease',
+              }}
+              onMouseEnter={e => (e.target.style.color = '#0077ed')}
+              onMouseLeave={e => (e.target.style.color = '#0071e3')}
+            >
+              Already have an account <span style={{ fontSize: '20px', lineHeight: 1 }}>›</span>
+            </Link>
+          </div>
+
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="px-6 py-24 border-t border-white/10">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs tracking-widest text-white/30 uppercase mb-12 text-center">
+      {/* ── Tagline strip ── */}
+      <section
+        style={{
+          backgroundColor: '#f5f5f7',
+          borderTop: '1px solid #d2d2d7',
+          borderBottom: '1px solid #d2d2d7',
+          padding: '40px 24px',
+          textAlign: 'center',
+        }}
+      >
+        <p
+          style={{
+            fontSize: 'clamp(20px, 3vw, 28px)',
+            fontWeight: '600',
+            letterSpacing: '-0.025em',
+            color: '#1d1d1f',
+            maxWidth: '700px',
+            margin: '0 auto',
+            lineHeight: '1.3',
+          }}
+        >
+          The only portfolio platform built for fashion creators.
+        </p>
+      </section>
+
+      {/* ── How it works ── */}
+      <section
+        style={{
+          backgroundColor: '#ffffff',
+          padding: '112px 48px',
+        }}
+      >
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+
+          <p
+            style={{
+              fontSize: '13px',
+              fontWeight: '500',
+              color: '#86868b',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              marginBottom: '72px',
+            }}
+          >
             How it works
           </p>
 
-          <div className="flex flex-col md:flex-row gap-12 md:gap-0">
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '0',
+            }}
+          >
             {[
               {
                 number: '01',
                 title: 'Connect Instagram',
-                desc: 'We pull your latest work automatically. Your feed becomes your portfolio — always up to date.',
+                desc: 'We pull your latest work automatically. Your feed becomes your portfolio — always fresh, always current.',
               },
               {
                 number: '02',
                 title: 'Set your brand',
-                desc: 'Choose your colors, name, and pricing in minutes. Make it unmistakably yours.',
+                desc: 'Choose your colors, name, and pricing in minutes. Make it unmistakably, entirely yours.',
               },
               {
                 number: '03',
                 title: 'Go live',
-                desc: 'Share your link and start taking orders. Your audience is already waiting.',
+                desc: 'Share your link and start taking orders. Your audience is already waiting for you.',
               },
             ].map((step, i) => (
               <div
                 key={step.number}
-                className="flex-1 flex flex-col md:items-start items-center text-center md:text-left relative"
+                style={{
+                  padding: '0 40px',
+                  borderLeft: i > 0 ? '1px solid #d2d2d7' : 'none',
+                  textAlign: 'center',
+                }}
               >
-                {/* Connector line between steps (desktop only) */}
-                {i < 2 && (
-                  <div
-                    className="hidden md:block absolute top-3 left-1/2 w-full h-px"
-                    style={{ background: 'linear-gradient(to right, rgba(255,255,255,0.15), transparent)' }}
-                  />
-                )}
                 <span
-                  className="text-xs tracking-widest text-white/20 mb-4 font-mono"
+                  style={{
+                    display: 'block',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    color: '#86868b',
+                    letterSpacing: '0.08em',
+                    fontVariantNumeric: 'tabular-nums',
+                    marginBottom: '16px',
+                  }}
                 >
                   {step.number}
                 </span>
                 <h3
-                  className="text-lg font-semibold mb-3 uppercase tracking-wide"
-                  style={{ fontFamily: 'var(--font-heading, serif)' }}
+                  style={{
+                    fontSize: '19px',
+                    fontWeight: '600',
+                    letterSpacing: '-0.02em',
+                    color: '#1d1d1f',
+                    marginBottom: '12px',
+                    lineHeight: '1.3',
+                  }}
                 >
                   {step.title}
                 </h3>
-                <p className="text-sm text-white/40 leading-relaxed max-w-xs">
+                <p
+                  style={{
+                    fontSize: '15px',
+                    fontWeight: '400',
+                    lineHeight: '1.65',
+                    color: '#6e6e73',
+                    letterSpacing: '-0.005em',
+                  }}
+                >
                   {step.desc}
                 </p>
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
-      {/* Features grid */}
-      <section className="px-6 py-24 border-t border-white/10">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs tracking-widest text-white/30 uppercase mb-12 text-center">
+      {/* ── Features grid ── */}
+      <section
+        style={{
+          backgroundColor: '#f5f5f7',
+          borderTop: '1px solid #d2d2d7',
+          padding: '112px 48px',
+        }}
+      >
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+
+          <p
+            style={{
+              fontSize: '13px',
+              fontWeight: '500',
+              color: '#86868b',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              marginBottom: '16px',
+            }}
+          >
             Everything you need
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-white/10">
+          <h2
+            style={{
+              fontSize: 'clamp(32px, 4vw, 48px)',
+              fontWeight: '700',
+              letterSpacing: '-0.035em',
+              color: '#1d1d1f',
+              textAlign: 'center',
+              marginBottom: '72px',
+              lineHeight: '1.1',
+            }}
+          >
+            All the tools. None of the noise.
+          </h2>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '2px',
+              backgroundColor: '#d2d2d7',
+              borderRadius: '18px',
+              overflow: 'hidden',
+            }}
+          >
             {[
               {
-                icon: '◈',
+                symbol: '↗',
                 title: 'Portfolio & shop in one',
-                desc: 'Showcase your work and sell your services from a single, cohesive link.',
+                desc: 'Showcase your work and sell your services from a single, cohesive link. One URL, full story.',
               },
               {
-                icon: '⟳',
-                title: 'Instagram feed auto-sync',
-                desc: 'Your portfolio stays fresh without lifting a finger. Post on Instagram, done.',
+                symbol: '⟳',
+                title: 'Instagram auto-sync',
+                desc: 'Your portfolio stays fresh without lifting a finger. Post on Instagram — your portfolio updates itself.',
               },
               {
-                icon: '⬡',
+                symbol: '$',
                 title: 'Stripe payments built-in',
-                desc: 'Accept payments securely from day one. No third-party setup required.',
+                desc: 'Accept payments securely from day one. No third-party setup, no redirects, no friction.',
               },
               {
-                icon: '▦',
-                title: 'Pre-made renders gallery',
-                desc: 'Show clients finished-look previews with a curated gallery of render templates.',
+                symbol: '◻',
+                title: 'Render gallery',
+                desc: 'Show clients polished, finished-look previews with a curated library of render templates.',
               },
               {
-                icon: '◐',
-                title: 'Custom brand colors & fonts',
-                desc: 'Your brand, your rules. Dial in your palette and typography in seconds.',
+                symbol: '◑',
+                title: 'Custom brand & fonts',
+                desc: 'Your brand, your rules. Dial in your palette and typography in seconds, not hours.',
               },
               {
-                icon: '⊞',
-                title: 'Admin panel to manage everything',
-                desc: 'Orders, inquiries, portfolio — all in one clean dashboard built for creators.',
+                symbol: '⊞',
+                title: 'Unified admin panel',
+                desc: 'Orders, inquiries, portfolio — all in one clean dashboard designed for working creators.',
               },
             ].map((feature) => (
               <div
                 key={feature.title}
-                className="flex flex-col gap-3 p-8"
-                style={{ backgroundColor: '#0a0a0a' }}
+                style={{
+                  backgroundColor: '#ffffff',
+                  padding: '40px 36px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px',
+                }}
               >
-                <span className="text-xl text-white/30">{feature.icon}</span>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
+                    backgroundColor: '#f5f5f7',
+                    fontSize: '16px',
+                    color: '#1d1d1f',
+                    fontWeight: '400',
+                    marginBottom: '4px',
+                    flexShrink: 0,
+                  }}
+                >
+                  {feature.symbol}
+                </span>
                 <h4
-                  className="text-sm font-semibold uppercase tracking-wide"
-                  style={{ fontFamily: 'var(--font-heading, serif)' }}
+                  style={{
+                    fontSize: '17px',
+                    fontWeight: '600',
+                    letterSpacing: '-0.02em',
+                    color: '#1d1d1f',
+                    lineHeight: '1.3',
+                  }}
                 >
                   {feature.title}
                 </h4>
-                <p className="text-xs text-white/40 leading-relaxed">{feature.desc}</p>
+                <p
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    lineHeight: '1.65',
+                    color: '#6e6e73',
+                    letterSpacing: '-0.003em',
+                  }}
+                >
+                  {feature.desc}
+                </p>
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 px-6 py-10">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
-          <span
-            className="text-sm tracking-widest uppercase text-white/60"
-            style={{ fontFamily: 'var(--font-heading, serif)' }}
+      {/* ── Bottom CTA ── */}
+      <section
+        style={{
+          backgroundColor: '#ffffff',
+          borderTop: '1px solid #d2d2d7',
+          padding: '120px 24px',
+          textAlign: 'center',
+        }}
+      >
+        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+
+          <h2
+            style={{
+              fontSize: 'clamp(36px, 5vw, 56px)',
+              fontWeight: '700',
+              letterSpacing: '-0.04em',
+              color: '#1d1d1f',
+              lineHeight: '1.08',
+              marginBottom: '24px',
+            }}
           >
-            FOLIO — Creator Portfolio Platform
+            Ready to own your presence?
+          </h2>
+
+          <p
+            style={{
+              fontSize: '19px',
+              fontWeight: '400',
+              lineHeight: '1.6',
+              color: '#6e6e73',
+              letterSpacing: '-0.01em',
+              marginBottom: '44px',
+            }}
+          >
+            Join fashion creators who use Folio to turn their work into a business.
+            Free to start — no credit card required.
+          </p>
+
+          <Link
+            to="/signup"
+            style={{
+              display: 'inline-block',
+              fontSize: '17px',
+              fontWeight: '500',
+              color: '#ffffff',
+              backgroundColor: '#0071e3',
+              textDecoration: 'none',
+              padding: '16px 32px',
+              borderRadius: '980px',
+              letterSpacing: '-0.01em',
+              transition: 'background-color 0.15s ease',
+            }}
+            onMouseEnter={e => (e.target.style.backgroundColor = '#0077ed')}
+            onMouseLeave={e => (e.target.style.backgroundColor = '#0071e3')}
+          >
+            Create your free portfolio
+          </Link>
+
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer
+        style={{
+          backgroundColor: '#f5f5f7',
+          borderTop: '1px solid #d2d2d7',
+          padding: '32px 48px',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1000px',
+            margin: '0 auto',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '13px',
+              fontWeight: '500',
+              color: '#86868b',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Folio — Creator Portfolio Platform
           </span>
-          <span className="text-xs text-white/30">
-            Built with ♥ for fashion creators
+
+          <div style={{ display: 'flex', gap: '24px' }}>
+            {[
+              { label: 'Sign In', to: '/login' },
+              { label: 'Get Started', to: '/signup' },
+            ].map(link => (
+              <Link
+                key={link.to}
+                to={link.to}
+                style={{
+                  fontSize: '13px',
+                  color: '#6e6e73',
+                  textDecoration: 'none',
+                  letterSpacing: '-0.01em',
+                  transition: 'color 0.15s ease',
+                }}
+                onMouseEnter={e => (e.target.style.color = '#1d1d1f')}
+                onMouseLeave={e => (e.target.style.color = '#6e6e73')}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          <span
+            style={{
+              fontSize: '12px',
+              color: '#86868b',
+              letterSpacing: '-0.005em',
+            }}
+          >
+            Built for fashion creators
           </span>
         </div>
       </footer>

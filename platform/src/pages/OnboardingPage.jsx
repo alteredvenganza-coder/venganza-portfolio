@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { updateCreatorProfile } from '../lib/auth';
 
+// ─── Constants ───────────────────────────────────────────────────────────────
 const TOTAL_STEPS = 3;
+const STEP_LABELS = ['Your Studio', 'Instagram', 'Brand Colors'];
 
 function slugify(str) {
   return str
@@ -14,6 +16,154 @@ function slugify(str) {
     .replace(/-+/g, '-');
 }
 
+// ─── Shared style tokens ────────────────────────────────────────────────────
+const inputBase = {
+  width: '100%',
+  border: '1px solid #d2d2d7',
+  borderRadius: '12px',
+  padding: '12px 16px',
+  fontSize: '15px',
+  color: '#1d1d1f',
+  backgroundColor: '#ffffff',
+  outline: 'none',
+  transition: 'border-color 0.15s, box-shadow 0.15s',
+  boxSizing: 'border-box',
+  fontFamily: 'inherit',
+};
+
+const onFocus = (e) => {
+  e.target.style.borderColor = '#0071e3';
+  e.target.style.boxShadow = '0 0 0 3px rgba(0,113,227,0.15)';
+};
+
+const onBlur = (e) => {
+  e.target.style.borderColor = '#d2d2d7';
+  e.target.style.boxShadow = 'none';
+};
+
+// Prefix-input wrapper (for folio.so/ slug, @handle, #hashtag)
+const prefixWrapperBase = {
+  display: 'flex',
+  alignItems: 'center',
+  border: '1px solid #d2d2d7',
+  borderRadius: '12px',
+  overflow: 'hidden',
+  transition: 'border-color 0.15s, box-shadow 0.15s',
+  backgroundColor: '#ffffff',
+};
+
+const prefixLabel = {
+  padding: '12px 14px',
+  fontSize: '15px',
+  color: '#6e6e73',
+  backgroundColor: '#f5f5f7',
+  borderRight: '1px solid #d2d2d7',
+  userSelect: 'none',
+  whiteSpace: 'nowrap',
+  fontFamily: 'inherit',
+};
+
+const prefixInput = {
+  flex: 1,
+  padding: '12px 14px',
+  fontSize: '15px',
+  color: '#1d1d1f',
+  backgroundColor: '#ffffff',
+  border: 'none',
+  outline: 'none',
+  fontFamily: 'inherit',
+};
+
+const onWrapperFocus = (e) => {
+  e.currentTarget.style.borderColor = '#0071e3';
+  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,113,227,0.15)';
+};
+
+const onWrapperBlur = (e) => {
+  e.currentTarget.style.borderColor = '#d2d2d7';
+  e.currentTarget.style.boxShadow = 'none';
+};
+
+// ─── Step progress indicator ─────────────────────────────────────────────────
+function StepProgress({ step }) {
+  return (
+    <div style={{ marginBottom: '36px' }}>
+      {/* Numbered dots + connectors */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginBottom: '10px' }}>
+        {Array.from({ length: TOTAL_STEPS }, (_, i) => {
+          const n = i + 1;
+          const isActive = n === step;
+          const isDone = n < step;
+
+          return (
+            <div key={n} style={{ display: 'flex', alignItems: 'center' }}>
+              {/* Dot */}
+              <div
+                style={{
+                  width: isActive ? 30 : 24,
+                  height: isActive ? 30 : 24,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  transition: 'all 0.25s',
+                  backgroundColor: isActive || isDone ? '#0071e3' : '#f5f5f7',
+                  color: isActive || isDone ? '#ffffff' : '#6e6e73',
+                  flexShrink: 0,
+                }}
+              >
+                {isDone ? (
+                  // Checkmark for completed steps
+                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  n
+                )}
+              </div>
+
+              {/* Connector line between dots */}
+              {n < TOTAL_STEPS && (
+                <div
+                  style={{
+                    width: '36px',
+                    height: '1px',
+                    backgroundColor: n < step ? '#0071e3' : '#d2d2d7',
+                    transition: 'background-color 0.25s',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Step label */}
+      <p style={{ textAlign: 'center', fontSize: '12px', fontWeight: '500', color: '#6e6e73', margin: 0, letterSpacing: '0.01em' }}>
+        Step {step} of {TOTAL_STEPS} — {STEP_LABELS[step - 1]}
+      </p>
+    </div>
+  );
+}
+
+// ─── Label helper ─────────────────────────────────────────────────────────────
+function Label({ children, optional = false }) {
+  return (
+    <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#1d1d1f', marginBottom: '6px' }}>
+      {children}
+      {optional && (
+        <span style={{ fontWeight: '400', color: '#6e6e73', marginLeft: '4px' }}>
+          (optional)
+        </span>
+      )}
+    </label>
+  );
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
 export default function OnboardingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -88,158 +238,163 @@ export default function OnboardingPage() {
     }
   };
 
-  const progressPercent = Math.round((step / TOTAL_STEPS) * 100);
-
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{
+        minHeight: '100vh',
+        backgroundColor: '#ffffff',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 16px',
+      }}
     >
-      <div
-        className="w-full max-w-sm rounded-2xl p-8"
-        style={{ backgroundColor: '#111' }}
-      >
-        {/* Brand */}
-        <div className="mb-6 text-center">
+      <div style={{ width: '100%', maxWidth: '380px' }}>
+
+        {/* ── Brand ─────────────────────────────────────────────────────── */}
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <h1
-            className="text-white text-2xl font-bold tracking-widest"
-            style={{ fontFamily: 'var(--font-heading, serif)' }}
+            style={{
+              fontSize: '30px',
+              fontWeight: '700',
+              letterSpacing: '0.2em',
+              color: '#1d1d1f',
+              marginBottom: 0,
+              marginTop: 0,
+              fontFamily: 'var(--font-heading, -apple-system, "SF Pro Display", sans-serif)',
+            }}
           >
             FOLIO
           </h1>
         </div>
 
-        {/* Progress bar */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-zinc-500 text-xs font-mono uppercase tracking-wider">
-              Step {step} of {TOTAL_STEPS}
-            </span>
-            <span className="text-zinc-500 text-xs font-mono">
-              {progressPercent}%
-            </span>
-          </div>
-          <div className="w-full h-px bg-zinc-800 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-white transition-all duration-500 ease-out"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-        </div>
+        {/* ── Step progress ─────────────────────────────────────────────── */}
+        <StepProgress step={step} />
 
-        {/* Step 1: Studio Info */}
+        {/* ── Step 1: Studio Info ───────────────────────────────────────── */}
         {step === 1 && (
-          <div className="space-y-4">
-            <h2 className="text-white text-xl font-semibold mb-1 leading-snug">
-              What&apos;s your studio called?
-            </h2>
-            <p className="text-zinc-500 text-xs font-mono mb-4">
-              This will be your public brand name.
-            </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ marginBottom: '4px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#1d1d1f', margin: '0 0 6px' }}>
+                What&apos;s your studio called?
+              </h2>
+              <p style={{ fontSize: '14px', color: '#6e6e73', margin: 0 }}>
+                This will be your public brand name.
+              </p>
+            </div>
 
+            {/* Studio Name */}
             <div>
-              <label className="block text-xs font-mono text-zinc-400 mb-1 uppercase tracking-wider">
-                Studio Name
-              </label>
+              <Label>Studio Name</Label>
               <input
                 type="text"
                 value={displayName}
                 onChange={handleDisplayNameChange}
+                onFocus={onFocus}
+                onBlur={onBlur}
                 placeholder="e.g. Venganza Studio"
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-zinc-600 transition-colors"
+                style={inputBase}
               />
             </div>
 
+            {/* URL Slug */}
             <div>
-              <label className="block text-xs font-mono text-zinc-400 mb-1 uppercase tracking-wider">
-                URL Slug
-              </label>
-              <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden focus-within:border-zinc-600 transition-colors">
-                <span className="text-zinc-600 text-xs font-mono px-3 py-3 border-r border-zinc-800 whitespace-nowrap">
-                  folio.so/
-                </span>
+              <Label>URL Slug</Label>
+              <div
+                style={prefixWrapperBase}
+                onFocusCapture={onWrapperFocus}
+                onBlurCapture={onWrapperBlur}
+              >
+                <span style={{ ...prefixLabel, fontSize: '13px' }}>folio.so/</span>
                 <input
                   type="text"
                   value={slug}
                   onChange={handleSlugChange}
                   placeholder="your-studio"
-                  className="flex-1 bg-transparent px-3 py-3 text-white text-sm placeholder-zinc-600 focus:outline-none"
+                  style={prefixInput}
                 />
               </div>
             </div>
 
+            {/* Location */}
             <div>
-              <label className="block text-xs font-mono text-zinc-400 mb-1 uppercase tracking-wider">
-                Location
-                <span className="text-zinc-600 ml-1 normal-case">(optional)</span>
-              </label>
+              <Label optional>Location</Label>
               <input
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
+                onFocus={onFocus}
+                onBlur={onBlur}
                 placeholder="e.g. Los Angeles, CA"
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-zinc-600 transition-colors"
+                style={inputBase}
               />
             </div>
           </div>
         )}
 
-        {/* Step 2: Instagram */}
+        {/* ── Step 2: Instagram ─────────────────────────────────────────── */}
         {step === 2 && (
-          <div className="space-y-4">
-            <h2 className="text-white text-xl font-semibold mb-1 leading-snug">
-              Connect your Instagram
-            </h2>
-            <p className="text-zinc-500 text-xs font-mono mb-4">
-              We&apos;ll pull your latest premade posts automatically.
-            </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ marginBottom: '4px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#1d1d1f', margin: '0 0 6px' }}>
+                Connect your Instagram
+              </h2>
+              <p style={{ fontSize: '14px', color: '#6e6e73', margin: 0 }}>
+                We&apos;ll pull your latest premade posts automatically.
+              </p>
+            </div>
 
+            {/* Instagram Handle */}
             <div>
-              <label className="block text-xs font-mono text-zinc-400 mb-1 uppercase tracking-wider">
-                Instagram Handle
-              </label>
-              <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden focus-within:border-zinc-600 transition-colors">
-                <span className="text-zinc-600 text-sm px-3 py-3 border-r border-zinc-800">
-                  @
-                </span>
+              <Label>Instagram Handle</Label>
+              <div
+                style={prefixWrapperBase}
+                onFocusCapture={onWrapperFocus}
+                onBlurCapture={onWrapperBlur}
+              >
+                <span style={prefixLabel}>@</span>
                 <input
                   type="text"
                   value={instagramHandle}
-                  onChange={(e) =>
-                    setInstagramHandle(e.target.value.replace('@', ''))
-                  }
+                  onChange={(e) => setInstagramHandle(e.target.value.replace('@', ''))}
                   placeholder="yourstudio"
-                  className="flex-1 bg-transparent px-3 py-3 text-white text-sm placeholder-zinc-600 focus:outline-none"
+                  style={prefixInput}
                 />
               </div>
             </div>
 
+            {/* Premade Hashtag */}
             <div>
-              <label className="block text-xs font-mono text-zinc-400 mb-1 uppercase tracking-wider">
-                Premade Hashtag
-                <span className="text-zinc-600 ml-1 normal-case">(optional)</span>
-              </label>
-              <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden focus-within:border-zinc-600 transition-colors">
-                <span className="text-zinc-600 text-sm px-3 py-3 border-r border-zinc-800">
-                  #
-                </span>
+              <Label optional>Premade Hashtag</Label>
+              <div
+                style={prefixWrapperBase}
+                onFocusCapture={onWrapperFocus}
+                onBlurCapture={onWrapperBlur}
+              >
+                <span style={prefixLabel}>#</span>
                 <input
                   type="text"
                   value={premadeHashtag}
-                  onChange={(e) =>
-                    setPremadeHashtag(e.target.value.replace('#', ''))
-                  }
+                  onChange={(e) => setPremadeHashtag(e.target.value.replace('#', ''))}
                   placeholder="studioPremades"
-                  className="flex-1 bg-transparent px-3 py-3 text-white text-sm placeholder-zinc-600 focus:outline-none"
+                  style={prefixInput}
                 />
               </div>
-              <p className="text-zinc-600 text-xs font-mono mt-2">
+              <p style={{ fontSize: '12px', color: '#6e6e73', margin: '6px 0 0' }}>
                 Posts tagged with this hashtag will appear in your shop.
               </p>
             </div>
 
-            <div className="border border-zinc-800 rounded-lg p-4 bg-zinc-900/50">
-              <p className="text-zinc-400 text-xs font-mono leading-relaxed">
+            {/* Info callout */}
+            <div
+              style={{
+                borderRadius: '12px',
+                padding: '14px 16px',
+                backgroundColor: '#f5f5f7',
+              }}
+            >
+              <p style={{ fontSize: '13px', color: '#6e6e73', lineHeight: '1.5', margin: 0 }}>
                 We pull your public Instagram posts matching this hashtag
                 and display them as premade listings — no manual uploading
                 required.
@@ -248,68 +403,101 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 3: Brand Colors */}
+        {/* ── Step 3: Brand Colors ──────────────────────────────────────── */}
         {step === 3 && (
-          <div className="space-y-4">
-            <h2 className="text-white text-xl font-semibold mb-1 leading-snug">
-              Set your brand color
-            </h2>
-            <p className="text-zinc-500 text-xs font-mono mb-4">
-              Choose colors that reflect your aesthetic.
-            </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ marginBottom: '4px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#1d1d1f', margin: '0 0 6px' }}>
+                Set your brand color
+              </h2>
+              <p style={{ fontSize: '14px', color: '#6e6e73', margin: 0 }}>
+                Choose colors that reflect your aesthetic.
+              </p>
+            </div>
 
+            {/* Primary Color */}
             <div>
-              <label className="block text-xs font-mono text-zinc-400 mb-2 uppercase tracking-wider">
-                Primary Color
-              </label>
-              <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 focus-within:border-zinc-600 transition-colors">
+              <Label>Primary Color</Label>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  border: '1px solid #d2d2d7',
+                  borderRadius: '12px',
+                  padding: '10px 16px',
+                }}
+              >
                 <input
                   type="color"
                   value={primaryColor}
                   onChange={(e) => setPrimaryColor(e.target.value)}
-                  className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent p-0"
+                  style={{ width: '32px', height: '32px', borderRadius: '6px', cursor: 'pointer', border: 'none', backgroundColor: 'transparent', padding: 0 }}
                 />
-                <span className="text-white text-sm font-mono">
+                <span style={{ fontSize: '14px', fontFamily: 'monospace', color: '#1d1d1f' }}>
                   {primaryColor.toUpperCase()}
                 </span>
               </div>
-              <p className="text-zinc-600 text-xs font-mono mt-1">
+              <p style={{ fontSize: '12px', color: '#6e6e73', margin: '6px 0 0' }}>
                 Used for buttons, accents, and highlights.
               </p>
             </div>
 
+            {/* Background Color */}
             <div>
-              <label className="block text-xs font-mono text-zinc-400 mb-2 uppercase tracking-wider">
-                Background Color
-              </label>
-              <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 focus-within:border-zinc-600 transition-colors">
+              <Label>Background Color</Label>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  border: '1px solid #d2d2d7',
+                  borderRadius: '12px',
+                  padding: '10px 16px',
+                }}
+              >
                 <input
                   type="color"
                   value={bgColor}
                   onChange={(e) => setBgColor(e.target.value)}
-                  className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent p-0"
+                  style={{ width: '32px', height: '32px', borderRadius: '6px', cursor: 'pointer', border: 'none', backgroundColor: 'transparent', padding: 0 }}
                 />
-                <span className="text-white text-sm font-mono">
+                <span style={{ fontSize: '14px', fontFamily: 'monospace', color: '#1d1d1f' }}>
                   {bgColor.toUpperCase()}
                 </span>
               </div>
-              <p className="text-zinc-600 text-xs font-mono mt-1">
+              <p style={{ fontSize: '12px', color: '#6e6e73', margin: '6px 0 0' }}>
                 The base background of your portfolio.
               </p>
             </div>
 
             {/* Live preview swatch */}
-            <div className="mt-2">
-              <p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">
+            <div>
+              <p style={{ fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#6e6e73', marginBottom: '8px' }}>
                 Preview
               </p>
               <div
-                className="w-full h-16 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: bgColor }}
+                style={{
+                  width: '100%',
+                  height: '64px',
+                  borderRadius: '12px',
+                  border: '1px solid #d2d2d7',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: bgColor,
+                  transition: 'background-color 0.2s',
+                }}
               >
                 <span
-                  className="text-sm font-mono font-semibold tracking-widest"
-                  style={{ color: primaryColor }}
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: '700',
+                    letterSpacing: '0.18em',
+                    color: primaryColor,
+                    fontFamily: 'var(--font-heading, -apple-system, "SF Pro Display", sans-serif)',
+                    transition: 'color 0.2s',
+                  }}
                 >
                   FOLIO
                 </span>
@@ -318,19 +506,33 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Error */}
+        {/* ── Error ─────────────────────────────────────────────────────── */}
         {error && (
-          <p className="text-red-400 text-xs font-mono text-center mt-4">
+          <p style={{ fontSize: '13px', color: '#ff3b30', textAlign: 'center', margin: '16px 0 0' }}>
             {error}
           </p>
         )}
 
-        {/* Navigation buttons */}
-        <div className="flex gap-3 mt-8">
+        {/* ── Navigation buttons ────────────────────────────────────────── */}
+        <div style={{ display: 'flex', gap: '10px', marginTop: '28px' }}>
           {step > 1 && (
             <button
               onClick={handleBack}
-              className="flex-1 bg-transparent border border-zinc-700 text-zinc-300 font-mono text-sm tracking-wider uppercase py-3 rounded-lg hover:border-zinc-500 hover:text-white transition-colors"
+              style={{
+                flex: 1,
+                backgroundColor: '#ffffff',
+                color: '#1d1d1f',
+                fontSize: '15px',
+                fontWeight: '500',
+                padding: '14px 16px',
+                borderRadius: '12px',
+                border: '1px solid #d2d2d7',
+                cursor: 'pointer',
+                transition: 'background-color 0.15s',
+                fontFamily: 'inherit',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f5f5f7'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; }}
             >
               Back
             </button>
@@ -339,20 +541,50 @@ export default function OnboardingPage() {
           {step < TOTAL_STEPS ? (
             <button
               onClick={handleNext}
-              className="flex-1 bg-white text-black font-mono text-sm font-semibold tracking-wider uppercase py-3 rounded-lg hover:bg-zinc-100 transition-colors"
+              style={{
+                flex: 1,
+                backgroundColor: '#0071e3',
+                color: '#ffffff',
+                fontSize: '15px',
+                fontWeight: '500',
+                padding: '14px 16px',
+                borderRadius: '12px',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'background-color 0.15s',
+                fontFamily: 'inherit',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#0077ed'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#0071e3'; }}
             >
-              Next
+              Continue
             </button>
           ) : (
             <button
               onClick={handleFinish}
               disabled={loading}
-              className="flex-1 bg-white text-black font-mono text-sm font-semibold tracking-wider uppercase py-3 rounded-lg hover:bg-zinc-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                flex: 1,
+                backgroundColor: '#0071e3',
+                color: '#ffffff',
+                fontSize: '15px',
+                fontWeight: '500',
+                padding: '14px 16px',
+                borderRadius: '12px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.6 : 1,
+                transition: 'background-color 0.15s, opacity 0.15s',
+                fontFamily: 'inherit',
+              }}
+              onMouseEnter={(e) => { if (!loading) e.currentTarget.style.backgroundColor = '#0077ed'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#0071e3'; }}
             >
-              {loading ? 'Launching...' : 'Launch My Portfolio →'}
+              {loading ? 'Launching…' : 'Launch My Portfolio'}
             </button>
           )}
         </div>
+
       </div>
     </div>
   );

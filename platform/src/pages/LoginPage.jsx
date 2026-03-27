@@ -2,6 +2,32 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signIn } from '../lib/auth';
 
+// ─── Shared style tokens ────────────────────────────────────────────────────
+const inputBase = {
+  width: '100%',
+  border: '1px solid #d2d2d7',
+  borderRadius: '12px',
+  padding: '12px 16px',
+  fontSize: '15px',
+  color: '#1d1d1f',
+  backgroundColor: '#ffffff',
+  outline: 'none',
+  transition: 'border-color 0.15s, box-shadow 0.15s',
+  boxSizing: 'border-box',
+  fontFamily: 'inherit',
+};
+
+const onFocus = (e) => {
+  e.target.style.borderColor = '#0071e3';
+  e.target.style.boxShadow = '0 0 0 3px rgba(0,113,227,0.15)';
+};
+
+const onBlur = (e) => {
+  e.target.style.borderColor = '#d2d2d7';
+  e.target.style.boxShadow = 'none';
+};
+
+// ─── Component ───────────────────────────────────────────────────────────────
 export default function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -26,81 +52,128 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{
+        minHeight: '100vh',
+        backgroundColor: '#ffffff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 16px',
+      }}
     >
-      <div
-        className="w-full max-w-sm rounded-2xl p-8"
-        style={{ backgroundColor: '#111' }}
-      >
-        {/* Brand */}
-        <div className="mb-8 text-center">
+      <div style={{ width: '100%', maxWidth: '380px' }}>
+
+        {/* ── Brand ─────────────────────────────────────────────────────── */}
+        <div style={{ textAlign: 'center', marginBottom: '44px' }}>
           <h1
-            className="text-white text-3xl font-bold tracking-widest mb-2"
-            style={{ fontFamily: 'var(--font-heading, serif)' }}
+            style={{
+              fontSize: '34px',
+              fontWeight: '700',
+              letterSpacing: '0.2em',
+              color: '#1d1d1f',
+              marginBottom: '8px',
+              marginTop: 0,
+              fontFamily: 'var(--font-heading, -apple-system, "SF Pro Display", sans-serif)',
+            }}
           >
             FOLIO
           </h1>
-          <p className="text-zinc-400 text-sm font-mono">
+          <p
+            style={{
+              fontSize: '15px',
+              color: '#6e6e73',
+              margin: 0,
+              fontFamily: '-apple-system, "SF Pro Text", sans-serif',
+            }}
+          >
             Welcome back
           </p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* ── Form ──────────────────────────────────────────────────────── */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+          {/* Email */}
           <div>
-            <label className="block text-xs font-mono text-zinc-400 mb-1 uppercase tracking-wider">
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#1d1d1f', marginBottom: '6px' }}>
               Email
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onFocus={onFocus}
+              onBlur={onBlur}
               required
               placeholder="you@example.com"
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-zinc-600 transition-colors"
+              style={inputBase}
             />
           </div>
 
+          {/* Password */}
           <div>
-            <label className="block text-xs font-mono text-zinc-400 mb-1 uppercase tracking-wider">
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#1d1d1f', marginBottom: '6px' }}>
               Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onFocus={onFocus}
+              onBlur={onBlur}
               required
               placeholder="••••••••"
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-zinc-600 transition-colors"
+              style={inputBase}
             />
           </div>
 
+          {/* Error */}
           {error && (
-            <p className="text-red-400 text-xs font-mono text-center">
+            <p style={{ fontSize: '13px', color: '#ff3b30', textAlign: 'center', margin: '0' }}>
               {error}
             </p>
           )}
 
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-white text-black font-mono text-sm font-semibold tracking-wider uppercase py-3 rounded-lg hover:bg-zinc-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            style={{
+              width: '100%',
+              backgroundColor: '#0071e3',
+              color: '#ffffff',
+              fontSize: '15px',
+              fontWeight: '500',
+              padding: '14px 16px',
+              borderRadius: '12px',
+              border: 'none',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.6 : 1,
+              transition: 'background-color 0.15s, opacity 0.15s',
+              marginTop: '4px',
+              fontFamily: 'inherit',
+            }}
+            onMouseEnter={(e) => { if (!loading) e.currentTarget.style.backgroundColor = '#0077ed'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#0071e3'; }}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
 
-        {/* Signup link */}
-        <p className="text-center text-zinc-500 text-xs font-mono mt-6">
+        {/* ── Divider ───────────────────────────────────────────────────── */}
+        <div style={{ height: '1px', backgroundColor: '#d2d2d7', margin: '28px 0' }} />
+
+        {/* ── Signup link ───────────────────────────────────────────────── */}
+        <p style={{ textAlign: 'center', fontSize: '14px', color: '#6e6e73', margin: 0 }}>
           Don&apos;t have an account?{' '}
           <Link
             to="/signup"
-            className="text-white hover:text-zinc-300 transition-colors underline underline-offset-2"
+            style={{ color: '#0071e3', textDecoration: 'none', fontWeight: '400' }}
           >
             Sign up
           </Link>
         </p>
+
       </div>
     </div>
   );
