@@ -2110,6 +2110,13 @@ const PremadesPage = () => {
 };
 
 // ==========================================
+// PHASE 2: PLATFORM PAGE IMPORTS
+// ==========================================
+import { SignupPage, LoginPage, OnboardingPage, DashboardPage } from './pages';
+import LandingPage from './pages/LandingPage';
+import { AuthProvider as SupabaseAuthProvider } from './hooks/useAuth';
+
+// ==========================================
 // ADMIN IMPORTS
 // ==========================================
 import { AuthProvider, useAuth } from './admin/lib/auth';
