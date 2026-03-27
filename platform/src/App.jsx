@@ -305,14 +305,14 @@ const MobileMenu = ({ onClose }) => {
         <X size={24} />
       </button>
       <nav className="flex flex-col items-center gap-6">
-        <Link to="/" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Home</Link>
-        <Link to="/brand-identity" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Brand Identity</Link>
-        <Link to="/designs" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Clothing Designs</Link>
-        <Link to="/vag" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">VAG</Link>
-        <Link to="/premades" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Premades</Link>
-        <Link to="/archive" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Archive</Link>
-        <Link to="/about" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-[color:var(--primary)] tracking-widest uppercase hover:text-black transition-colors">Who the f*ck is Rare?</Link>
-        <Link to="/contact" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Contact</Link>
+        <Link to="/p" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Home</Link>
+        <Link to="/p/brand-identity" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Brand Identity</Link>
+        <Link to="/p/designs" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Clothing Designs</Link>
+        <Link to="/p/vag" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">VAG</Link>
+        <Link to="/p/premades" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Premades</Link>
+        <Link to="/p/archive" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Archive</Link>
+        <Link to="/p/about" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-[color:var(--primary)] tracking-widest uppercase hover:text-black transition-colors">Who the f*ck is Rare?</Link>
+        <Link to="/p/contact" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Contact</Link>
       </nav>
     </div>
   );
@@ -340,7 +340,7 @@ const SiteFooter = ({ light = true }) => {
           <span className={`font-mono text-[9px] md:text-[10px] ${textColor} ${hoverColor} uppercase tracking-[0.15em] transition-colors cursor-pointer`}>MAT Drop</span>
         </div>
         <p className={`font-mono text-[8px] md:text-[9px] ${textColor} uppercase tracking-[0.2em] mb-2`}>Coming Soon</p>
-        <Link to="/materializing-ideas" className={`font-mono text-[8px] md:text-[9px] text-[color:var(--primary)] ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>
+        <Link to="/p/materializing-ideas" className={`font-mono text-[8px] md:text-[9px] text-[color:var(--primary)] ${hoverColor} uppercase tracking-[0.15em] transition-colors`}>
           What is Materializing Ideas?
         </Link>
       </div>
@@ -451,7 +451,7 @@ const Home = () => {
 
         {/* Left — Logo + Handle + Description */}
         <div className="nav-item flex-shrink-0">
-          <Link to="/" className="heading-font leading-none text-black tracking-widest hover:opacity-70 transition-opacity block">
+          <Link to="/p" className="heading-font leading-none text-black tracking-widest hover:opacity-70 transition-opacity block">
             <span className="hidden lg:inline text-4xl xl:text-5xl">{siteConfig.displayName}</span>
             <span className="lg:hidden text-3xl sm:text-4xl">Altered<br/>Venganza</span>
           </Link>
@@ -472,21 +472,21 @@ const Home = () => {
             </button>
             {servicesOpen && (
               <div className="absolute top-full left-0 bg-white border border-black/10 rounded-lg shadow-xl py-2 min-w-[200px] z-50">
-                <Link to="/brand-identity" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">Brand Identity</Link>
-                <Link to="/designs" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">Clothing Designs</Link>
+                <Link to="/p/brand-identity" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">Brand Identity</Link>
+                <Link to="/p/designs" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">Clothing Designs</Link>
               </div>
             )}
           </div>
-          <Link to="/vag" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">VAG</Link>
-          <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">Premades</Link>
-          <Link to="/archive" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">Archive</Link>
-          <Link to="/about" className="nav-item font-mono text-[11px] text-[color:var(--primary)] hover:text-black uppercase tracking-[0.15em] transition-colors">Who the f*ck is Rare?</Link>
+          <Link to="/p/vag" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">VAG</Link>
+          <Link to="/p/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">Premades</Link>
+          <Link to="/p/archive" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">Archive</Link>
+          <Link to="/p/about" className="nav-item font-mono text-[11px] text-[color:var(--primary)] hover:text-black uppercase tracking-[0.15em] transition-colors">Who the f*ck is Rare?</Link>
         </nav>
 
         {/* Right — Contact + Cart + Burger */}
         <div className="flex items-center gap-6 pt-2 ml-auto">
-          <Link to="/contact" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden md:block">Contact</Link>
-          <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden md:block">Cart (0)</Link>
+          <Link to="/p/contact" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden md:block">Contact</Link>
+          <Link to="/p/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden md:block">Cart (0)</Link>
           <button onClick={() => setMenuOpen(true)} className="md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
             <Menu size={24} />
           </button>
@@ -496,7 +496,7 @@ const Home = () => {
       {/* ============ HERO — Two panels side by side ============ */}
       <div className="flex flex-col md:flex-row w-full relative z-10" style={{ minHeight: '70vh' }}>
         {/* Left — Premades Slideshow */}
-        <Link to="/premades" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer">
+        <Link to="/p/premades" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer">
           {slidesLoading && (
             <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
               <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs animate-pulse">Loading...</span>
@@ -535,7 +535,7 @@ const Home = () => {
         </Link>
 
         {/* Right — MAT Renders (clickable) */}
-        <Link to="/mat-renders" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden bg-neutral-900 flex items-center justify-center group cursor-pointer">
+        <Link to="/p/mat-renders" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden bg-neutral-900 flex items-center justify-center group cursor-pointer">
           {theme.images?.heroRight && (
             <img src={theme.images.heroRight} alt="MAT Renders" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
           )}
@@ -617,11 +617,11 @@ const ServicePage = ({ title, services }) => {
 
        {/* Fixed header: logo/brand left, nav/burger right */}
        <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-10 py-4 bg-[color:var(--bg-color)]/80 backdrop-blur-sm">
-         <Link to="/" className="opacity-80 hover:opacity-100 transition-opacity">
+         <Link to="/p" className="opacity-80 hover:opacity-100 transition-opacity">
            <span className={`heading-font text-xl tracking-widest${isTailored ? ' text-black' : ' text-white'}`}>{siteConfig.displayName}</span>
          </Link>
          <div className="flex items-center gap-4">
-           <Link to="/" className={`hidden md:inline-flex items-center gap-2 transition-colors text-[10px] font-mono uppercase tracking-widest${isTailored ? ' text-black/50 hover:text-black' : ' text-white/50 hover:text-white'}`}>
+           <Link to="/p" className={`hidden md:inline-flex items-center gap-2 transition-colors text-[10px] font-mono uppercase tracking-widest${isTailored ? ' text-black/50 hover:text-black' : ' text-white/50 hover:text-white'}`}>
              Back to Home <ArrowRight size={14} />
            </Link>
            <button onClick={() => setMenuOpen(true)} className={`md:hidden w-10 h-10 flex items-center justify-center transition-colors${isTailored ? ' text-black/70 hover:text-black' : ' text-white/70 hover:text-white'}`}>
@@ -690,7 +690,7 @@ const ServiceDetail = () => {
 
        {/* Fixed header: brand/logo left, back/burger right */}
        <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 md:px-10 py-4 bg-[color:var(--bg-color)]/80 backdrop-blur-sm">
-         <Link to="/" className="opacity-80 hover:opacity-100 transition-opacity">
+         <Link to="/p" className="opacity-80 hover:opacity-100 transition-opacity">
            <span className={`heading-font text-xl tracking-widest${isTailored ? ' text-black' : ' text-white'}`}>{siteConfig.displayName}</span>
          </Link>
          <div className="flex items-center gap-4">
@@ -904,7 +904,7 @@ const ServiceOrderPage = () => {
       <p className="text-white/30 font-mono text-[9px] uppercase tracking-widest max-w-xs">
         Include your brand name and order email in the subject line.
       </p>
-      <Link to="/" className="mt-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
+      <Link to="/p" className="mt-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
         Back to Home <ArrowRight size={12} />
       </Link>
     </div>
@@ -1192,7 +1192,7 @@ const AboutPage = () => {
       <span className="float-a absolute top-[55%] left-[5%] font-mono text-[8px] text-black/6 uppercase tracking-[0.3em] select-none" style={{animationDelay:'3s'}}>altered</span>
 
       {/* Nav */}
-      <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest z-10">
+      <Link to="/p" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest z-10">
         Back to Home <ArrowRight size={14} />
       </Link>
       <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
@@ -1233,7 +1233,7 @@ const MaterializingIdeasPage = () => {
       <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
         <Menu size={24} />
       </button>
-      <Link to="/" className="hidden md:inline-flex self-end items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest mb-12">
+      <Link to="/p" className="hidden md:inline-flex self-end items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest mb-12">
         Back to Home <ArrowRight size={14} />
       </Link>
 
@@ -1266,7 +1266,7 @@ const MaterializingIdeasPage = () => {
 
       {/* Footer note */}
       <p className="font-mono text-[10px] text-black/30 uppercase tracking-[0.2em] text-center">
-        A sub-brand of Altered Venganza — <Link to="/about" className="text-[color:var(--primary)] hover:text-black transition-colors">Who the f*ck is Rare?</Link>
+        A sub-brand of Altered Venganza — <Link to="/p/about" className="text-[color:var(--primary)] hover:text-black transition-colors">Who the f*ck is Rare?</Link>
       </p>
 
       <div className="mt-12"><SiteFooter light={true} /></div>
@@ -1279,7 +1279,7 @@ const GalleryPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-center relative z-10 px-6">
-      <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
+      <Link to="/p" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
           Back to Home <ArrowRight size={16} />
       </Link>
       <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
@@ -1307,7 +1307,7 @@ const ContactPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative z-10 px-6 py-20">
-      <Link to="/" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
+      <Link to="/p" className="absolute top-10 right-10 hidden md:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-mono uppercase tracking-widest">
           Back to Home <ArrowRight size={16} />
       </Link>
       <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
@@ -1388,10 +1388,10 @@ const ArchivePage = () => {
       <div className="mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 border-b border-black/10 pb-10 w-full">
          <div className="flex flex-col items-start gap-8 w-full">
            <div className="flex justify-between items-start w-full">
-             <Link to="/" className="heading-font text-5xl md:text-7xl text-black tracking-widest leading-none block hover:opacity-80 transition-opacity">
+             <Link to="/p" className="heading-font text-5xl md:text-7xl text-black tracking-widest leading-none block hover:opacity-80 transition-opacity">
                Altered Venganza
              </Link>
-             <Link to="/" className="hidden md:inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest mt-2">
+             <Link to="/p" className="hidden md:inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest mt-2">
                 Back to Home <ArrowRight size={14} />
              </Link>
            </div>
@@ -1766,7 +1766,7 @@ const MatRendersPage = () => {
 
       {/* ── HEADER ── */}
       <header className="flex items-center justify-between px-6 md:px-12 pt-8 pb-6">
-        <Link to="/" className="mat-header heading-font text-white/30 hover:text-white transition-colors tracking-widest text-sm uppercase font-mono">
+        <Link to="/p" className="mat-header heading-font text-white/30 hover:text-white transition-colors tracking-widest text-sm uppercase font-mono">
           ← {siteConfig.displayName}
         </Link>
         <span className="mat-header font-mono text-[9px] text-white/20 uppercase tracking-[0.3em]">
@@ -1882,7 +1882,7 @@ const MatRendersPage = () => {
             <Camera size={14} /> Order via DM
           </a>
           <Link
-            to="/contact"
+            to="/p/contact"
             className="flex items-center justify-center gap-3 px-8 py-4 border border-white/20 text-white font-mono text-xs uppercase tracking-widest rounded-full hover:border-white/40 hover:bg-white/5 transition-all"
           >
             Contact Us
@@ -1943,7 +1943,7 @@ const PremadesPage = () => {
 
         {/* Row 1: Brand + right count */}
         <div className="flex items-start justify-between">
-          <Link to="/" className="heading-font text-[3rem] md:text-[3.5rem] leading-none text-black tracking-widest block hover:opacity-80 transition-opacity">
+          <Link to="/p" className="heading-font text-[3rem] md:text-[3.5rem] leading-none text-black tracking-widest block hover:opacity-80 transition-opacity">
             Altered Venganza
           </Link>
           <p className="hidden md:flex text-black/60 font-mono text-xs uppercase tracking-[0.1em] items-center gap-2 pt-3 flex-shrink-0">
@@ -1970,7 +1970,7 @@ const PremadesPage = () => {
 
           {/* Nav links on the LEFT side below description */}
           <div className="flex items-center gap-6 flex-shrink-0">
-            <Link to="/" className="font-mono text-[11px] text-black/50 hover:text-black transition-colors uppercase tracking-[0.2em]">
+            <Link to="/p" className="font-mono text-[11px] text-black/50 hover:text-black transition-colors uppercase tracking-[0.2em]">
               ← Home
             </Link>
             <button
@@ -2110,13 +2110,6 @@ const PremadesPage = () => {
 };
 
 // ==========================================
-// PHASE 2: PLATFORM PAGE IMPORTS
-// ==========================================
-import { SignupPage, LoginPage, OnboardingPage, DashboardPage } from './pages';
-import LandingPage from './pages/LandingPage';
-import { AuthProvider as SupabaseAuthProvider } from './hooks/useAuth';
-
-// ==========================================
 // ADMIN IMPORTS
 // ==========================================
 import { AuthProvider, useAuth } from './admin/lib/auth';
@@ -2130,6 +2123,7 @@ import PremadeEdit from './admin/pages/PremadeEdit';
 import MediaLibrary from './admin/pages/MediaLibrary';
 import AdminSettings from './admin/pages/AdminSettings';
 import ThemeEditor from './admin/pages/ThemeEditor';
+import LandingPage from './pages/LandingPage';
 
 const AdminGuard = () => {
   const { user, loading, login } = useAuth();
@@ -2209,7 +2203,6 @@ const GlobalCartSidebar = () => {
 export default function App() {
   return (
     <BrowserRouter>
-      <SupabaseAuthProvider>
       <CartProvider>
         <AuthProvider>
           <EditorProvider>
@@ -2220,19 +2213,22 @@ export default function App() {
               <GlobalCartSidebar />
               <EditorToolbar />
             <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/materializing-ideas" element={<MaterializingIdeasPage />} />
-              <Route path="/vag" element={<GalleryPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/archive" element={<ArchivePage />} />
-              <Route path="/premades" element={<PremadesPage />} />
-              <Route path="/mat-renders" element={<MatRendersPage />} />
-              <Route path="/service/:id" element={<ServiceDetail />} />
-              <Route path="/service/:id/order" element={<ServiceOrderPage />} />
-              <Route path="/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
-              <Route path="/designs" element={<ServicePage title="Clothing Design Service" services={designsData} />} />
+              {/* Platform landing */}
+              <Route path="/" element={<LandingPage />} />
+
+              {/* Creator portfolio routes */}
+              <Route path="/p" element={<Home />} />
+              <Route path="/p/about" element={<AboutPage />} />
+              <Route path="/p/materializing-ideas" element={<MaterializingIdeasPage />} />
+              <Route path="/p/vag" element={<GalleryPage />} />
+              <Route path="/p/contact" element={<ContactPage />} />
+              <Route path="/p/archive" element={<ArchivePage />} />
+              <Route path="/p/premades" element={<PremadesPage />} />
+              <Route path="/p/mat-renders" element={<MatRendersPage />} />
+              <Route path="/p/service/:id" element={<ServiceDetail />} />
+              <Route path="/p/service/:id/order" element={<ServiceOrderPage />} />
+              <Route path="/p/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
+              <Route path="/p/designs" element={<ServicePage title="Clothing Design Service" services={designsData} />} />
 
               {/* Admin routes */}
               <Route path="/admin" element={<AdminGuard />}>
@@ -2244,19 +2240,11 @@ export default function App() {
                 <Route path="media" element={<MediaLibrary />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
-
-              {/* Platform routes */}
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/onboarding" element={<OnboardingPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/landing" element={<LandingPage />} />
             </Routes>
             </ToastProvider>
           </EditorProvider>
         </AuthProvider>
       </CartProvider>
-      </SupabaseAuthProvider>
     </BrowserRouter>
   );
 }

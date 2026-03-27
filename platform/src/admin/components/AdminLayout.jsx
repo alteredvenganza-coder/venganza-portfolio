@@ -20,7 +20,7 @@ export default function AdminLayout() {
 
   const handleEditSite = () => {
     enterEditMode();
-    navigate('/');
+    navigate('/p');
   };
 
   const SidebarContent = ({ onNav }) => (
@@ -112,7 +112,7 @@ export default function AdminLayout() {
             <Menu size={20} />
           </button>
           <div className="hidden md:block" />
-          <a href="/" target="_blank" rel="noopener noreferrer"
+          <a href="/p" target="_blank" rel="noopener noreferrer"
             className="font-mono text-[10px] text-white/30 uppercase tracking-widest hover:text-white/60 transition-colors">
             View Site →
           </a>
