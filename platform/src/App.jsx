@@ -2113,6 +2113,7 @@ const PremadesPage = () => {
 // ADMIN IMPORTS
 // ==========================================
 import { AuthProvider, useAuth } from './admin/lib/auth';
+import { AuthProvider as SupabaseAuthProvider } from './hooks/useAuth';
 import { EditorProvider } from './admin/lib/editor-context';
 import { ToastProvider } from './admin/lib/toast';
 import AdminLayout from './admin/components/AdminLayout';
@@ -2246,10 +2247,10 @@ export default function App() {
               </Route>
 
               {/* Platform auth routes */}
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/onboarding" element={<OnboardingPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/signup" element={<SupabaseAuthProvider><SignupPage /></SupabaseAuthProvider>} />
+              <Route path="/login" element={<SupabaseAuthProvider><LoginPage /></SupabaseAuthProvider>} />
+              <Route path="/onboarding" element={<SupabaseAuthProvider><OnboardingPage /></SupabaseAuthProvider>} />
+              <Route path="/dashboard" element={<SupabaseAuthProvider><DashboardPage /></SupabaseAuthProvider>} />
             </Routes>
             </ToastProvider>
           </EditorProvider>
