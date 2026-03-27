@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { updateCreatorProfile } from '../lib/auth';
+import { updateCreatorProfile, getSession } from '../lib/auth';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const TOTAL_STEPS = 3;
@@ -219,7 +219,15 @@ export default function OnboardingPage() {
     setError('');
     setLoading(true);
     try {
-      await updateCreatorProfile(session?.user?.id, {
+      // session from context may still be loading — get fresh one from Supabase directly
+      const activeSession = session ?? await getSession();
+      const userId = activeSession?.user?.id;
+      if (!userId) {
+        setError('Session expired. Please sign in again.');
+        setLoading(false);
+        return;
+      }
+      await updateCreatorProfile(userId, {
         display_name: displayName,
         slug,
         location,
