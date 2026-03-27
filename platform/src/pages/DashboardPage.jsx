@@ -189,7 +189,7 @@ export default function DashboardPage() {
   return (
     <div
       className="min-h-screen flex flex-col bg-[#f5f5f7]"
-      style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}
+      style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif", position: 'relative', zIndex: 10 }}
     >
       {/* ── Mobile top bar ── */}
       <header className="lg:hidden sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 px-5 py-3 flex items-center justify-between">

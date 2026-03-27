@@ -269,6 +269,8 @@ export default function OnboardingPage() {
       style={{
         minHeight: '100vh',
         backgroundColor: '#ffffff',
+        position: 'relative',
+        zIndex: 10,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',

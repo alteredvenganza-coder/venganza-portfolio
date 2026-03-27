@@ -59,7 +59,6 @@ export default function LandingPage() {
           background: 'radial-gradient(circle, rgba(123,31,36,0.08) 0%, rgba(123,31,36,0.03) 40%, transparent 70%)',
           filter: 'blur(20px)',
           pointerEvents: 'none',
-          transition: 'left 0.08s ease-out, top 0.08s ease-out',
           mixBlendMode: 'multiply',
         }} />
       </div>
