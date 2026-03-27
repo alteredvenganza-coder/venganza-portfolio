@@ -2129,6 +2129,7 @@ import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
 import OnboardingPage from './pages/OnboardingPage';
 import DashboardPage from './pages/DashboardPage';
+import AuthCallbackPage from './pages/AuthCallbackPage';
 
 const AdminGuard = () => {
   const { user, loading, login } = useAuth();
@@ -2250,6 +2251,7 @@ export default function App() {
               <Route element={<SupabaseAuthProvider><Outlet /></SupabaseAuthProvider>}>
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/auth/callback" element={<AuthCallbackPage />} />
                 <Route path="/onboarding" element={<OnboardingPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
               </Route>

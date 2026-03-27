@@ -36,6 +36,9 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [sentTo, setSentTo] = useState('');
+  const [resent, setResent] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,13 +52,68 @@ export default function SignupPage() {
     setLoading(true);
     try {
       await signUp({ displayName, email, password });
-      navigate('/onboarding');
+      setSentTo(email);
+      setEmailSent(true);
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (emailSent) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 16px' }}>
+        <div style={{ width: '100%', maxWidth: '380px', textAlign: 'center' }}>
+
+          {/* Email icon */}
+          <div style={{ fontSize: '64px', marginBottom: '24px', lineHeight: 1 }}>✉️</div>
+
+          {/* Heading */}
+          <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1d1d1f', marginBottom: '12px', marginTop: 0, fontFamily: '-apple-system, "SF Pro Display", sans-serif' }}>
+            Check your email
+          </h1>
+
+          {/* Subtext */}
+          <p style={{ fontSize: '15px', color: '#6e6e73', marginBottom: '32px', lineHeight: '1.5', fontFamily: '-apple-system, "SF Pro Text", sans-serif' }}>
+            We sent a confirmation link to<br />
+            <strong style={{ color: '#1d1d1f' }}>{sentTo}</strong>.<br />
+            Click it to activate your account.
+          </p>
+
+          {/* Open Mail button */}
+          <a
+            href="mailto:"
+            style={{ display: 'block', width: '100%', backgroundColor: '#0071e3', color: '#ffffff', fontSize: '15px', fontWeight: '500', padding: '14px 16px', borderRadius: '12px', textDecoration: 'none', marginBottom: '16px', boxSizing: 'border-box', fontFamily: 'inherit' }}
+          >
+            Open Mail App
+          </a>
+
+          {/* Resend */}
+          {resent ? (
+            <p style={{ fontSize: '14px', color: '#34c759', margin: '0 0 8px' }}>Email resent!</p>
+          ) : (
+            <button
+              onClick={async () => {
+                try {
+                  await signUp({ displayName, email, password });
+                  setResent(true);
+                } catch {}
+              }}
+              style={{ background: 'none', border: 'none', color: '#0071e3', fontSize: '14px', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}
+            >
+              Didn&apos;t get it? Resend
+            </button>
+          )}
+
+          {/* Spam note */}
+          <p style={{ fontSize: '12px', color: '#aeaeb2', marginTop: '16px' }}>
+            Check your spam folder if you don&apos;t see it.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { updateCreatorProfile, getSession } from '../lib/auth';
@@ -166,7 +166,7 @@ function Label({ children, optional = false }) {
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function OnboardingPage() {
   const navigate = useNavigate();
-  const { session } = useAuth();
+  const { session, loading: authLoading } = useAuth();
 
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
@@ -185,6 +185,25 @@ export default function OnboardingPage() {
   // Step 3 fields
   const [primaryColor, setPrimaryColor] = useState('#ffffff');
   const [bgColor, setBgColor] = useState('#0a0a0a');
+
+  // Redirect to login if no session after auth finishes loading
+  useEffect(() => {
+    if (!authLoading && !session) {
+      navigate('/login', { replace: true });
+    }
+  }, [authLoading, session, navigate]);
+
+  // Show spinner while auth is loading
+  if (authLoading) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div>
+          <div style={{ width: '36px', height: '36px', border: '3px solid #e5e5ea', borderTopColor: '#0071e3', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto' }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      </div>
+    );
+  }
 
   const handleDisplayNameChange = (e) => {
     const val = e.target.value;
