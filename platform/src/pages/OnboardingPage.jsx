@@ -166,7 +166,7 @@ function Label({ children, optional = false }) {
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function OnboardingPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { session } = useAuth();
 
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
@@ -219,15 +219,14 @@ export default function OnboardingPage() {
     setError('');
     setLoading(true);
     try {
-      await updateCreatorProfile({
-        userId: user?.id,
-        displayName,
+      await updateCreatorProfile(session?.user?.id, {
+        display_name: displayName,
         slug,
         location,
-        instagramHandle,
-        premadeHashtag,
-        primaryColor,
-        bgColor,
+        instagram_handle: instagramHandle,
+        premade_hashtag: premadeHashtag,
+        primary_color: primaryColor,
+        bg_color: bgColor,
         is_onboarded: true,
       });
       navigate('/dashboard');
