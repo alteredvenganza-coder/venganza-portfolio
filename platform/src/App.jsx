@@ -2209,6 +2209,7 @@ const GlobalCartSidebar = () => {
 export default function App() {
   return (
     <BrowserRouter>
+      <SupabaseAuthProvider>
       <CartProvider>
         <AuthProvider>
           <EditorProvider>
@@ -2243,11 +2244,19 @@ export default function App() {
                 <Route path="media" element={<MediaLibrary />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
+
+              {/* Platform routes */}
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/onboarding" element={<OnboardingPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/landing" element={<LandingPage />} />
             </Routes>
             </ToastProvider>
           </EditorProvider>
         </AuthProvider>
       </CartProvider>
+      </SupabaseAuthProvider>
     </BrowserRouter>
   );
 }
