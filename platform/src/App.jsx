@@ -2124,6 +2124,10 @@ import MediaLibrary from './admin/pages/MediaLibrary';
 import AdminSettings from './admin/pages/AdminSettings';
 import ThemeEditor from './admin/pages/ThemeEditor';
 import LandingPage from './pages/LandingPage';
+import SignupPage from './pages/SignupPage';
+import LoginPage from './pages/LoginPage';
+import OnboardingPage from './pages/OnboardingPage';
+import DashboardPage from './pages/DashboardPage';
 
 const AdminGuard = () => {
   const { user, loading, login } = useAuth();
@@ -2240,6 +2244,12 @@ export default function App() {
                 <Route path="media" element={<MediaLibrary />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
+
+              {/* Platform auth routes */}
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/onboarding" element={<OnboardingPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
             </Routes>
             </ToastProvider>
           </EditorProvider>
