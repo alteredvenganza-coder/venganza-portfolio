@@ -23,6 +23,7 @@ const SECTIONS = [
       { id: 'hero-left', label: 'Hero Left (Premades)', parentId: 'hero',
         settings: [
           { type: 'image', key: 'images.heroLeft', label: 'Fallback Image', desc: 'Shown when no Instagram premades are loaded' },
+          { type: 'image', key: 'images.comingSoon', label: 'Coming Soon Image', desc: 'Shown as placeholder when no premades or fallback image exist' },
         ],
       },
       { id: 'hero-right', label: 'Hero Right (MAT Renders)', parentId: 'hero',

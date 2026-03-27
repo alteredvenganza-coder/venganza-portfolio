@@ -5,7 +5,13 @@
     "logo": "/logo.png",
     "aboutHero": "",
     "galleryBg": "",
-    "ogImage": ""
+    "ogImage": "",
+    "comingSoon": "",
+    "matRender1": "/theme/matRender1.jpeg",
+    "matRender2": "/theme/matRender2.png",
+    "matRender3": "/theme/matRender3.jpeg",
+    "matRender5": "/theme/matRender5.jpeg",
+    "matRender6": "/theme/matRender6.jpeg"
   },
   "colors": {
     "primary": "#7b1f24",

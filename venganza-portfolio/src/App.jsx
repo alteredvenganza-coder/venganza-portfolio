@@ -512,7 +512,10 @@ const Home = () => {
           {!slidesLoading && slides.length === 0 && theme.images?.heroLeft && (
             <img src={theme.images.heroLeft} alt="Hero" className="absolute inset-0 w-full h-full object-cover" />
           )}
-          {!slidesLoading && slides.length === 0 && !theme.images?.heroLeft && (
+          {!slidesLoading && slides.length === 0 && !theme.images?.heroLeft && theme.images?.comingSoon && (
+            <img src={theme.images.comingSoon} alt="Coming Soon" className="absolute inset-0 w-full h-full object-cover" />
+          )}
+          {!slidesLoading && slides.length === 0 && !theme.images?.heroLeft && !theme.images?.comingSoon && (
             <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
               <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs">Coming Soon</span>
             </div>
