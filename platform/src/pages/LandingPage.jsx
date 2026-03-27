@@ -1,6 +1,29 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 
 export default function LandingPage() {
+  const [cursor, setCursor] = useState({ x: -999, y: -999 });
+  const rafRef = useRef(null);
+
+  useEffect(() => {
+    const move = (x, y) => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => setCursor({ x, y }));
+    };
+    const onMouse = e => move(e.clientX, e.clientY);
+    const onTouch = e => {
+      const t = e.touches[0];
+      if (t) move(t.clientX, t.clientY);
+    };
+    window.addEventListener('mousemove', onMouse, { passive: true });
+    window.addEventListener('touchmove', onTouch, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', onMouse);
+      window.removeEventListener('touchmove', onTouch);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -24,6 +47,20 @@ export default function LandingPage() {
           position: 'absolute', inset: 0,
           backgroundImage: 'linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px)',
           backgroundSize: '60px 60px',
+        }} />
+        {/* Mouse/touch spotlight */}
+        <div style={{
+          position: 'fixed',
+          left: cursor.x - 300,
+          top: cursor.y - 300,
+          width: '600px',
+          height: '600px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.18) 0%, rgba(99,102,241,0.1) 30%, transparent 70%)',
+          filter: 'blur(20px)',
+          pointerEvents: 'none',
+          transition: 'left 0.08s ease-out, top 0.08s ease-out',
+          mixBlendMode: 'multiply',
         }} />
       </div>
 
