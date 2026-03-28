@@ -607,7 +607,7 @@ export default function DashboardPage() {
                         Authorise Show&apos;p Folio to read your Instagram posts and display them as premade listings.
                       </p>
                       <a
-                        href={`https://www.instagram.com/oauth/authorize?client_id=${import.meta.env.VITE_META_APP_ID}&redirect_uri=${encodeURIComponent(`${window.location.origin}/api/instagram-callback`)}&scope=instagram_basic,user_profile,user_media&response_type=code&state=${session?.user?.id}`}
+                        href={`https://www.instagram.com/oauth/authorize?client_id=${import.meta.env.VITE_META_APP_ID}&redirect_uri=${encodeURIComponent(`${window.location.origin}/api/instagram-callback`)}&scope=instagram_business_basic&response_type=code&state=${session?.user?.id}`}
                         className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white"
                         style={{ background: 'linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)', textDecoration: 'none' }}
                       >
