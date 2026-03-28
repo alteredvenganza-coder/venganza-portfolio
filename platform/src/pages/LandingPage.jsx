@@ -8,6 +8,7 @@ const ACCENT_BORDER= 'rgba(123,31,36,0.15)';
 
 export default function LandingPage() {
   const [cursor, setCursor] = useState({ x: -999, y: -999 });
+  const [openStep, setOpenStep] = useState(0);
   const rafRef = useRef(null);
 
   useEffect(() => {
@@ -178,29 +179,65 @@ export default function LandingPage() {
       </section>
 
       {/* ── How it works ── */}
-      <section style={{ position: 'relative', zIndex: 1, padding: '60px 48px' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.12em', textTransform: 'uppercase', textAlign: 'center', color: '#aeaeb2', marginBottom: '48px' }}>How it works</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1px', background: 'rgba(0,0,0,0.08)', borderRadius: '20px', overflow: 'hidden' }}>
+      <section style={{ position: 'relative', zIndex: 1, padding: '60px 24px' }}>
+        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+          <p style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.12em', textTransform: 'uppercase', textAlign: 'center', color: '#aeaeb2', marginBottom: '14px' }}>How it works</p>
+          <h2 style={{ fontSize: 'clamp(26px, 4vw, 36px)', fontWeight: '700', letterSpacing: '-0.03em', textAlign: 'center', color: '#1d1d1f', marginBottom: '36px', lineHeight: '1.15' }}>
+            Three steps to your portfolio
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {[
-              { number: '01', title: 'Connect Instagram', desc: 'Your feed becomes your portfolio — always fresh, always current.' },
-              { number: '02', title: 'Set your brand',    desc: 'Colors, name, and pricing in minutes. Make it entirely yours.' },
-              { number: '03', title: 'Go live',           desc: 'Share your link. Your audience is already waiting.' },
-            ].map((step) => (
-              <div key={step.number} style={{ padding: '36px 28px', background: '#ffffff', transition: 'background 0.2s' }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#fafafa'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; }}
-              >
-                <div style={{
-                  width: '32px', height: '32px', borderRadius: '8px', marginBottom: '18px',
-                  background: ACCENT_DIM, border: `1px solid ${ACCENT_BORDER}`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '11px', fontWeight: '700', color: ACCENT, letterSpacing: '0.04em',
-                }}>{step.number}</div>
-                <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1d1d1f', marginBottom: '8px', letterSpacing: '-0.02em' }}>{step.title}</h3>
-                <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#6e6e73' }}>{step.desc}</p>
-              </div>
-            ))}
+              { number: '01', title: 'Sign up',          desc: 'Create your account in under 60 seconds. No credit card needed.', icon: '◎' },
+              { number: '02', title: 'Connect & brand',  desc: 'Link Instagram, set your colors, name, and pricing. Make it entirely yours.', icon: '◑' },
+              { number: '03', title: 'Go live',          desc: 'Share your link. Your audience is already waiting.', icon: '↗' },
+            ].map((step, i) => {
+              const isOpen = openStep === i;
+              return (
+                <div
+                  key={step.number}
+                  onClick={() => setOpenStep(isOpen ? -1 : i)}
+                  style={{
+                    borderRadius: '14px',
+                    border: isOpen ? `1.5px solid ${ACCENT_BORDER}` : '1.5px solid rgba(0,0,0,0.07)',
+                    background: isOpen ? ACCENT_DIM : '#ffffff',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    transition: 'border-color 0.2s, background 0.2s',
+                  }}
+                >
+                  {/* Row header */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 18px' }}>
+                    <div style={{
+                      width: '34px', height: '34px', borderRadius: '10px', flexShrink: 0,
+                      background: isOpen ? ACCENT_DIM : 'rgba(0,0,0,0.04)',
+                      border: isOpen ? `1px solid ${ACCENT_BORDER}` : '1px solid rgba(0,0,0,0.07)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '14px', color: isOpen ? ACCENT : '#8e8e93',
+                      transition: 'all 0.2s',
+                    }}>{step.icon}</div>
+                    <span style={{
+                      fontSize: '15px', fontWeight: '600', color: isOpen ? '#1d1d1f' : '#3a3a3c',
+                      flex: 1, letterSpacing: '-0.01em',
+                    }}>{step.title}</span>
+                    <span style={{
+                      fontSize: '11px', fontWeight: '600', color: isOpen ? ACCENT : '#aeaeb2',
+                      marginRight: '4px', letterSpacing: '0.04em',
+                      transition: 'color 0.2s',
+                    }}>{step.number}</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                      style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.25s', flexShrink: 0 }}>
+                      <path d="M4 6l4 4 4-4" stroke={isOpen ? ACCENT : '#aeaeb2'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  {/* Expandable body */}
+                  {isOpen && (
+                    <div style={{ padding: '0 18px 18px 64px' }}>
+                      <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#6e6e73', margin: 0 }}>{step.desc}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
