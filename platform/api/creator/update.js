@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   // Whitelist updatable fields
   const allowed = ['display_name','logo_text','bio','tagline','location',
     'primary_color','accent_color','bg_color','text_color',
-    'instagram_handle','premade_hashtag','stripe_payment_link',
+    'instagram_handle','instagram_token','premade_hashtag','stripe_payment_link',
     'premade_basic_price','premade_premium_price','premade_subtitle1','premade_subtitle2',
     'archive_price','archive_cutoff_date','mat_price_single','mat_price_custom','mat_price_360',
     'image_hero_left','image_hero_right','image_logo',

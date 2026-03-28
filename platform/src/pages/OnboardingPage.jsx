@@ -181,6 +181,8 @@ export default function OnboardingPage() {
   // Step 2 fields
   const [instagramHandle, setInstagramHandle] = useState('');
   const [premadeHashtag, setPremadeHashtag] = useState('');
+  const [igConnected, setIgConnected] = useState(false);
+  const [showManualHandle, setShowManualHandle] = useState(false);
 
   // Step 3 fields
   const [primaryColor, setPrimaryColor] = useState('#ffffff');
@@ -192,6 +194,17 @@ export default function OnboardingPage() {
       navigate('/login', { replace: true });
     }
   }, [authLoading, session, navigate]);
+
+  // Check if returning from Instagram OAuth
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ig = params.get('instagram');
+    if (ig === 'connected') {
+      setIgConnected(true);
+      setStep(2);
+      window.history.replaceState({}, '', '/onboarding');
+    }
+  }, []);
 
   // Show spinner while auth is loading
   if (authLoading) {
@@ -369,37 +382,68 @@ export default function OnboardingPage() {
                 Connect your Instagram
               </h2>
               <p style={{ fontSize: '14px', color: '#6e6e73', margin: 0 }}>
-                We&apos;ll pull your latest premade posts automatically.
+                Your tagged posts will appear as premade listings automatically.
               </p>
             </div>
 
-            {/* Instagram Handle */}
-            <div>
-              <Label>Instagram Handle</Label>
-              <div
-                style={prefixWrapperBase}
-                onFocusCapture={onWrapperFocus}
-                onBlurCapture={onWrapperBlur}
-              >
-                <span style={prefixLabel}>@</span>
-                <input
-                  type="text"
-                  value={instagramHandle}
-                  onChange={(e) => setInstagramHandle(e.target.value.replace('@', ''))}
-                  placeholder="yourstudio"
-                  style={prefixInput}
-                />
+            {igConnected ? (
+              /* ── Already connected ── */
+              <div style={{ borderRadius: '16px', padding: '20px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '24px' }}>✓</span>
+                <div>
+                  <p style={{ margin: 0, fontWeight: '600', color: '#15803d', fontSize: '15px' }}>Instagram connected!</p>
+                  <p style={{ margin: '2px 0 0', fontSize: '13px', color: '#166534' }}>Your posts will sync automatically.</p>
+                </div>
               </div>
-            </div>
+            ) : (
+              /* ── Connect button ── */
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '8px 0' }}>
+                <a
+                  href={`https://www.instagram.com/oauth/authorize?client_id=${import.meta.env.VITE_META_APP_ID}&redirect_uri=${encodeURIComponent(`${window.location.origin}/api/instagram-callback`)}&scope=instagram_basic,user_profile,user_media&response_type=code&state=${session?.user?.id}`}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '10px',
+                    padding: '14px 28px', borderRadius: '14px',
+                    background: 'linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)',
+                    color: '#fff', fontWeight: '600', fontSize: '15px',
+                    textDecoration: 'none', width: '100%', justifyContent: 'center',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                  Connect with Instagram
+                </a>
+                {!showManualHandle && (
+                  <button
+                    onClick={() => setShowManualHandle(true)}
+                    style={{ fontSize: '13px', color: '#6e6e73', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                  >
+                    Enter handle manually instead
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Manual handle fallback */}
+            {showManualHandle && !igConnected && (
+              <div>
+                <Label>Instagram Handle</Label>
+                <div style={prefixWrapperBase} onFocusCapture={onWrapperFocus} onBlurCapture={onWrapperBlur}>
+                  <span style={prefixLabel}>@</span>
+                  <input
+                    type="text"
+                    value={instagramHandle}
+                    onChange={(e) => setInstagramHandle(e.target.value.replace('@', ''))}
+                    placeholder="yourstudio"
+                    style={prefixInput}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Premade Hashtag */}
             <div>
               <Label optional>Premade Hashtag</Label>
-              <div
-                style={prefixWrapperBase}
-                onFocusCapture={onWrapperFocus}
-                onBlurCapture={onWrapperBlur}
-              >
+              <div style={prefixWrapperBase} onFocusCapture={onWrapperFocus} onBlurCapture={onWrapperBlur}>
                 <span style={prefixLabel}>#</span>
                 <input
                   type="text"
@@ -415,13 +459,7 @@ export default function OnboardingPage() {
             </div>
 
             {/* Info callout */}
-            <div
-              style={{
-                borderRadius: '12px',
-                padding: '14px 16px',
-                backgroundColor: '#f5f5f7',
-              }}
-            >
+            <div style={{ borderRadius: '12px', padding: '14px 16px', backgroundColor: '#f5f5f7' }}>
               <p style={{ fontSize: '13px', color: '#6e6e73', lineHeight: '1.5', margin: 0 }}>
                 We pull your public Instagram posts matching this hashtag
                 and display them as premade listings — no manual uploading

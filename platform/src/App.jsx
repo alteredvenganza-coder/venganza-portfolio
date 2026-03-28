@@ -2127,6 +2127,7 @@ import ThemeEditor from './admin/pages/ThemeEditor';
 import LandingPage from './pages/LandingPage';
 import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
+import CookieBanner from './components/CookieBanner';
 import OnboardingPage from './pages/OnboardingPage';
 import DashboardPage from './pages/DashboardPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
@@ -2215,6 +2216,7 @@ export default function App() {
             <ToastProvider>
               <ThemeController />
               <AnimatedBackground />
+              <CookieBanner />
               <GlobalCartButton />
               <GlobalCartSidebar />
               <EditorToolbar />

@@ -136,6 +136,19 @@ export default function LandingPage() {
               onMouseEnter={e => { e.currentTarget.style.color = '#1d1d1f'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.2)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = '#6e6e73'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >Sign in →</Link>
+            <a
+              href="https://altered-venganza.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontSize: '15px', fontWeight: '500', color: '#6e6e73',
+                textDecoration: 'none', padding: '14px 24px', borderRadius: '980px',
+                border: '1px solid rgba(0,0,0,0.1)',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#1d1d1f'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.2)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#6e6e73'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >See live example ↗</a>
           </div>
         </div>
       </section>
@@ -277,7 +290,19 @@ export default function LandingPage() {
               >{link.label}</Link>
             ))}
           </div>
-          <span style={{ fontSize: '12px', color: '#aeaeb2' }}>Built for fashion creators</span>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <span style={{ fontSize: '12px', color: '#aeaeb2' }}>Built for fashion creators</span>
+            <span style={{ color: '#d2d2d7' }}>·</span>
+            <a href="https://www.iubenda.com/privacy-policy/your-id" target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: '#aeaeb2', textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#6e6e73')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#aeaeb2')}
+            >Privacy Policy</a>
+            <span style={{ color: '#d2d2d7' }}>·</span>
+            <a href="https://www.iubenda.com/terms-and-conditions/your-id" target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: '#aeaeb2', textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#6e6e73')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#aeaeb2')}
+            >Terms</a>
+          </div>
         </div>
       </footer>
 

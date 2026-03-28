@@ -113,6 +113,20 @@ export default function DashboardPage() {
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState(''); // '' | 'saved' | 'error'
   const [copied, setCopied] = useState(false);
+  const [igToast, setIgToast] = useState(''); // '' | 'connected' | 'error' | 'denied'
+
+  // ── Instagram OAuth toast ─────────────────────────────────────────────────────
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ig = params.get('instagram');
+    if (ig) {
+      setIgToast(ig);
+      setActiveSection('instagram');
+      // Clean the URL without reload
+      window.history.replaceState({}, '', '/dashboard');
+      setTimeout(() => setIgToast(''), 5000);
+    }
+  }, []);
 
   // ── auth guard ────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -497,39 +511,102 @@ export default function DashboardPage() {
               <div className="space-y-6">
                 <SectionHeader eyebrow="Social" heading="Instagram" />
 
+                {/* Toast */}
+                {igToast && (
+                  <div className={`rounded-xl px-4 py-3 text-sm font-medium ${
+                    igToast === 'connected'
+                      ? 'bg-green-50 text-green-700 border border-green-200'
+                      : 'bg-red-50 text-red-700 border border-red-200'
+                  }`}>
+                    {igToast === 'connected' && '✓ Instagram connected successfully!'}
+                    {igToast === 'error'     && 'Something went wrong. Please try again.'}
+                    {igToast === 'denied'    && 'Instagram connection was cancelled.'}
+                  </div>
+                )}
+
+                {/* Connection status card */}
                 <SettingsCard
-                  title="Instagram settings"
-                  description="Connect your Instagram presence to your portfolio."
+                  title="Instagram account"
+                  description="Connect your Instagram so your premade posts appear in your shop automatically."
                 >
-                  <Field
-                    label="Instagram Handle"
-                    hint="Enter without the @ symbol."
-                  >
+                  {creator?.instagram_handle && creator?.instagram_token ? (
+                    /* ── Connected state ── */
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" />
+                        <div>
+                          <p className="text-sm font-semibold text-[#1d1d1f]">
+                            @{creator.instagram_handle}
+                          </p>
+                          <p className="text-xs text-[#6e6e73]">Connected · token refreshes every 60 days</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={async () => {
+                            if (!session?.user?.id) return;
+                            await fetch(`/api/instagram-refresh?creator_id=${session.user.id}`);
+                            setIgToast('connected');
+                            setTimeout(() => setIgToast(''), 3000);
+                          }}
+                          className="text-xs text-[#6e6e73] hover:text-[#1d1d1f] underline"
+                        >
+                          Refresh token
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (!session?.user?.id) return;
+                            await fetch('/api/creator/update', {
+                              method: 'PATCH',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${session.access_token}`,
+                              },
+                              body: JSON.stringify({ instagram_token: null, instagram_handle: '' }),
+                            });
+                            setCreator(c => ({ ...c, instagram_token: null, instagram_handle: '' }));
+                            setFormData(f => ({ ...f, instagram_handle: '' }));
+                          }}
+                          className="text-xs text-red-500 hover:text-red-700 underline"
+                        >
+                          Disconnect
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* ── Not connected state ── */
+                    <div className="flex flex-col items-center gap-4 py-2">
+                      <p className="text-sm text-[#6e6e73] text-center max-w-xs">
+                        Authorise Show&apos;p Folio to read your Instagram posts and display them as premade listings.
+                      </p>
+                      <a
+                        href={`https://www.instagram.com/oauth/authorize?client_id=${import.meta.env.VITE_META_APP_ID}&redirect_uri=${encodeURIComponent(`${window.location.origin}/api/instagram-callback`)}&scope=instagram_basic,user_profile,user_media&response_type=code&state=${session?.user?.id}`}
+                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white"
+                        style={{ background: 'linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)', textDecoration: 'none' }}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        Connect with Instagram
+                      </a>
+                    </div>
+                  )}
+                </SettingsCard>
+
+                {/* Premade hashtag — always visible */}
+                <SettingsCard
+                  title="Premade hashtag"
+                  description="Posts tagged with this hashtag appear in your shop."
+                >
+                  <Field label="Hashtag" hint="Without the # symbol.">
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6e6e73] text-sm select-none pointer-events-none">
-                        @
-                      </span>
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6e6e73] text-sm select-none pointer-events-none">#</span>
                       <input
                         type="text"
-                        value={formData.instagram_handle}
-                        onChange={handleChange('instagram_handle')}
-                        placeholder="yourhandle"
+                        value={formData.premade_hashtag}
+                        onChange={handleChange('premade_hashtag')}
+                        placeholder="yourhashtag"
                         className={`${INPUT} pl-8`}
                       />
                     </div>
-                  </Field>
-
-                  <Field
-                    label="Premade Hashtag"
-                    hint="Hashtag used on your premade content posts."
-                  >
-                    <input
-                      type="text"
-                      value={formData.premade_hashtag}
-                      onChange={handleChange('premade_hashtag')}
-                      placeholder="#yourhashtag"
-                      className={INPUT}
-                    />
                   </Field>
                 </SettingsCard>
               </div>
@@ -589,6 +666,14 @@ export default function DashboardPage() {
 
           </div>
         </main>
+      </div>
+
+      {/* ── Privacy footer ── */}
+      <div className="text-center py-3 border-t border-gray-100 bg-white">
+        <span className="text-xs text-[#aeaeb2]">Show&apos;p Folio · </span>
+        <a href="https://www.iubenda.com/privacy-policy/your-id" target="_blank" rel="noopener noreferrer" className="text-xs text-[#aeaeb2] hover:text-[#6e6e73] underline">Privacy Policy</a>
+        <span className="text-xs text-[#aeaeb2]"> · </span>
+        <a href="https://www.iubenda.com/terms-and-conditions/your-id" target="_blank" rel="noopener noreferrer" className="text-xs text-[#aeaeb2] hover:text-[#6e6e73] underline">Terms</a>
       </div>
 
       {/* ── Fixed save bar ── */}

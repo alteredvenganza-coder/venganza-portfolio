@@ -34,6 +34,8 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [acceptedTos, setAcceptedTos] = useState(false);
+  const [acceptedLiability, setAcceptedLiability] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
@@ -48,10 +50,20 @@ export default function SignupPage() {
       setError('Passwords do not match.');
       return;
     }
+    if (!acceptedTos || !acceptedLiability) {
+      setError('Please accept both checkboxes to continue.');
+      return;
+    }
 
     setLoading(true);
     try {
       await signUp({ displayName, email, password });
+      // Log acceptance (fire-and-forget — don't block signup)
+      fetch('/api/log-acceptance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, accepted_tos: true, accepted_liability_clause: true }),
+      }).catch(() => {});
       setSentTo(email);
       setEmailSent(true);
     } catch (err) {
@@ -226,6 +238,45 @@ export default function SignupPage() {
             />
           </div>
 
+          {/* ── Checkbox 1: ToS ──────────────────────────────────────── */}
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={acceptedTos}
+              onChange={(e) => setAcceptedTos(e.target.checked)}
+              required
+              style={{ marginTop: '3px', accentColor: '#0071e3', flexShrink: 0 }}
+            />
+            <span style={{ fontSize: '13px', color: '#6e6e73', lineHeight: '1.5' }}>
+              I have read and agree to the{' '}
+              <a href="https://www.iubenda.com/terms-and-conditions/your-id" target="_blank" rel="noopener noreferrer" style={{ color: '#0071e3', textDecoration: 'none' }}>
+                Terms of Service
+              </a>{' '}
+              and{' '}
+              <a href="https://www.iubenda.com/privacy-policy/your-id" target="_blank" rel="noopener noreferrer" style={{ color: '#0071e3', textDecoration: 'none' }}>
+                Privacy Policy
+              </a>.
+            </span>
+          </label>
+
+          {/* ── Checkbox 2: Liability clause (Art. 1341-1342 c.c.) ── */}
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={acceptedLiability}
+              onChange={(e) => setAcceptedLiability(e.target.checked)}
+              required
+              style={{ marginTop: '3px', accentColor: '#0071e3', flexShrink: 0 }}
+            />
+            <span style={{ fontSize: '13px', color: '#6e6e73', lineHeight: '1.5' }}>
+              I specifically accept the clauses regarding{' '}
+              <strong style={{ color: '#1d1d1f', fontWeight: '500' }}>limitation of liability</strong>,{' '}
+              <strong style={{ color: '#1d1d1f', fontWeight: '500' }}>service interruptions</strong>, and{' '}
+              <strong style={{ color: '#1d1d1f', fontWeight: '500' }}>jurisdiction</strong>{' '}
+              (Art. 1341–1342 Italian Civil Code).
+            </span>
+          </label>
+
           {/* Error */}
           {error && (
             <p style={{ fontSize: '13px', color: '#ff3b30', textAlign: 'center', margin: '0' }}>
@@ -236,7 +287,7 @@ export default function SignupPage() {
           {/* Submit */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !acceptedTos || !acceptedLiability}
             style={{
               width: '100%',
               backgroundColor: '#0071e3',
