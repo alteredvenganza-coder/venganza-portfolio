@@ -44,8 +44,8 @@ function SaleToast({ closing, onDismiss }) {
 
         {/* Text */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1d1d1f', lineHeight: 1.3 }}>
-            New sale 🎉
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#1d1d1f', lineHeight: 1.3 }}>
+            You've got a sale! 💸
           </div>
           <div style={{ fontSize: 13, color: '#6e6e73', marginTop: 2, lineHeight: 1.4 }}>
             Premade Vol.3 — Noir Set
@@ -112,8 +112,8 @@ function StaticToastPreview() {
           💸
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1d1d1f', lineHeight: 1.3 }}>
-            New sale 🎉
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#1d1d1f', lineHeight: 1.3 }}>
+            You've got a sale! 💸
           </div>
           <div style={{ fontSize: 13, color: '#6e6e73', marginTop: 2, lineHeight: 1.4 }}>
             Premade Vol.3 — Noir Set
