@@ -2131,6 +2131,7 @@ import CookieBanner from './components/CookieBanner';
 import OnboardingPage from './pages/OnboardingPage';
 import DashboardPage from './pages/DashboardPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
+import NotificationDemoPage from './pages/NotificationDemoPage';
 
 const AdminGuard = () => {
   const { user, loading, login } = useAuth();
@@ -2257,6 +2258,9 @@ export default function App() {
                 <Route path="/onboarding" element={<OnboardingPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
               </Route>
+
+              {/* Utility / demo routes */}
+              <Route path="/notification-demo" element={<NotificationDemoPage />} />
             </Routes>
             </ToastProvider>
           </EditorProvider>
