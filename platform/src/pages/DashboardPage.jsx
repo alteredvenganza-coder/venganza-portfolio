@@ -114,6 +114,7 @@ export default function DashboardPage() {
   const [saveStatus, setSaveStatus] = useState(''); // '' | 'saved' | 'error'
   const [copied, setCopied] = useState(false);
   const [igToast, setIgToast] = useState(''); // '' | 'connected' | 'error' | 'denied'
+  const [igTest, setIgTest] = useState(null); // null | 'loading' | result object
 
   // ── Instagram OAuth toast ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -184,6 +185,18 @@ export default function DashboardPage() {
   const handleLogout = async () => {
     await signOut();
     navigate('/login');
+  };
+
+  const handleIgTest = async () => {
+    if (!session?.user?.id) return;
+    setIgTest('loading');
+    try {
+      const res = await fetch(`/api/instagram-test?creator_id=${session.user.id}`);
+      const data = await res.json();
+      setIgTest(data);
+    } catch (err) {
+      setIgTest({ ok: false, error: err.message });
+    }
   };
 
   // ── loading state ─────────────────────────────────────────────────────────────
@@ -541,7 +554,7 @@ export default function DashboardPage() {
                           <p className="text-xs text-[#6e6e73]">Connected · token refreshes every 60 days</p>
                         </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 items-center">
                         <button
                           onClick={async () => {
                             if (!session?.user?.id) return;
@@ -552,6 +565,19 @@ export default function DashboardPage() {
                           className="text-xs text-[#6e6e73] hover:text-[#1d1d1f] underline"
                         >
                           Refresh token
+                        </button>
+                        <button
+                          onClick={handleIgTest}
+                          disabled={igTest === 'loading'}
+                          style={{
+                            fontSize: 12, padding: '2px 10px', borderRadius: 8,
+                            border: '1px solid #d1d1d6', background: 'transparent',
+                            color: igTest === 'loading' ? '#aeaeb2' : '#1d1d1f',
+                            cursor: igTest === 'loading' ? 'not-allowed' : 'pointer',
+                            lineHeight: '20px',
+                          }}
+                        >
+                          {igTest === 'loading' ? '…' : 'Test Connection'}
                         </button>
                         <button
                           onClick={async () => {
@@ -566,6 +592,7 @@ export default function DashboardPage() {
                             });
                             setCreator(c => ({ ...c, instagram_token: null, instagram_handle: '' }));
                             setFormData(f => ({ ...f, instagram_handle: '' }));
+                            setIgTest(null);
                           }}
                           className="text-xs text-red-500 hover:text-red-700 underline"
                         >
@@ -590,6 +617,46 @@ export default function DashboardPage() {
                     </div>
                   )}
                 </SettingsCard>
+
+                {/* Instagram test result */}
+                {igTest && igTest !== 'loading' && (
+                  <div style={{
+                    background: 'rgba(255,255,255,0.7)', borderRadius: 12,
+                    border: `1.5px solid ${igTest.ok ? '#34c759' : '#ff3b30'}`,
+                    padding: '16px 20px',
+                  }}>
+                    {igTest.ok ? (
+                      <>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: '#1d1d1f', marginBottom: 4 }}>
+                          ✓ Connection verified
+                        </p>
+                        <p style={{ fontSize: 12, color: '#6e6e73', marginBottom: 2 }}>
+                          @{igTest.username} · {igTest.account_type} · {igTest.media_count} posts
+                        </p>
+                        <p style={{ fontSize: 11, color: '#aeaeb2', marginBottom: igTest.recent_posts?.length ? 12 : 0 }}>
+                          Token: •••••••{igTest.token_preview}
+                        </p>
+                        {igTest.recent_posts?.length > 0 && (
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                            {igTest.recent_posts.map((post) => {
+                              const src = post.media_type === 'VIDEO' ? post.thumbnail_url : post.media_url;
+                              return src ? (
+                                <img
+                                  key={post.id}
+                                  src={src}
+                                  alt={post.caption?.slice(0, 40) || 'Post'}
+                                  style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8 }}
+                                />
+                              ) : null;
+                            })}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <p style={{ fontSize: 13, color: '#ff3b30' }}>✗ {igTest.error || 'Test failed'}</p>
+                    )}
+                  </div>
+                )}
 
                 {/* Premade hashtag — always visible */}
                 <SettingsCard
