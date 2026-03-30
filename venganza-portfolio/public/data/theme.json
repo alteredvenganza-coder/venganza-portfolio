@@ -10,7 +10,8 @@
     "matRender2": "/theme/matRender2.png",
     "matRender3": "/theme/matRender3.jpeg",
     "matRender6": "/theme/matRender6.jpeg",
-    "matRender5": "/theme/matRender5.jpeg"
+    "matRender5": "/theme/matRender5.jpeg",
+    "matRender4": "/theme/matRender4.webp"
   },
   "colors": {
     "primary": "#7b1f24",
