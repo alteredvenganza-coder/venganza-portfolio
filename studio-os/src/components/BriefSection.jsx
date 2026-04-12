@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Check, Upload, X, ChevronDown, ChevronUp, Image } from 'lucide-react';
+import { Plus, Trash2, Check, Upload, X, ChevronDown, ChevronUp, Image, Sparkles } from 'lucide-react';
 import Btn from './Btn';
 import { genId } from '../lib/utils';
 import { uploadProjectFile, deleteProjectFile } from '../lib/db';
@@ -19,10 +19,13 @@ function emptyBrief() {
 
 export default function BriefSection({ brief: rawBrief, projectId, onUpdate }) {
   const brief   = { ...emptyBrief(), ...rawBrief };
-  const [open,  setOpen]    = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [newStep, setNewStep]     = useState('');
-  const fileRef = useRef(null);
+  const [open,       setOpen]      = useState(false);
+  const [uploading,  setUploading] = useState(false);
+  const [analyzing,  setAnalyzing] = useState(false);
+  const [analyzeErr, setAnalyzeErr]= useState('');
+  const [newStep,    setNewStep]   = useState('');
+  const fileRef    = useRef(null);
+  const aiFileRef  = useRef(null);
 
   function update(patch) {
     onUpdate({ ...brief, ...patch });
@@ -42,6 +45,54 @@ export default function BriefSection({ brief: rawBrief, projectId, onUpdate }) {
 
   function deleteStep(id) {
     update({ steps: brief.steps.filter(s => s.id !== id) });
+  }
+
+  // ── AI analysis of chat screenshots / documents ───────────────────────────
+  async function handleAiFiles(e) {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    if (aiFileRef.current) aiFileRef.current.value = '';
+
+    setAnalyzeErr('');
+    setAnalyzing(true);
+
+    try {
+      const filesData = await Promise.all(
+        files.map(file => new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload  = () => resolve({ fileData: reader.result.split(',')[1], mimeType: file.type });
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        }))
+      );
+
+      const res  = await fetch('/api/analyze-brief', {
+        method:  'POST',
+        headers: { 'content-type': 'application/json' },
+        body:    JSON.stringify({ files: filesData }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Errore analisi');
+
+      const { notes: aiNotes, steps: aiSteps } = data;
+
+      // Append notes (don't overwrite existing)
+      const newNotes = brief.notes
+        ? brief.notes + '\n\n— Estratto dall\'AI —\n' + aiNotes
+        : aiNotes;
+
+      // Append steps
+      const newSteps = [
+        ...brief.steps,
+        ...aiSteps.map(label => ({ id: genId(), label, done: false })),
+      ];
+
+      update({ notes: newNotes, steps: newSteps });
+    } catch (err) {
+      setAnalyzeErr(err.message);
+    } finally {
+      setAnalyzing(false);
+    }
   }
 
   // ── Images ─────────────────────────────────────────────────────────────────
@@ -112,6 +163,34 @@ export default function BriefSection({ brief: rawBrief, projectId, onUpdate }) {
             style={{ overflow: 'hidden' }}
           >
             <div className="px-4 sm:px-5 pb-5 flex flex-col gap-5 border-t border-border pt-4">
+
+              {/* ── AI analysis ── */}
+              <div className="rounded-lg border border-dashed border-border bg-paper p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={14} className="text-burgundy shrink-0" />
+                    <div>
+                      <p className="text-xs font-medium text-ink">Analizza con AI</p>
+                      <p className="text-[11px] text-subtle">Carica screenshot di chat, email o documenti — l'AI genera note e step</p>
+                    </div>
+                  </div>
+                  <label>
+                    <input
+                      ref={aiFileRef}
+                      type="file"
+                      accept="image/*,.pdf"
+                      multiple
+                      className="hidden"
+                      onChange={handleAiFiles}
+                    />
+                    <Btn as="span" variant="secondary" size="sm" disabled={analyzing} onClick={() => aiFileRef.current?.click()}>
+                      <Sparkles size={12} />
+                      {analyzing ? 'Analisi…' : 'Analizza'}
+                    </Btn>
+                  </label>
+                </div>
+                {analyzeErr && <p className="text-xs text-burgundy mt-2">{analyzeErr}</p>}
+              </div>
 
               {/* ── Note generali ── */}
               <div>

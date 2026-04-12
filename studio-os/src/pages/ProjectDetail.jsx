@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -36,7 +36,25 @@ export default function ProjectDetail() {
   const [confirmDel,  setConfirmDel]  = useState(false);
   const [pauseOpen,   setPauseOpen]   = useState(false);
   const [pauseReason, setPauseReason] = useState('');
+  // Local price state — salva solo onBlur per evitare race conditions DB
+  const [priceLocal,  setPriceLocal]  = useState('');
+  const [paidLocal,   setPaidLocal]   = useState('');
   const [newTask,     setNewTask]     = useState('');
+
+  // Sync local price fields when project loads or changes from outside
+  const prevId = useRef(null);
+  if (prevId.current !== id) {
+    prevId.current = id;
+    // can't call setState in render; will sync via useEffect below
+  }
+
+  useEffect(() => {
+    if (project) {
+      setPriceLocal(project.price ?? '');
+      setPaidLocal(project.paidAmount ?? '');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   if (!project) {
     return (
@@ -339,8 +357,9 @@ export default function ProjectDetail() {
               <input
                 type="number"
                 placeholder="€ 0"
-                value={project.price ?? ''}
-                onChange={e => updateProject(id, { price: e.target.value ? Number(e.target.value) : null })}
+                value={priceLocal}
+                onChange={e => setPriceLocal(e.target.value)}
+                onBlur={e => updateProject(id, { price: e.target.value ? Number(e.target.value) : null })}
                 className="text-sm"
               />
             </div>
@@ -351,8 +370,9 @@ export default function ProjectDetail() {
               <input
                 type="number"
                 placeholder="€ 0"
-                value={project.paidAmount ?? ''}
-                onChange={e => updateProject(id, { paidAmount: e.target.value ? Number(e.target.value) : null })}
+                value={paidLocal}
+                onChange={e => setPaidLocal(e.target.value)}
+                onBlur={e => updateProject(id, { paidAmount: e.target.value ? Number(e.target.value) : null })}
                 className="text-sm"
               />
             </div>
