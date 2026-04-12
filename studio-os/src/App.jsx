@@ -32,8 +32,8 @@ import LoginPage from './pages/LoginPage';
 // ── Loading screen ─────────────────────────────────────────────────────────────
 function Spinner() {
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center">
-      <p className="label-meta">Caricamento…</p>
+    <div style={{ minHeight: '100vh', background: '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7b1f24', fontFamily: 'sans-serif' }}>Caricamento…</p>
     </div>
   );
 }
