@@ -1,23 +1,59 @@
-import { useLocalStorage } from './useLocalStorage';
-import { STORAGE_CLIENTS, STORAGE_PROJECTS } from '../lib/constants';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { genId } from '../lib/utils';
+import * as db from '../lib/db';
+import { useAuth } from './useAuth';
 
-// ─── Clients ──────────────────────────────────────────────────────────────────
+// ── Store context ──────────────────────────────────────────────────────────────
+
+const StoreContext = createContext(null);
+
+export function StoreProvider({ children }) {
+  const { user } = useAuth();
+  const [clients,  setClients]  = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [loading,  setLoading]  = useState(true);
+
+  useEffect(() => {
+    if (!user) { setLoading(false); return; }
+
+    setLoading(true);
+    Promise.all([db.fetchClients(user.id), db.fetchProjects(user.id)])
+      .then(([c, p]) => { setClients(c); setProjects(p); })
+      .finally(() => setLoading(false));
+  }, [user]);
+
+  return (
+    <StoreContext.Provider value={{ clients, setClients, projects, setProjects, loading, user }}>
+      {children}
+    </StoreContext.Provider>
+  );
+}
+
+export function useStore() {
+  return useContext(StoreContext);
+}
+
+// ── Clients ────────────────────────────────────────────────────────────────────
+
 export function useClients() {
-  const [clients, setClients] = useLocalStorage(STORAGE_CLIENTS, []);
+  const { clients, setClients, user } = useStore();
 
-  function addClient(data) {
-    const client = { ...data, id: genId(), createdAt: new Date().toISOString() };
+  async function addClient(data) {
+    const client = await db.insertClient(user.id, data);
     setClients(prev => [client, ...prev]);
     return client;
   }
 
-  function updateClient(id, patch) {
-    setClients(prev => prev.map(c => (c.id === id ? { ...c, ...patch } : c)));
+  async function updateClient(id, patch) {
+    const current = clients.find(c => c.id === id);
+    const merged  = { ...current, ...patch };
+    setClients(prev => prev.map(c => c.id === id ? merged : c)); // optimistic
+    await db.patchClient(id, patch);
   }
 
-  function deleteClient(id) {
-    setClients(prev => prev.filter(c => c.id !== id));
+  async function deleteClient(id) {
+    setClients(prev => prev.filter(c => c.id !== id)); // optimistic
+    await db.removeClient(id);
   }
 
   function getClient(id) {
@@ -27,30 +63,31 @@ export function useClients() {
   return { clients, addClient, updateClient, deleteClient, getClient };
 }
 
-// ─── Projects ─────────────────────────────────────────────────────────────────
-export function useProjects() {
-  const [projects, setProjects] = useLocalStorage(STORAGE_PROJECTS, []);
+// ── Projects ───────────────────────────────────────────────────────────────────
 
-  function addProject(data) {
-    const project = {
-      tasks: [],
-      isPaused: false,
-      pausedReason: '',
-      paymentStatus: 'unpaid',
+export function useProjects() {
+  const { projects, setProjects, user } = useStore();
+
+  async function addProject(data) {
+    const payload = {
+      tasks: [], isPaused: false, pausedReason: '', paymentStatus: 'unpaid',
       ...data,
-      id: genId(),
-      createdAt: new Date().toISOString(),
     };
+    const project = await db.insertProject(user.id, payload);
     setProjects(prev => [project, ...prev]);
     return project;
   }
 
-  function updateProject(id, patch) {
-    setProjects(prev => prev.map(p => (p.id === id ? { ...p, ...patch } : p)));
+  async function updateProject(id, patch) {
+    const current = projects.find(p => p.id === id);
+    const merged  = { ...current, ...patch };
+    setProjects(prev => prev.map(p => p.id === id ? merged : p)); // optimistic
+    await db.patchProject(id, patch);
   }
 
-  function deleteProject(id) {
-    setProjects(prev => prev.filter(p => p.id !== id));
+  async function deleteProject(id) {
+    setProjects(prev => prev.filter(p => p.id !== id)); // optimistic
+    await db.removeProject(id);
   }
 
   function getProject(id) {
@@ -61,52 +98,28 @@ export function useProjects() {
     return projects.filter(p => p.clientId === clientId);
   }
 
-  // Tasks
-  function addTask(projectId, text) {
-    updateProject(projectId, {});
-    setProjects(prev =>
-      prev.map(p => {
-        if (p.id !== projectId) return p;
-        return {
-          ...p,
-          tasks: [...(p.tasks ?? []), { id: genId(), text, done: false }],
-        };
-      })
-    );
+  async function addTask(projectId, text) {
+    const project = projects.find(p => p.id === projectId);
+    const tasks   = [...(project.tasks ?? []), { id: genId(), text, done: false }];
+    await updateProject(projectId, { tasks });
   }
 
-  function toggleTask(projectId, taskId) {
-    setProjects(prev =>
-      prev.map(p => {
-        if (p.id !== projectId) return p;
-        return {
-          ...p,
-          tasks: p.tasks.map(t =>
-            t.id === taskId ? { ...t, done: !t.done } : t
-          ),
-        };
-      })
-    );
+  async function toggleTask(projectId, taskId) {
+    const project = projects.find(p => p.id === projectId);
+    const tasks   = project.tasks.map(t => t.id === taskId ? { ...t, done: !t.done } : t);
+    await updateProject(projectId, { tasks });
   }
 
-  function deleteTask(projectId, taskId) {
-    setProjects(prev =>
-      prev.map(p => {
-        if (p.id !== projectId) return p;
-        return { ...p, tasks: p.tasks.filter(t => t.id !== taskId) };
-      })
-    );
+  async function deleteTask(projectId, taskId) {
+    const project = projects.find(p => p.id === projectId);
+    const tasks   = project.tasks.filter(t => t.id !== taskId);
+    await updateProject(projectId, { tasks });
   }
 
   return {
     projects,
-    addProject,
-    updateProject,
-    deleteProject,
-    getProject,
-    getProjectsByClient,
-    addTask,
-    toggleTask,
-    deleteTask,
+    addProject, updateProject, deleteProject,
+    getProject, getProjectsByClient,
+    addTask, toggleTask, deleteTask,
   };
 }
