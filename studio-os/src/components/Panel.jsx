@@ -8,7 +8,7 @@ export default function Panel({ title, count, children, className = '', action }
       transition={{ duration: 0.25 }}
       className={`bg-white border border-border rounded-lg shadow-card ${className}`}
     >
-      <header className="flex items-center justify-between px-5 py-4 border-b border-border">
+      <header className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-border">
         <div className="flex items-center gap-2">
           <h3 className="font-display text-base font-semibold text-ink">{title}</h3>
           {count !== undefined && (
@@ -17,7 +17,7 @@ export default function Panel({ title, count, children, className = '', action }
         </div>
         {action}
       </header>
-      <div className="p-5">{children}</div>
+      <div className="p-4 sm:p-5">{children}</div>
     </motion.section>
   );
 }

@@ -19,7 +19,7 @@ export default function StageStepper({ current, onChange, disabled = false }) {
               disabled={disabled}
               title={STAGE_LABELS[stage]}
               className={[
-                'relative px-4 py-2 text-xs font-mono font-medium tracking-wide rounded transition-colors',
+                'relative px-2 sm:px-4 py-2 text-xs font-mono font-medium tracking-wide rounded transition-colors',
                 'focus:outline-none',
                 isActive
                   ? 'ring-1 ring-offset-1'
@@ -52,7 +52,7 @@ export default function StageStepper({ current, onChange, disabled = false }) {
 
             {idx < STAGES.length - 1 && (
               <div
-                className="w-5 h-px shrink-0"
+                className="w-3 sm:w-5 h-px shrink-0"
                 style={{ backgroundColor: idx < currentIdx ? '#c9888b' : '#e8e4dc' }}
               />
             )}

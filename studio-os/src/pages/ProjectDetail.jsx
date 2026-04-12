@@ -105,7 +105,7 @@ export default function ProjectDetail() {
       </div>
 
       {/* Stage stepper */}
-      <div className="bg-white border border-border rounded-lg shadow-card px-5 py-4 mb-5">
+      <div className="bg-white border border-border rounded-lg shadow-card px-3 sm:px-5 py-3 sm:py-4 mb-5">
         <StageStepper
           current={project.stage}
           onChange={handleStageChange}
@@ -120,17 +120,17 @@ export default function ProjectDetail() {
       </div>
 
       {/* Main grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-5">
         {/* ── Left column (main info) ── */}
-        <div className="lg:col-span-2 flex flex-col gap-5">
+        <div className="lg:col-span-2 flex flex-col gap-3 lg:gap-5">
 
           {/* Title card */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-border rounded-lg shadow-card p-5"
+            className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5"
           >
-            <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex items-start justify-between gap-2 sm:gap-4 mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Badge
@@ -145,22 +145,22 @@ export default function ProjectDetail() {
                     </Link>
                   )}
                 </div>
-                <h1 className="font-display text-2xl font-semibold text-ink leading-tight">
+                <h1 className="font-display text-xl sm:text-2xl font-semibold text-ink leading-tight">
                   {project.title}
                 </h1>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 <Btn variant="secondary" size="sm" onClick={() => setEditOpen(true)}>
-                  <Edit2 size={13} />
+                  <Edit2 size={13} /> <span className="hidden sm:inline">Modifica</span>
                 </Btn>
                 {project.isPaused ? (
                   <Btn variant="secondary" size="sm" onClick={handleResume}>
-                    <Play size={13} /> Riprendi
+                    <Play size={13} /> <span className="hidden sm:inline">Riprendi</span>
                   </Btn>
                 ) : (
                   <Btn variant="ghost" size="sm" onClick={() => setPauseOpen(true)}>
-                    <Pause size={13} /> Pausa
+                    <Pause size={13} /> <span className="hidden sm:inline">Pausa</span>
                   </Btn>
                 )}
                 <Btn variant="danger" size="sm" onClick={() => setConfirmDel(true)}>
@@ -177,7 +177,7 @@ export default function ProjectDetail() {
           </motion.div>
 
           {/* Tasks */}
-          <div className="bg-white border border-border rounded-lg shadow-card p-5">
+          <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-display text-base font-semibold text-ink">Checklist</h3>
               {tasks.length > 0 && (
@@ -256,7 +256,7 @@ export default function ProjectDetail() {
           </div>
 
           {/* Next action + missing info */}
-          <div className="bg-white border border-border rounded-lg shadow-card p-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
             <div>
               <p className="label-meta mb-2 flex items-center gap-1">
                 <MessageSquare size={11} /> Prossima azione
@@ -281,10 +281,10 @@ export default function ProjectDetail() {
         </div>
 
         {/* ── Right column (meta) ── */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 lg:gap-4">
 
           {/* Deadline */}
-          <div className="bg-white border border-border rounded-lg shadow-card p-5">
+          <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5">
             <p className="label-meta mb-3 flex items-center gap-1">
               <Calendar size={11} /> Deadline
             </p>
@@ -317,7 +317,7 @@ export default function ProjectDetail() {
           </div>
 
           {/* Price + payment */}
-          <div className="bg-white border border-border rounded-lg shadow-card p-5">
+          <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5">
             <p className="label-meta mb-3 flex items-center gap-1">
               <DollarSign size={11} /> Pagamento
             </p>
@@ -348,7 +348,7 @@ export default function ProjectDetail() {
           </div>
 
           {/* Stage shortcut */}
-          <div className="bg-white border border-border rounded-lg shadow-card p-5">
+          <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5">
             <p className="label-meta mb-3">Stage attuale</p>
             <Badge
               label={STAGE_LABELS[project.stage]}

@@ -48,7 +48,7 @@ export default function Layout({ children }) {
     <div className="min-h-screen bg-cream">
       {/* ── Header ── */}
       <header className="sticky top-0 z-40 bg-white border-b border-border">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center gap-6">
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 h-14 flex items-center gap-6">
           {/* Logo */}
           <Link to="/" className="shrink-0">
             <span className="font-display text-base font-semibold text-ink tracking-tight">
@@ -72,13 +72,13 @@ export default function Layout({ children }) {
                 }
               >
                 <Icon size={14} />
-                {label}
+                <span className="hidden sm:inline">{label}</span>
               </NavLink>
             ))}
           </nav>
 
           {/* Search */}
-          <div className="flex-1 max-w-xs relative ml-auto">
+          <div className="flex-1 max-w-xs hidden sm:block relative ml-auto">
             <div className="relative">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-subtle pointer-events-none" />
               <input
@@ -102,7 +102,7 @@ export default function Layout({ children }) {
 
             {/* Results dropdown */}
             {focused && q && (
-              <div className="absolute top-full mt-1 w-full bg-white border border-border rounded-lg shadow-modal overflow-hidden z-50">
+              <div className="absolute top-full mt-1 w-full bg-white border border-border rounded-lg shadow-modal overflow-hidden z-50 max-h-72 overflow-y-auto">
                 {!hasResults && (
                   <p className="px-4 py-3 text-xs text-subtle">Nessun risultato per "{q}"</p>
                 )}

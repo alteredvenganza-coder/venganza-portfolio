@@ -45,7 +45,7 @@ export default function ProjectCard({ project, clientName, compact = false }) {
           </div>
 
           {/* Title */}
-          <p className="font-medium text-sm text-ink leading-snug mb-1 line-clamp-2">
+          <p className="font-medium text-xs sm:text-sm text-ink leading-snug mb-1 line-clamp-2">
             {project.title}
           </p>
 
@@ -62,7 +62,7 @@ export default function ProjectCard({ project, clientName, compact = false }) {
 
           {/* Footer: deadline + payment */}
           {!compact && (
-            <div className="flex items-center justify-between mt-3">
+            <div className="flex flex-wrap items-center justify-between mt-2 sm:mt-3 gap-1">
               <div>
                 {project.deadline ? (
                   <span

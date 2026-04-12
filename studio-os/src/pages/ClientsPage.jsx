@@ -30,25 +30,25 @@ export default function ClientsPage() {
   return (
     <>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
         <div>
-          <h1 className="font-display text-3xl font-semibold text-ink">Clienti</h1>
-          <p className="text-sm text-muted mt-1">
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold text-ink">Clienti</h1>
+          <p className="text-xs sm:text-sm text-muted mt-1">
             {clients.length} {clients.length === 1 ? 'cliente' : 'clienti'}
           </p>
         </div>
         <Btn variant="primary" onClick={() => setShowForm(true)}>
-          <Plus size={14} /> Nuovo cliente
+          <Plus size={14} /> <span className="hidden sm:inline">Nuovo cliente</span>
         </Btn>
       </div>
 
       {/* Search */}
       {clients.length > 0 && (
-        <div className="relative mb-6 max-w-sm">
+        <div className="relative mb-6 w-full sm:max-w-sm">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-subtle pointer-events-none" />
           <input
             type="text"
-            placeholder="Cerca per nome, brand, email…"
+            placeholder="Cerca per nome, brand…"
             value={query}
             onChange={e => setQuery(e.target.value)}
             className="pl-9 text-sm"

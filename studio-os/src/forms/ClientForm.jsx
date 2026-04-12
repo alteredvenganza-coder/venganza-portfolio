@@ -49,9 +49,9 @@ export default function ClientForm({ open, onClose, onSave, initialValues }) {
       onClose={onClose}
       title={isEdit ? 'Modifica cliente' : 'Nuovo cliente'}
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-4">
         {/* Name + Brand */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <Field label="Nome" required error={errors.name}>
             <input
               type="text"
@@ -72,7 +72,7 @@ export default function ClientForm({ open, onClose, onSave, initialValues }) {
         </div>
 
         {/* Email + Phone */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <Field label="Email">
             <input
               type="email"
@@ -110,14 +110,14 @@ export default function ClientForm({ open, onClose, onSave, initialValues }) {
             placeholder="Note libere sul cliente…"
             value={form.notes}
             onChange={e => set('notes', e.target.value)}
-            className="resize-y"
+            className="resize-none sm:resize-y"
           />
         </Field>
 
         {/* Actions */}
-        <div className="flex justify-end gap-2 pt-2 border-t border-border">
-          <Btn variant="secondary" type="button" onClick={onClose}>Annulla</Btn>
-          <Btn variant="primary" type="submit">
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 sm:pt-4 border-t border-border">
+          <Btn variant="secondary" type="button" onClick={onClose} className="w-full sm:w-auto">Annulla</Btn>
+          <Btn variant="primary" type="submit" className="w-full sm:w-auto">
             {isEdit ? 'Salva modifiche' : 'Aggiungi cliente'}
           </Btn>
         </div>

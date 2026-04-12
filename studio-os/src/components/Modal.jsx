@@ -44,7 +44,7 @@ export default function Modal({ open, onClose, title, children, width = 'max-w-x
             className={`relative w-full ${width} bg-white rounded-lg shadow-modal z-10 max-h-[90vh] overflow-y-auto`}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border sticky top-0 bg-white rounded-t-lg">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-border sticky top-0 bg-white rounded-t-lg">
               <h2 className="font-display text-lg font-semibold text-ink">{title}</h2>
               <button
                 onClick={onClose}
@@ -56,7 +56,7 @@ export default function Modal({ open, onClose, title, children, width = 'max-w-x
             </div>
 
             {/* Body */}
-            <div className="px-6 py-5">
+            <div className="px-4 sm:px-6 py-4 sm:py-5">
               {children}
             </div>
           </motion.div>

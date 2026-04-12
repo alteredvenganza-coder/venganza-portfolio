@@ -55,19 +55,19 @@ export default function ClientDetail() {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white border border-border rounded-lg shadow-card p-6 mb-6"
+        className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-6 mb-6"
       >
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+          <div className="flex items-start gap-3 sm:gap-4">
             {/* Avatar */}
-            <div className="w-14 h-14 rounded-full bg-burgundy-pale flex items-center justify-center shrink-0">
-              <span className="font-display text-xl font-semibold text-burgundy">
+            <div className="w-12 sm:w-14 h-12 sm:h-14 rounded-full bg-burgundy-pale flex items-center justify-center shrink-0">
+              <span className="font-display text-lg sm:text-xl font-semibold text-burgundy">
                 {initials(client.name)}
               </span>
             </div>
 
             <div>
-              <h1 className="font-display text-2xl font-semibold text-ink">{client.name}</h1>
+              <h1 className="font-display text-xl sm:text-2xl font-semibold text-ink">{client.name}</h1>
               {client.brand && (
                 <p className="label-meta mt-1">{client.brand}</p>
               )}
@@ -76,7 +76,7 @@ export default function ClientDetail() {
 
           <div className="flex items-center gap-2 shrink-0">
             <Btn variant="secondary" size="sm" onClick={() => setEditOpen(true)}>
-              <Edit2 size={13} /> Modifica
+              <Edit2 size={13} /> <span className="hidden sm:inline">Modifica</span>
             </Btn>
             <Btn variant="danger" size="sm" onClick={() => setConfirmDel(true)}>
               <Trash2 size={13} />
@@ -85,11 +85,11 @@ export default function ClientDetail() {
         </div>
 
         {/* Contact info */}
-        <div className="flex flex-wrap gap-4 mt-5 pt-5 border-t border-border">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-border">
           {client.email && (
             <a
               href={`mailto:${client.email}`}
-              className="flex items-center gap-1.5 text-sm text-muted hover:text-burgundy transition-colors"
+              className="flex items-center gap-1.5 text-xs sm:text-sm text-muted hover:text-burgundy transition-colors"
             >
               <Mail size={13} /> {client.email}
             </a>
@@ -97,17 +97,17 @@ export default function ClientDetail() {
           {client.phone && (
             <a
               href={`tel:${client.phone}`}
-              className="flex items-center gap-1.5 text-sm text-muted hover:text-burgundy transition-colors"
+              className="flex items-center gap-1.5 text-xs sm:text-sm text-muted hover:text-burgundy transition-colors"
             >
               <Phone size={13} /> {client.phone}
             </a>
           )}
           {client.language && (
-            <span className="flex items-center gap-1.5 text-sm text-muted">
+            <span className="flex items-center gap-1.5 text-xs sm:text-sm text-muted">
               <Globe size={13} /> {client.language}
             </span>
           )}
-          <span className="ml-auto label-meta">
+          <span className="sm:ml-auto label-meta">
             Cliente dal {formatDate(client.createdAt)}
           </span>
         </div>
@@ -121,12 +121,12 @@ export default function ClientDetail() {
       </motion.div>
 
       {/* Projects */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display text-xl font-semibold text-ink">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-2 sm:gap-4">
+        <h2 className="font-display text-lg sm:text-xl font-semibold text-ink">
           Progetti <span className="text-muted font-sans text-base font-normal">({projects.length})</span>
         </h2>
         <Btn variant="primary" size="sm" onClick={() => setAddProjOpen(true)}>
-          <Plus size={14} /> Nuovo progetto
+          <Plus size={14} /> <span className="hidden sm:inline">Nuovo progetto</span>
         </Btn>
       </div>
 
@@ -143,7 +143,7 @@ export default function ClientDetail() {
           {active.length > 0 && (
             <div className="mb-4">
               <p className="label-meta mb-3">Attivi ({active.length})</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
                 {active.map(p => (
                   <ProjectCard key={p.id} project={p} />
                 ))}
@@ -153,7 +153,7 @@ export default function ClientDetail() {
           {completed.length > 0 && (
             <div>
               <p className="label-meta mb-3">Completati ({completed.length})</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
                 {completed.map(p => (
                   <ProjectCard key={p.id} project={p} />
                 ))}

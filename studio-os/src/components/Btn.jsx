@@ -15,8 +15,8 @@ export default function Btn({
     'inline-flex items-center gap-1.5 font-sans font-medium rounded transition-colors focus:outline-none select-none';
 
   const sizes = {
-    sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-sm',
+    sm: 'px-3 py-2 sm:py-1.5 text-xs',
+    md: 'px-4 py-2.5 sm:py-2 text-sm',
     lg: 'px-5 py-2.5 text-sm',
   };
 

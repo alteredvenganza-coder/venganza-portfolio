@@ -71,7 +71,7 @@ export default function ProjectForm({
       title={isEdit ? 'Modifica progetto' : 'Nuovo progetto'}
       width="max-w-2xl"
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-4">
         {/* Client */}
         <Field label="Cliente" required error={errors.clientId}>
           <select

@@ -53,29 +53,29 @@ export default function Dashboard() {
   return (
     <>
       {/* ── Header ── */}
-      <div className="flex items-start justify-between mb-8 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 sm:mb-8 gap-3 sm:gap-4">
         <div>
-          <h1 className="font-display text-3xl font-semibold text-ink">Dashboard</h1>
-          <p className="text-sm text-muted mt-1">
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold text-ink">Dashboard</h1>
+          <p className="text-xs sm:text-sm text-muted mt-1">
             {active.length} {active.length === 1 ? 'progetto attivo' : 'progetti attivi'}
             {clients.length > 0 && ` · ${clients.length} clienti`}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Btn variant="secondary" size="sm" onClick={() => setShowAddClient(true)}>
-            <Plus size={14} /> Cliente
+            <Plus size={14} /> <span className="hidden sm:inline">Cliente</span>
           </Btn>
           <Btn variant="primary" size="sm" onClick={() => setShowAddProject(true)}>
-            <Plus size={14} /> Progetto
+            <Plus size={14} /> <span className="hidden sm:inline">Progetto</span>
           </Btn>
         </div>
       </div>
 
       {/* ── Type filter ── */}
-      <div className="flex items-center gap-2 mb-6 flex-wrap">
+      <div className="flex items-center gap-1 sm:gap-2 mb-5 sm:mb-6 overflow-x-auto pb-1">
         <button
           onClick={() => setTypeFilter('all')}
-          className={`px-3 py-1.5 text-xs font-mono rounded border transition-colors ${
+          className={`px-2 sm:px-3 py-1.5 text-xs font-mono rounded border transition-colors whitespace-nowrap ${
             typeFilter === 'all'
               ? 'bg-ink text-white border-ink'
               : 'bg-white text-muted border-border hover:border-ink/30'
@@ -87,7 +87,7 @@ export default function Dashboard() {
           <button
             key={t}
             onClick={() => setTypeFilter(t)}
-            className={`px-3 py-1.5 text-xs font-mono rounded border transition-colors ${
+            className={`px-2 sm:px-3 py-1.5 text-xs font-mono rounded border transition-colors whitespace-nowrap ${
               typeFilter === t
                 ? 'bg-ink text-white border-ink'
                 : 'bg-white text-muted border-border hover:border-ink/30'
@@ -99,7 +99,7 @@ export default function Dashboard() {
       </div>
 
       {/* ── 3 Info panels ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
         {/* Urgent */}
         <Panel
           title="Urgenti"
@@ -161,7 +161,7 @@ export default function Dashboard() {
 
       {/* ── Kanban ── */}
       <div>
-        <h2 className="font-display text-xl font-semibold text-ink mb-4">Kanban</h2>
+        <h2 className="font-display text-lg sm:text-xl font-semibold text-ink mb-4">Kanban</h2>
 
         {projects.length === 0 ? (
           <div className="bg-white border border-border rounded-lg p-10 text-center">
@@ -172,7 +172,7 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="overflow-x-auto pb-2">
-            <div className="flex gap-4 min-w-max">
+            <div className="flex gap-3 sm:gap-4 min-w-max">
               {STAGES.map(stage => {
                 const col = projectsForStage(stage);
                 return (
@@ -181,7 +181,7 @@ export default function Dashboard() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="w-52 shrink-0"
+                    className="w-40 sm:w-52 shrink-0"
                   >
                     {/* Column header */}
                     <div

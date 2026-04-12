@@ -11,10 +11,10 @@ export default function ClientCard({ client, projectCount = 0 }) {
     >
       <Link
         to={`/clients/${client.id}`}
-        className="flex items-center gap-4 p-4 bg-white border border-border rounded-lg shadow-card hover:border-burgundy-muted transition-colors group"
+        className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-border rounded-lg shadow-card hover:border-burgundy-muted transition-colors group"
       >
         {/* Avatar */}
-        <div className="w-10 h-10 rounded-full bg-burgundy-pale flex items-center justify-center shrink-0">
+        <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-full bg-burgundy-pale flex items-center justify-center shrink-0">
           <span className="font-display text-sm font-semibold text-burgundy">
             {initials(client.name)}
           </span>
@@ -26,7 +26,7 @@ export default function ClientCard({ client, projectCount = 0 }) {
           {client.brand && (
             <p className="label-meta mt-0.5 truncate">{client.brand}</p>
           )}
-          <div className="flex items-center gap-3 mt-1">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mt-1">
             {client.email && (
               <span className="flex items-center gap-1 text-[11px] text-subtle">
                 <Mail size={11} /> {client.email}
@@ -42,7 +42,7 @@ export default function ClientCard({ client, projectCount = 0 }) {
 
         {/* Project count */}
         <div className="text-center shrink-0">
-          <p className="text-lg font-display font-semibold text-ink">{projectCount}</p>
+          <p className="text-base sm:text-lg font-display font-semibold text-ink">{projectCount}</p>
           <p className="label-meta">{projectCount === 1 ? 'progetto' : 'progetti'}</p>
         </div>
 
