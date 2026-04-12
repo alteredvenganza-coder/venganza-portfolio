@@ -1,6 +1,26 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Component } from 'react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { StoreProvider, useStore } from './hooks/useStore';
+
+// ── Error boundary ─────────────────────────────────────────────────────────────
+class ErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="min-h-screen bg-cream flex items-center justify-center p-6">
+          <div className="bg-white border border-border rounded-lg p-6 max-w-lg shadow-card">
+            <p className="label-meta text-burgundy mb-2">Errore di configurazione</p>
+            <p className="text-sm text-ink font-mono whitespace-pre-wrap">{this.state.error.message}</p>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import ClientsPage from './pages/ClientsPage';
@@ -51,6 +71,7 @@ function ProtectedApp() {
 // ── Root ───────────────────────────────────────────────────────────────────────
 export default function App() {
   return (
+    <ErrorBoundary>
     <AuthProvider>
       <BrowserRouter>
         <Routes>
@@ -59,5 +80,6 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </ErrorBoundary>
   );
 }
