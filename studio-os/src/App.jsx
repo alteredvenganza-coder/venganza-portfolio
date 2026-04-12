@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Component } from 'react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { StoreProvider, useStore } from './hooks/useStore';
+import { supabaseConfigured } from './lib/supabase';
 
 // ── Error boundary ─────────────────────────────────────────────────────────────
 class ErrorBoundary extends Component {
@@ -70,6 +71,20 @@ function ProtectedApp() {
 
 // ── Root ───────────────────────────────────────────────────────────────────────
 export default function App() {
+  if (!supabaseConfigured) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: 'sans-serif' }}>
+        <div style={{ background: '#fff', border: '1px solid #e8e4dc', borderRadius: '8px', padding: '24px', maxWidth: '480px', width: '100%' }}>
+          <p style={{ fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#7b1f24', marginBottom: '8px' }}>Configurazione mancante</p>
+          <p style={{ fontSize: '14px', color: '#1a1a1a', lineHeight: 1.6 }}>
+            Le variabili <code>VITE_SUPABASE_URL</code> e <code>VITE_SUPABASE_ANON_KEY</code> non sono impostate.<br /><br />
+            Vai su <strong>Vercel → Settings → Environment Variables</strong>, aggiungile e rideploya.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <ErrorBoundary>
     <AuthProvider>
