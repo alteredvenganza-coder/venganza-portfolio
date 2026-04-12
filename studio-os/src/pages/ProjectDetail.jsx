@@ -10,6 +10,7 @@ import Badge from '../components/Badge';
 import Btn from '../components/Btn';
 import Field from '../components/Field';
 import Modal from '../components/Modal';
+import BriefSection from '../components/BriefSection';
 import ProjectForm from '../forms/ProjectForm';
 import { useClients, useProjects } from '../hooks/useStore';
 import {
@@ -361,6 +362,15 @@ export default function ProjectDetail() {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* ── Brief & Referenze ── */}
+      <div className="mt-5">
+        <BriefSection
+          brief={project.brief ?? {}}
+          projectId={id}
+          onUpdate={(brief) => updateProject(id, { brief })}
+        />
       </div>
 
       {/* ── Edit modal ── */}

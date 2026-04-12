@@ -40,6 +40,8 @@ create table if not exists public.projects (
   next_action     text,
   missing_info    text,
   tasks           jsonb default '[]',
+  files           jsonb default '[]',
+  brief           jsonb default '{}',
   created_at      timestamptz default now()
 );
 
@@ -49,3 +51,25 @@ create policy "Owner full access — projects"
   on public.projects for all
   using  (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+-- ── Aggiungi colonne se la tabella esiste già ─────────────────
+alter table public.projects
+  add column if not exists files jsonb default '[]',
+  add column if not exists brief jsonb default '{}';
+
+-- ── Storage bucket per immagini di progetto ───────────────────
+insert into storage.buckets (id, name, public)
+  values ('project-files', 'project-files', true)
+  on conflict (id) do nothing;
+
+create policy "Auth upload project-files"
+  on storage.objects for insert to authenticated
+  with check (bucket_id = 'project-files');
+
+create policy "Public read project-files"
+  on storage.objects for select
+  using (bucket_id = 'project-files');
+
+create policy "Auth delete project-files"
+  on storage.objects for delete to authenticated
+  using (bucket_id = 'project-files');

@@ -41,7 +41,9 @@ function projectFromDb(row) {
     paymentStatus: row.payment_status,
     nextAction:    row.next_action,
     missingInfo:   row.missing_info,
-    tasks:         row.tasks ?? [],
+    tasks:         row.tasks  ?? [],
+    files:         row.files  ?? [],
+    brief:         row.brief  ?? {},
     createdAt:     row.created_at,
   };
 }
@@ -60,7 +62,9 @@ function projectToDb(p) {
   if ('paymentStatus' in p) row.payment_status = p.paymentStatus;
   if ('nextAction'    in p) row.next_action    = p.nextAction;
   if ('missingInfo'   in p) row.missing_info   = p.missingInfo;
-  if ('tasks'         in p) row.tasks          = p.tasks ?? [];
+  if ('tasks'         in p) row.tasks          = p.tasks  ?? [];
+  if ('files'         in p) row.files          = p.files  ?? [];
+  if ('brief'         in p) row.brief          = p.brief  ?? {};
   return row;
 }
 
@@ -131,5 +135,21 @@ export async function patchProject(id, patch) {
 
 export async function removeProject(id) {
   const { error } = await supabase.from('projects').delete().eq('id', id);
+  if (error) throw error;
+}
+
+// ── Storage — project files ───────────────────────────────────────────────────
+
+export async function uploadProjectFile(projectId, file) {
+  const ext  = file.name.split('.').pop().toLowerCase();
+  const path = `${projectId}/${Date.now()}.${ext}`;
+  const { error } = await supabase.storage.from('project-files').upload(path, file);
+  if (error) throw error;
+  const { data } = supabase.storage.from('project-files').getPublicUrl(path);
+  return { url: data.publicUrl, path };
+}
+
+export async function deleteProjectFile(storagePath) {
+  const { error } = await supabase.storage.from('project-files').remove([storagePath]);
   if (error) throw error;
 }

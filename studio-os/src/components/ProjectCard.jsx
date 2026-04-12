@@ -9,10 +9,39 @@ import {
 } from '../lib/constants';
 import { formatDate, isOverdue, daysUntil } from '../lib/utils';
 
+function CountdownPill({ deadline }) {
+  if (!deadline) return null;
+  const overdue = isOverdue(deadline);
+  const days    = daysUntil(deadline);
+
+  let bg, color, label;
+  if (overdue) {
+    bg = '#f5e8e8'; color = '#7b1f24'; label = 'Scaduto';
+  } else if (days <= 3) {
+    bg = '#fce8e6'; color = '#c0392b'; label = `${days}g`;
+  } else if (days <= 7) {
+    bg = '#fff8e1'; color = '#7a6010'; label = `${days}g`;
+  } else if (days <= 14) {
+    bg = '#fff8e1'; color = '#7a6010'; label = `${days}g`;
+  } else {
+    return null; // non invasivo: non mostrare se manca ancora molto
+  }
+
+  return (
+    <span
+      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-medium"
+      style={{ background: bg, color }}
+    >
+      {overdue && <AlertCircle size={9} />}
+      {label}
+    </span>
+  );
+}
+
 export default function ProjectCard({ project, clientName, compact = false }) {
-  const overdue    = isOverdue(project.deadline);
-  const days       = daysUntil(project.deadline);
-  const urgent     = days !== null && days <= 3 && days >= 0;
+  const overdue = isOverdue(project.deadline);
+  const days    = daysUntil(project.deadline);
+  const urgent  = days !== null && days <= 3 && days >= 0;
 
   return (
     <motion.div whileHover={{ y: -1 }} transition={{ duration: 0.15 }}>
@@ -25,23 +54,26 @@ export default function ProjectCard({ project, clientName, compact = false }) {
         ].join(' ')}
       >
         <div className={compact ? 'p-3' : 'p-4'}>
-          {/* Top row: type + stage */}
-          <div className="flex items-center gap-2 mb-2">
+          {/* Top row: type + stage + countdown */}
+          <div className="flex items-center gap-1.5 mb-2 flex-wrap">
             <Badge
               label={TYPE_LABELS[project.type] ?? project.type}
               bg={TYPE_BG[project.type] ?? '#f3efe8'}
               color={TYPE_TEXT[project.type] ?? '#6b6460'}
             />
-            <Badge
-              label={STAGE_LABELS[project.stage] ?? project.stage}
-              bg={STAGE_BG[project.stage] ?? '#faf8f5'}
-              color={STAGE_TEXT[project.stage] ?? '#6b6460'}
-            />
+            {!compact && (
+              <Badge
+                label={STAGE_LABELS[project.stage] ?? project.stage}
+                bg={STAGE_BG[project.stage] ?? '#faf8f5'}
+                color={STAGE_TEXT[project.stage] ?? '#6b6460'}
+              />
+            )}
             {project.isPaused && (
-              <span className="flex items-center gap-0.5 text-[11px] font-mono text-[#7a6010]">
-                <Pause size={10} /> Paused
+              <span className="flex items-center gap-0.5 text-[10px] font-mono text-[#7a6010]">
+                <Pause size={9} /> Pausa
               </span>
             )}
+            <CountdownPill deadline={project.deadline} />
           </div>
 
           {/* Title */}
