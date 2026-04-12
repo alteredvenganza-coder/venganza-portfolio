@@ -37,8 +37,9 @@ export default function ProjectDetail() {
   const [pauseOpen,   setPauseOpen]   = useState(false);
   const [pauseReason, setPauseReason] = useState('');
   // Local price state — salva solo onBlur per evitare race conditions DB
-  const [priceLocal,  setPriceLocal]  = useState('');
-  const [paidLocal,   setPaidLocal]   = useState('');
+  const [priceLocal,      setPriceLocal]      = useState('');
+  const [paidLocal,       setPaidLocal]       = useState('');
+  const [retainerFeeLocal, setRetainerFeeLocal] = useState('');
   const [newTask,     setNewTask]     = useState('');
 
   // Sync local price fields when project loads or changes from outside
@@ -52,6 +53,7 @@ export default function ProjectDetail() {
     if (project) {
       setPriceLocal(project.price ?? '');
       setPaidLocal(project.paidAmount ?? '');
+      setRetainerFeeLocal(project.retainerFee ?? '');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -351,40 +353,74 @@ export default function ProjectDetail() {
               </button>
             </div>
 
-            {/* Budget totale */}
-            <div>
-              <p className="text-[11px] text-subtle font-mono mb-1">Budget totale</p>
-              <input
-                type="number"
-                placeholder="€ 0"
-                value={priceLocal}
-                onChange={e => setPriceLocal(e.target.value)}
-                onBlur={e => updateProject(id, { price: e.target.value ? Number(e.target.value) : null })}
-                className="text-sm"
-              />
-            </div>
-
-            {/* Importo ricevuto */}
-            <div>
-              <p className="text-[11px] text-subtle font-mono mb-1">Ricevuto (acconto / totale)</p>
-              <input
-                type="number"
-                placeholder="€ 0"
-                value={paidLocal}
-                onChange={e => setPaidLocal(e.target.value)}
-                onBlur={e => updateProject(id, { paidAmount: e.target.value ? Number(e.target.value) : null })}
-                className="text-sm"
-              />
-            </div>
-
-            {/* Da incassare */}
-            {project.price != null && (
-              <div className="flex items-center justify-between pt-2 border-t border-border">
-                <p className="text-[11px] text-subtle font-mono">Da incassare</p>
-                <p className={`text-sm font-semibold font-mono ${(project.price - (project.paidAmount ?? 0)) > 0 ? 'text-burgundy' : 'text-[#276749]'}`}>
-                  {formatEur(project.price - (project.paidAmount ?? 0))}
-                </p>
-              </div>
+            {project.type === 'retainer' ? (
+              /* ── Retainer fields ── */
+              <>
+                <div>
+                  <p className="text-[11px] text-subtle font-mono mb-1">Fee mensile (€/mese)</p>
+                  <input
+                    type="number"
+                    placeholder="€ 0"
+                    value={retainerFeeLocal}
+                    onChange={e => setRetainerFeeLocal(e.target.value)}
+                    onBlur={e => updateProject(id, { retainerFee: e.target.value ? Number(e.target.value) : null })}
+                    className="text-sm"
+                  />
+                </div>
+                <div>
+                  <p className="text-[11px] text-subtle font-mono mb-1">Ricevuto (mese corrente)</p>
+                  <input
+                    type="number"
+                    placeholder="€ 0"
+                    value={paidLocal}
+                    onChange={e => setPaidLocal(e.target.value)}
+                    onBlur={e => updateProject(id, { paidAmount: e.target.value ? Number(e.target.value) : null })}
+                    className="text-sm"
+                  />
+                </div>
+                {project.retainerFee != null && (
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
+                    <p className="text-[11px] text-subtle font-mono">MRR</p>
+                    <p className="text-sm font-semibold font-mono text-[#5b21b6]">
+                      {formatEur(project.retainerFee)}/mese
+                    </p>
+                  </div>
+                )}
+              </>
+            ) : (
+              /* ── One-off project fields ── */
+              <>
+                <div>
+                  <p className="text-[11px] text-subtle font-mono mb-1">Budget totale</p>
+                  <input
+                    type="number"
+                    placeholder="€ 0"
+                    value={priceLocal}
+                    onChange={e => setPriceLocal(e.target.value)}
+                    onBlur={e => updateProject(id, { price: e.target.value ? Number(e.target.value) : null })}
+                    className="text-sm"
+                  />
+                </div>
+                <div>
+                  <p className="text-[11px] text-subtle font-mono mb-1">Ricevuto (acconto / totale)</p>
+                  <input
+                    type="number"
+                    placeholder="€ 0"
+                    value={paidLocal}
+                    onChange={e => setPaidLocal(e.target.value)}
+                    onBlur={e => updateProject(id, { paidAmount: e.target.value ? Number(e.target.value) : null })}
+                    className="text-sm"
+                  />
+                </div>
+                {project.price != null && (
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
+                    <p className="text-[11px] text-subtle font-mono">Da incassare</p>
+                    <p className={`text-sm font-semibold font-mono ${(project.price - (project.paidAmount ?? 0)) > 0 ? 'text-burgundy' : 'text-[#276749]'}`}>
+                      {formatEur(project.price - (project.paidAmount ?? 0))}
+                    </p>
+                  </div>
+                )}
+              </>
             )}
 
             {/* Contratto inviato */}

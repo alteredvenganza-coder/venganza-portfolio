@@ -57,7 +57,14 @@ alter table public.projects
   add column if not exists files         jsonb   default '[]',
   add column if not exists brief         jsonb   default '{}',
   add column if not exists paid_amount   numeric,
-  add column if not exists contract_sent boolean default false;
+  add column if not exists contract_sent boolean default false,
+  add column if not exists retainer_fee  numeric;
+
+-- Aggiorna check constraint tipo per includere retainer
+alter table public.projects drop constraint if exists projects_type_check;
+alter table public.projects
+  add constraint projects_type_check
+  check (type in ('fashion','branding','edilizia','retainer','other'));
 
 -- ── Storage bucket per immagini di progetto ───────────────────
 insert into storage.buckets (id, name, public)

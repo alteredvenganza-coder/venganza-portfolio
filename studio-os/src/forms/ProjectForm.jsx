@@ -12,6 +12,7 @@ const EMPTY = {
   stage:         'lead',
   deadline:      '',
   price:         '',
+  retainerFee:   '',
   paymentStatus: 'unpaid',
   nextAction:    '',
   missingInfo:   '',
@@ -57,8 +58,9 @@ export default function ProjectForm({
     if (Object.keys(e).length) { setErrors(e); return; }
     onSave({
       ...form,
-      price: form.price !== '' ? Number(form.price) : null,
-      deadline: form.deadline || null,
+      price:       form.price       !== '' ? Number(form.price)       : null,
+      retainerFee: form.retainerFee !== '' ? Number(form.retainerFee) : null,
+      deadline:    form.deadline || null,
     });
   }
 
@@ -127,24 +129,36 @@ export default function ProjectForm({
           </Field>
         </div>
 
-        {/* Deadline + Price */}
+        {/* Deadline + Price/Fee */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <Field label="Deadline">
+          <Field label={form.type === 'retainer' ? 'Scadenza contratto' : 'Deadline'}>
             <input
               type="date"
               value={form.deadline}
               onChange={e => set('deadline', e.target.value)}
             />
           </Field>
-          <Field label="Prezzo (€)">
-            <input
-              type="number"
-              placeholder="0"
-              min="0"
-              value={form.price}
-              onChange={e => set('price', e.target.value)}
-            />
-          </Field>
+          {form.type === 'retainer' ? (
+            <Field label="Fee mensile (€)">
+              <input
+                type="number"
+                placeholder="0"
+                min="0"
+                value={form.retainerFee}
+                onChange={e => set('retainerFee', e.target.value)}
+              />
+            </Field>
+          ) : (
+            <Field label="Prezzo totale (€)">
+              <input
+                type="number"
+                placeholder="0"
+                min="0"
+                value={form.price}
+                onChange={e => set('price', e.target.value)}
+              />
+            </Field>
+          )}
         </div>
 
         {/* Payment status */}

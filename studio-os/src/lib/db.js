@@ -40,6 +40,7 @@ function projectFromDb(row) {
     price:         row.price,
     paidAmount:    row.paid_amount    ?? null,
     contractSent:  row.contract_sent  ?? false,
+    retainerFee:   row.retainer_fee   ?? null,
     paymentStatus: row.payment_status,
     nextAction:    row.next_action,
     missingInfo:   row.missing_info,
@@ -63,6 +64,7 @@ function projectToDb(p) {
   if ('price'         in p) row.price          = p.price ? Number(p.price) : null;
   if ('paidAmount'    in p) row.paid_amount    = p.paidAmount ? Number(p.paidAmount) : null;
   if ('contractSent'  in p) row.contract_sent  = Boolean(p.contractSent);
+  if ('retainerFee'   in p) row.retainer_fee   = p.retainerFee ? Number(p.retainerFee) : null;
   if ('paymentStatus' in p) row.payment_status = p.paymentStatus;
   if ('nextAction'    in p) row.next_action    = p.nextAction;
   if ('missingInfo'   in p) row.missing_info   = p.missingInfo;

@@ -81,10 +81,11 @@ export default function Dashboard() {
 
   const incassatoMese   = thisMonthProjects.reduce((s, p) => s + (p.paidAmount ?? 0), 0);
   const fatturatoMese   = thisMonthProjects.reduce((s, p) => s + (p.price ?? 0), 0);
-  const pipeline        = projects.filter(p => p.stage !== 'completed').reduce((s, p) => s + (p.price ?? 0), 0);
-  const daIncassare     = projects.filter(p => p.stage !== 'completed').reduce((s, p) => s + Math.max(0, (p.price ?? 0) - (p.paidAmount ?? 0)), 0);
-  const goalPct         = Math.min(100, Math.round((incassatoMese / MONTHLY_GOAL) * 100));
-  const mancaAlGoal     = Math.max(0, MONTHLY_GOAL - incassatoMese);
+  const pipeline        = projects.filter(p => p.stage !== 'completed' && p.type !== 'retainer').reduce((s, p) => s + (p.price ?? 0), 0);
+  const daIncassare     = projects.filter(p => p.stage !== 'completed' && p.type !== 'retainer').reduce((s, p) => s + Math.max(0, (p.price ?? 0) - (p.paidAmount ?? 0)), 0);
+  const mrr             = projects.filter(p => p.type === 'retainer' && p.stage !== 'completed').reduce((s, p) => s + (p.retainerFee ?? 0), 0);
+  const goalPct         = Math.min(100, Math.round(((incassatoMese + mrr) / MONTHLY_GOAL) * 100));
+  const mancaAlGoal     = Math.max(0, MONTHLY_GOAL - incassatoMese - mrr);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -171,8 +172,8 @@ export default function Dashboard() {
           {goalPct >= 100 ? '🎯 Obiettivo raggiunto!' : `Mancano ${formatEur(mancaAlGoal)} al goal`}
         </p>
 
-        {/* 4 stat boxes */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* Stat boxes */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           <div className="bg-paper rounded-lg p-3">
             <p className="label-meta mb-1">Incassato (mese)</p>
             <p className="text-base font-display font-semibold text-ink">{formatEur(incassatoMese)}</p>
@@ -189,6 +190,12 @@ export default function Dashboard() {
             <p className="label-meta mb-1">Da incassare</p>
             <p className={`text-base font-display font-semibold ${daIncassare > 0 ? 'text-burgundy' : 'text-ink'}`}>
               {formatEur(daIncassare)}
+            </p>
+          </div>
+          <div className="bg-[#ede8fe] rounded-lg p-3">
+            <p className="label-meta mb-1" style={{ color: '#5b21b6' }}>MRR Retainer</p>
+            <p className="text-base font-display font-semibold" style={{ color: '#5b21b6' }}>
+              {formatEur(mrr)}<span className="text-xs font-mono font-normal opacity-60">/mese</span>
             </p>
           </div>
         </div>
