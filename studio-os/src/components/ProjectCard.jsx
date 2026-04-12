@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Pause, AlertCircle } from 'lucide-react';
@@ -7,29 +8,57 @@ import {
   TYPE_BG, TYPE_TEXT, TYPE_LABELS,
   PAYMENT_BG, PAYMENT_TEXT, PAYMENT_LABELS,
 } from '../lib/constants';
-import { formatDate, isOverdue, daysUntil } from '../lib/utils';
+import { formatDate, isOverdue } from '../lib/utils';
+
+function useCountdown(deadline) {
+  const [diff, setDiff] = useState(() => deadline ? new Date(deadline) - Date.now() : null);
+
+  useEffect(() => {
+    if (!deadline) return;
+    const target = new Date(deadline);
+    // set to end of day
+    target.setHours(23, 59, 59, 999);
+    const tick = () => setDiff(target - Date.now());
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [deadline]);
+
+  return diff;
+}
+
+function formatCountdown(ms) {
+  if (ms <= 0) return null; // overdue
+  const totalSec = Math.floor(ms / 1000);
+  const days  = Math.floor(totalSec / 86400);
+  const hours = Math.floor((totalSec % 86400) / 3600);
+  const mins  = Math.floor((totalSec % 3600) / 60);
+  const secs  = totalSec % 60;
+
+  if (days > 30)  return `${days}g`;
+  if (days >= 1)  return `${days}g ${String(hours).padStart(2,'0')}h`;
+  if (hours >= 1) return `${hours}h ${String(mins).padStart(2,'0')}m`;
+  return `${String(mins).padStart(2,'0')}m ${String(secs).padStart(2,'0')}s`;
+}
 
 function CountdownPill({ deadline }) {
+  const diff = useCountdown(deadline);
   if (!deadline) return null;
-  const overdue = isOverdue(deadline);
-  const days    = daysUntil(deadline);
 
-  let bg, color, label;
-  if (overdue) {
-    bg = '#f5e8e8'; color = '#7b1f24'; label = 'Scaduto';
-  } else if (days <= 3) {
-    bg = '#fce8e6'; color = '#c0392b'; label = `${days}g`;
-  } else if (days <= 7) {
-    bg = '#fff8e1'; color = '#9a6b00'; label = `${days}g`;
-  } else if (days <= 30) {
-    bg = '#f3efe8'; color = '#6b6460'; label = `${days}g`;
-  } else {
-    bg = '#f3efe8'; color = '#9e9690'; label = `${days}g`;
-  }
+  const overdue = diff !== null && diff <= 0;
+  const label   = overdue ? 'Scaduto' : formatCountdown(diff ?? 0);
+
+  const days = diff ? Math.floor(diff / 86400000) : 0;
+  let bg, color;
+  if (overdue)      { bg = '#f5e8e8'; color = '#7b1f24'; }
+  else if (days <= 3)  { bg = '#fce8e6'; color = '#c0392b'; }
+  else if (days <= 7)  { bg = '#fff8e1'; color = '#9a6b00'; }
+  else if (days <= 30) { bg = '#f3efe8'; color = '#6b6460'; }
+  else                 { bg = '#f3efe8'; color = '#9e9690'; }
 
   return (
     <span
-      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-medium"
+      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-medium tabular-nums"
       style={{ background: bg, color }}
     >
       {overdue && <AlertCircle size={9} />}
@@ -39,9 +68,9 @@ function CountdownPill({ deadline }) {
 }
 
 export default function ProjectCard({ project, clientName, compact = false }) {
-  const overdue = isOverdue(project.deadline);
-  const days    = daysUntil(project.deadline);
-  const urgent  = days !== null && days <= 3 && days >= 0;
+  const diff   = useCountdown(project.deadline);
+  const overdue = diff !== null && diff <= 0;
+  const urgent  = diff !== null && diff > 0 && diff < 3 * 86400000;
 
   return (
     <motion.div whileHover={{ y: -1 }} transition={{ duration: 0.15 }}>
@@ -100,17 +129,12 @@ export default function ProjectCard({ project, clientName, compact = false }) {
                   <span
                     className={[
                       'flex items-center gap-1 text-[11px] font-mono',
-                      overdue
-                        ? 'text-burgundy font-medium'
-                        : urgent
-                          ? 'text-[#7a6010]'
-                          : 'text-subtle',
+                      overdue ? 'text-burgundy font-medium' : urgent ? 'text-[#7a6010]' : 'text-subtle',
                     ].join(' ')}
                   >
                     {overdue && <AlertCircle size={11} />}
                     {formatDate(project.deadline)}
                     {overdue && ' · scaduto'}
-                    {!overdue && urgent && ` · ${days}gg`}
                   </span>
                 ) : (
                   <span className="text-[11px] font-mono text-subtle">Nessuna deadline</span>
