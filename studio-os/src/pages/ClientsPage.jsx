@@ -5,7 +5,6 @@ import ClientCard from '../components/ClientCard';
 import Btn from '../components/Btn';
 import ClientForm from '../forms/ClientForm';
 import { useClients, useProjects } from '../hooks/useStore';
-
 export default function ClientsPage() {
   const { clients, addClient } = useClients();
   const { projects }           = useProjects();
@@ -97,7 +96,11 @@ export default function ClientsPage() {
       <ClientForm
         open={showForm}
         onClose={() => setShowForm(false)}
-        onSave={(data) => { addClient(data); setShowForm(false); }}
+        onSave={async (clientData, projectData) => {
+          const client = await addClient(clientData);
+          if (projectData && client?.id) addProject({ ...projectData, clientId: client.id });
+          setShowForm(false);
+        }}
       />
     </>
   );

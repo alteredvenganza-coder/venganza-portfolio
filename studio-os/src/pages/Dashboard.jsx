@@ -351,7 +351,11 @@ export default function Dashboard() {
       <ClientForm
         open={showAddClient}
         onClose={() => setShowAddClient(false)}
-        onSave={(data) => { addClient(data); setShowAddClient(false); }}
+        onSave={async (clientData, projectData) => {
+          const client = await addClient(clientData);
+          if (projectData && client?.id) addProject({ ...projectData, clientId: client.id });
+          setShowAddClient(false);
+        }}
       />
     </>
   );
