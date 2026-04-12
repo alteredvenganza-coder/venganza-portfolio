@@ -10,6 +10,12 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      window.onerror = function(msg, src, line) {
+        document.getElementById('root').innerHTML =
+          '<div style="padding:24px;font-family:sans-serif;color:#7b1f24;font-size:14px;background:#faf8f5;min-height:100vh"><b>Errore JS:</b> ' + msg + '<br><span style="color:#666">' + (src||'') + ':' + (line||'') + '</span></div>';
+      };
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
