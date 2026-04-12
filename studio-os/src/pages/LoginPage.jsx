@@ -11,14 +11,30 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
+  const [confirm,  setConfirm]  = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
+    setConfirm(false);
     setLoading(true);
-    const err = mode === 'login'
-      ? await signIn(email, password)
-      : await signUp(email, password);
+
+    if (mode === 'signup') {
+      const err = await signUp(email, password);
+      setLoading(false);
+      if (err) { setError(err.message); return; }
+      // Supabase may require email confirmation — try signing in immediately
+      const loginErr = await signIn(email, password);
+      if (loginErr) {
+        // Confirmation required
+        setConfirm(true);
+        return;
+      }
+      navigate('/');
+      return;
+    }
+
+    const err = await signIn(email, password);
     setLoading(false);
     if (err) { setError(err.message); return; }
     navigate('/');
@@ -61,6 +77,12 @@ export default function LoginPage() {
 
             {error && (
               <p className="text-sm text-burgundy">{error}</p>
+            )}
+
+            {confirm && (
+              <p className="text-sm text-[#7a6010] bg-[#fff8e1] border border-[#f0d060] rounded px-3 py-2">
+                Account creato. Controlla la tua email e clicca il link di conferma prima di accedere.
+              </p>
             )}
 
             <button
