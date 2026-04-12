@@ -105,12 +105,12 @@ export default function ProjectForm({
             placeholder="Brief del progetto, obiettivi, note…"
             value={form.description}
             onChange={e => set('description', e.target.value)}
-            className="resize-y"
+            className="resize-none sm:resize-y"
           />
         </Field>
 
         {/* Type + Stage */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <Field label="Tipo">
             <select value={form.type} onChange={e => set('type', e.target.value)}>
               {PROJECT_TYPES.map(t => (
@@ -128,7 +128,7 @@ export default function ProjectForm({
         </div>
 
         {/* Deadline + Price */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <Field label="Deadline">
             <input
               type="date"
@@ -157,7 +157,7 @@ export default function ProjectForm({
         </Field>
 
         {/* Next action + missing info */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <Field label="Prossima azione">
             <input
               type="text"
@@ -177,9 +177,9 @@ export default function ProjectForm({
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-2 pt-2 border-t border-border">
-          <Btn variant="secondary" type="button" onClick={onClose}>Annulla</Btn>
-          <Btn variant="primary" type="submit">
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 sm:pt-4 border-t border-border">
+          <Btn variant="secondary" type="button" onClick={onClose} className="w-full sm:w-auto">Annulla</Btn>
+          <Btn variant="primary" type="submit" className="w-full sm:w-auto">
             {isEdit ? 'Salva modifiche' : 'Crea progetto'}
           </Btn>
         </div>
