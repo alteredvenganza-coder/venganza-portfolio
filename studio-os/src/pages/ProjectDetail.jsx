@@ -318,15 +318,12 @@ export default function ProjectDetail() {
           </div>
 
           {/* Price + payment */}
-          <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5">
-            <p className="label-meta mb-3 flex items-center gap-1">
-              <DollarSign size={11} /> Pagamento
-            </p>
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-lg font-display font-semibold text-ink">
-                {formatEur(project.price)}
+          <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <p className="label-meta flex items-center gap-1">
+                <DollarSign size={11} /> Pagamento
               </p>
-              <button onClick={handlePaymentCycle} title="Cambia stato">
+              <button onClick={handlePaymentCycle} title="Cambia stato pagamento">
                 <Badge
                   label={PAYMENT_LABELS[project.paymentStatus]}
                   bg={PAYMENT_BG[project.paymentStatus]}
@@ -335,17 +332,55 @@ export default function ProjectDetail() {
                 />
               </button>
             </div>
-            <input
-              type="number"
-              placeholder="Importo €"
-              value={project.price ?? ''}
-              onChange={e =>
-                updateProject(id, {
-                  price: e.target.value ? Number(e.target.value) : null,
-                })
-              }
-              className="text-sm"
-            />
+
+            {/* Budget totale */}
+            <div>
+              <p className="text-[11px] text-subtle font-mono mb-1">Budget totale</p>
+              <input
+                type="number"
+                placeholder="€ 0"
+                value={project.price ?? ''}
+                onChange={e => updateProject(id, { price: e.target.value ? Number(e.target.value) : null })}
+                className="text-sm"
+              />
+            </div>
+
+            {/* Importo ricevuto */}
+            <div>
+              <p className="text-[11px] text-subtle font-mono mb-1">Ricevuto (acconto / totale)</p>
+              <input
+                type="number"
+                placeholder="€ 0"
+                value={project.paidAmount ?? ''}
+                onChange={e => updateProject(id, { paidAmount: e.target.value ? Number(e.target.value) : null })}
+                className="text-sm"
+              />
+            </div>
+
+            {/* Da incassare */}
+            {project.price != null && (
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <p className="text-[11px] text-subtle font-mono">Da incassare</p>
+                <p className={`text-sm font-semibold font-mono ${(project.price - (project.paidAmount ?? 0)) > 0 ? 'text-burgundy' : 'text-[#276749]'}`}>
+                  {formatEur(project.price - (project.paidAmount ?? 0))}
+                </p>
+              </div>
+            )}
+
+            {/* Contratto inviato */}
+            <button
+              onClick={() => updateProject(id, { contractSent: !project.contractSent })}
+              className={`flex items-center gap-2 px-3 py-2 rounded border text-xs font-mono transition-colors ${
+                project.contractSent
+                  ? 'bg-[#e6f4ea] border-[#276749] text-[#276749]'
+                  : 'bg-paper border-border text-muted hover:border-ink/30'
+              }`}
+            >
+              <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${project.contractSent ? 'bg-[#276749] border-[#276749]' : 'border-border'}`}>
+                {project.contractSent && <Check size={10} className="text-white" />}
+              </span>
+              Contratto inviato
+            </button>
           </div>
 
           {/* Stage shortcut */}

@@ -12,7 +12,9 @@ import Btn from '../components/Btn';
 import Badge from '../components/Badge';
 import { useClients, useProjects } from '../hooks/useStore';
 import { STAGES, STAGE_LABELS, STAGE_BG, STAGE_TEXT, PROJECT_TYPES, TYPE_LABELS } from '../lib/constants';
-import { isOverdue, daysUntil } from '../lib/utils';
+import { isOverdue, daysUntil, formatEur } from '../lib/utils';
+
+const MONTHLY_GOAL = 10000;
 import ProjectForm from '../forms/ProjectForm';
 import ClientForm from '../forms/ClientForm';
 
@@ -66,6 +68,23 @@ export default function Dashboard() {
   const [showAddProject, setShowAddProject] = useState(false);
   const [showAddClient,  setShowAddClient]  = useState(false);
   const [activeProject,  setActiveProject]  = useState(null);
+
+  // ── Finance calculations ───────────────────────────────────────────────────
+  const now         = new Date();
+  const thisMonth   = now.getMonth();
+  const thisYear    = now.getFullYear();
+
+  const thisMonthProjects = projects.filter(p => {
+    const d = new Date(p.createdAt);
+    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+  });
+
+  const incassatoMese   = thisMonthProjects.reduce((s, p) => s + (p.paidAmount ?? 0), 0);
+  const fatturatoMese   = thisMonthProjects.reduce((s, p) => s + (p.price ?? 0), 0);
+  const pipeline        = projects.filter(p => p.stage !== 'completed').reduce((s, p) => s + (p.price ?? 0), 0);
+  const daIncassare     = projects.filter(p => p.stage !== 'completed').reduce((s, p) => s + Math.max(0, (p.price ?? 0) - (p.paidAmount ?? 0)), 0);
+  const goalPct         = Math.min(100, Math.round((incassatoMese / MONTHLY_GOAL) * 100));
+  const mancaAlGoal     = Math.max(0, MONTHLY_GOAL - incassatoMese);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -128,6 +147,50 @@ export default function Dashboard() {
           <Btn variant="primary" size="sm" onClick={() => setShowAddProject(true)}>
             <Plus size={14} /> <span className="hidden sm:inline">Progetto</span>
           </Btn>
+        </div>
+      </div>
+
+      {/* ── Finance widget ── */}
+      <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5 mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-4">
+          <p className="label-meta">Obiettivo mensile — {new Date().toLocaleString('it-IT', { month: 'long', year: 'numeric' })}</p>
+          <p className="text-xs font-mono text-subtle">{formatEur(incassatoMese)} / {formatEur(MONTHLY_GOAL)}</p>
+        </div>
+
+        {/* Progress bar */}
+        <div className="h-2 bg-paper rounded-full mb-1 overflow-hidden">
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: goalPct >= 100 ? '#276749' : goalPct >= 60 ? '#7a6010' : '#7b1f24' }}
+            initial={{ width: 0 }}
+            animate={{ width: `${goalPct}%` }}
+            transition={{ duration: 0.6 }}
+          />
+        </div>
+        <p className="text-[11px] font-mono text-subtle mb-4">
+          {goalPct >= 100 ? '🎯 Obiettivo raggiunto!' : `Mancano ${formatEur(mancaAlGoal)} al goal`}
+        </p>
+
+        {/* 4 stat boxes */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="bg-paper rounded-lg p-3">
+            <p className="label-meta mb-1">Incassato (mese)</p>
+            <p className="text-base font-display font-semibold text-ink">{formatEur(incassatoMese)}</p>
+          </div>
+          <div className="bg-paper rounded-lg p-3">
+            <p className="label-meta mb-1">Fatturato (mese)</p>
+            <p className="text-base font-display font-semibold text-ink">{formatEur(fatturatoMese)}</p>
+          </div>
+          <div className="bg-paper rounded-lg p-3">
+            <p className="label-meta mb-1">Pipeline totale</p>
+            <p className="text-base font-display font-semibold text-ink">{formatEur(pipeline)}</p>
+          </div>
+          <div className="bg-paper rounded-lg p-3">
+            <p className="label-meta mb-1">Da incassare</p>
+            <p className={`text-base font-display font-semibold ${daIncassare > 0 ? 'text-burgundy' : 'text-ink'}`}>
+              {formatEur(daIncassare)}
+            </p>
+          </div>
         </div>
       </div>
 

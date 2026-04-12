@@ -54,8 +54,10 @@ create policy "Owner full access — projects"
 
 -- ── Aggiungi colonne se la tabella esiste già ─────────────────
 alter table public.projects
-  add column if not exists files jsonb default '[]',
-  add column if not exists brief jsonb default '{}';
+  add column if not exists files         jsonb   default '[]',
+  add column if not exists brief         jsonb   default '{}',
+  add column if not exists paid_amount   numeric,
+  add column if not exists contract_sent boolean default false;
 
 -- ── Storage bucket per immagini di progetto ───────────────────
 insert into storage.buckets (id, name, public)
