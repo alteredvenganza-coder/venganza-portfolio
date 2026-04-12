@@ -20,11 +20,11 @@ function CountdownPill({ deadline }) {
   } else if (days <= 3) {
     bg = '#fce8e6'; color = '#c0392b'; label = `${days}g`;
   } else if (days <= 7) {
-    bg = '#fff8e1'; color = '#7a6010'; label = `${days}g`;
-  } else if (days <= 14) {
-    bg = '#fff8e1'; color = '#7a6010'; label = `${days}g`;
+    bg = '#fff8e1'; color = '#9a6b00'; label = `${days}g`;
+  } else if (days <= 30) {
+    bg = '#f3efe8'; color = '#6b6460'; label = `${days}g`;
   } else {
-    return null; // non invasivo: non mostrare se manca ancora molto
+    bg = '#f3efe8'; color = '#9e9690'; label = `${days}g`;
   }
 
   return (
