@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { genId } from '../lib/utils';
 import * as db from '../lib/db';
 import { useAuth } from './useAuth';
+import { fireWebhook } from '../lib/webhook';
 
 // ── Store context ──────────────────────────────────────────────────────────────
 
@@ -102,6 +103,7 @@ export function useProjects() {
     const project = projects.find(p => p.id === projectId);
     const tasks   = [...(project.tasks ?? []), { id: genId(), text, done: false }];
     await updateProject(projectId, { tasks });
+    fireWebhook({ event: 'task_added', project: project.title, task: text });
   }
 
   async function toggleTask(projectId, taskId) {

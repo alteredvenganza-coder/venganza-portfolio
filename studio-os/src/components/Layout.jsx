@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, LayoutDashboard, Users, FolderKanban, X } from 'lucide-react';
+import { Search, LayoutDashboard, Users, FolderKanban, X, Settings } from 'lucide-react';
 import { useClients } from '../hooks/useStore';
 import { useProjects } from '../hooks/useStore';
+import SettingsModal from './SettingsModal';
 
 const NAV = [
   { to: '/',        label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -14,8 +15,9 @@ export default function Layout({ children }) {
   const { projects } = useProjects();
   const navigate     = useNavigate();
 
-  const [query, setQuery]     = useState('');
-  const [focused, setFocused] = useState(false);
+  const [query, setQuery]       = useState('');
+  const [focused, setFocused]   = useState(false);
+  const [settings, setSettings] = useState(false);
 
   const q = query.trim().toLowerCase();
 
@@ -77,8 +79,17 @@ export default function Layout({ children }) {
             ))}
           </nav>
 
+          {/* Settings icon */}
+          <button
+            onClick={() => setSettings(true)}
+            className="ml-auto shrink-0 p-1.5 rounded text-muted hover:text-ink hover:bg-paper transition-colors"
+            title="Impostazioni"
+          >
+            <Settings size={16} />
+          </button>
+
           {/* Search */}
-          <div className="flex-1 max-w-xs hidden sm:block relative ml-auto">
+          <div className="flex-1 max-w-xs hidden sm:block relative">
             <div className="relative">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-subtle pointer-events-none" />
               <input
@@ -149,6 +160,8 @@ export default function Layout({ children }) {
       <main className="max-w-6xl mx-auto px-6 py-8">
         {children}
       </main>
+
+      <SettingsModal open={settings} onClose={() => setSettings(false)} />
     </div>
   );
 }

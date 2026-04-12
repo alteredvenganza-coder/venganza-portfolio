@@ -75,3 +75,20 @@ create policy "Public read project-files"
 create policy "Auth delete project-files"
   on storage.objects for delete to authenticated
   using (bucket_id = 'project-files');
+
+-- ── Push Subscriptions ────────────────────────────────────────
+create table if not exists public.push_subscriptions (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid references auth.users(id) on delete cascade not null,
+  endpoint     text not null,
+  subscription jsonb not null,
+  created_at   timestamptz default now(),
+  unique(user_id, endpoint)
+);
+
+alter table public.push_subscriptions enable row level security;
+
+create policy "Owner push subs"
+  on public.push_subscriptions for all
+  using  (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
