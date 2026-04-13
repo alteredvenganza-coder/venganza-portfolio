@@ -70,22 +70,14 @@ export default function Dashboard() {
   const [activeProject,  setActiveProject]  = useState(null);
 
   // ── Finance calculations ───────────────────────────────────────────────────
-  const now         = new Date();
-  const thisMonth   = now.getMonth();
-  const thisYear    = now.getFullYear();
-
-  const thisMonthProjects = projects.filter(p => {
-    const d = new Date(p.createdAt);
-    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
-  });
-
-  const incassatoMese   = thisMonthProjects.reduce((s, p) => s + (p.paidAmount ?? 0), 0);
-  const fatturatoMese   = thisMonthProjects.reduce((s, p) => s + (p.price ?? 0), 0);
-  const pipeline        = projects.filter(p => p.stage !== 'completed' && p.type !== 'retainer').reduce((s, p) => s + (p.price ?? 0), 0);
-  const daIncassare     = projects.filter(p => p.stage !== 'completed' && p.type !== 'retainer').reduce((s, p) => s + Math.max(0, (p.price ?? 0) - (p.paidAmount ?? 0)), 0);
+  const activeProjects  = projects.filter(p => p.stage !== 'completed' && p.type !== 'retainer');
+  const incassato       = activeProjects.reduce((s, p) => s + (p.paidAmount ?? 0), 0);
+  const fatturato       = activeProjects.reduce((s, p) => s + (p.price ?? 0), 0);
+  const pipeline        = projects.filter(p => ['lead','onboarding'].includes(p.stage) && p.type !== 'retainer').reduce((s, p) => s + (p.price ?? 0), 0);
+  const daIncassare     = activeProjects.reduce((s, p) => s + Math.max(0, (p.price ?? 0) - (p.paidAmount ?? 0)), 0);
   const mrr             = projects.filter(p => p.type === 'retainer' && p.stage !== 'completed').reduce((s, p) => s + (p.retainerFee ?? 0), 0);
-  const goalPct         = Math.min(100, Math.round(((incassatoMese + mrr) / MONTHLY_GOAL) * 100));
-  const mancaAlGoal     = Math.max(0, MONTHLY_GOAL - incassatoMese - mrr);
+  const goalPct         = Math.min(100, Math.round(((incassato + mrr) / MONTHLY_GOAL) * 100));
+  const mancaAlGoal     = Math.max(0, MONTHLY_GOAL - incassato - mrr);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -175,12 +167,12 @@ export default function Dashboard() {
         {/* Stat boxes */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           <div className="bg-paper rounded-lg p-3">
-            <p className="label-meta mb-1">Incassato (mese)</p>
-            <p className="text-base font-display font-semibold text-ink">{formatEur(incassatoMese)}</p>
+            <p className="label-meta mb-1">Incassato</p>
+            <p className="text-base font-display font-semibold text-ink">{formatEur(incassato)}</p>
           </div>
           <div className="bg-paper rounded-lg p-3">
-            <p className="label-meta mb-1">Fatturato (mese)</p>
-            <p className="text-base font-display font-semibold text-ink">{formatEur(fatturatoMese)}</p>
+            <p className="label-meta mb-1">Fatturato attivo</p>
+            <p className="text-base font-display font-semibold text-ink">{formatEur(fatturato)}</p>
           </div>
           <div className="bg-paper rounded-lg p-3">
             <p className="label-meta mb-1">Pipeline totale</p>

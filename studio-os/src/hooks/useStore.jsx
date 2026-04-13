@@ -83,7 +83,14 @@ export function useProjects() {
     const current = projects.find(p => p.id === id);
     const merged  = { ...current, ...patch };
     setProjects(prev => prev.map(p => p.id === id ? merged : p)); // optimistic
-    await db.patchProject(id, patch);
+    try {
+      await db.patchProject(id, patch);
+    } catch (err) {
+      console.error('[db] patchProject failed:', err);
+      // revert optimistic update
+      setProjects(prev => prev.map(p => p.id === id ? current : p));
+      alert('Errore salvataggio: ' + (err?.message ?? err));
+    }
   }
 
   async function deleteProject(id) {
