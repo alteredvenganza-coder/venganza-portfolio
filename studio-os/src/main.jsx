@@ -14,6 +14,7 @@ window.addEventListener('unhandledrejection', e => {
   console.error('Unhandled promise rejection:', e.reason);
 });
 
+// v2 — build trigger
 // Registra Service Worker per push notifications
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
