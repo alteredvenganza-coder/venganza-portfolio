@@ -70,14 +70,15 @@ export default function Dashboard() {
   const [activeProject,  setActiveProject]  = useState(null);
 
   // ── Finance calculations ───────────────────────────────────────────────────
-  const activeProjects  = projects.filter(p => p.stage !== 'completed' && p.type !== 'retainer');
+  const activeProjects  = projects.filter(p => p.stage !== 'completed' && p.type !== 'retainer' && p.type !== 'premade');
   const incassato       = activeProjects.reduce((s, p) => s + (p.paidAmount ?? 0), 0);
   const fatturato       = activeProjects.reduce((s, p) => s + (p.price ?? 0), 0);
-  const pipeline        = projects.filter(p => ['lead','onboarding'].includes(p.stage) && p.type !== 'retainer').reduce((s, p) => s + (p.price ?? 0), 0);
+  const pipeline        = projects.filter(p => ['lead','onboarding'].includes(p.stage) && p.type !== 'retainer' && p.type !== 'premade').reduce((s, p) => s + (p.price ?? 0), 0);
   const daIncassare     = activeProjects.reduce((s, p) => s + Math.max(0, (p.price ?? 0) - (p.paidAmount ?? 0)), 0);
   const mrr             = projects.filter(p => p.type === 'retainer' && p.stage !== 'completed').reduce((s, p) => s + (p.retainerFee ?? 0), 0);
-  const goalPct         = Math.min(100, Math.round(((incassato + mrr) / MONTHLY_GOAL) * 100));
-  const mancaAlGoal     = Math.max(0, MONTHLY_GOAL - incassato - mrr);
+  const premadeRev      = projects.filter(p => p.type === 'premade').reduce((s, p) => s + ((p.price ?? 0) * (p.salesCount ?? 0)), 0);
+  const goalPct         = Math.min(100, Math.round(((incassato + mrr + premadeRev) / MONTHLY_GOAL) * 100));
+  const mancaAlGoal     = Math.max(0, MONTHLY_GOAL - incassato - mrr - premadeRev);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -188,6 +189,12 @@ export default function Dashboard() {
             <p className="label-meta mb-1" style={{ color: '#5b21b6' }}>MRR Retainer</p>
             <p className="text-base font-display font-semibold" style={{ color: '#5b21b6' }}>
               {formatEur(mrr)}<span className="text-xs font-mono font-normal opacity-60">/mese</span>
+            </p>
+          </div>
+          <div className="bg-[#fff3e0] rounded-lg p-3">
+            <p className="label-meta mb-1" style={{ color: '#c2410c' }}>Premade venduti</p>
+            <p className="text-base font-display font-semibold" style={{ color: '#c2410c' }}>
+              {formatEur(premadeRev)}
             </p>
           </div>
         </div>

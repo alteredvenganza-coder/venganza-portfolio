@@ -13,6 +13,7 @@ const EMPTY = {
   deadline:      '',
   price:         '',
   retainerFee:   '',
+  salesCount:    '',
   paymentStatus: 'unpaid',
   nextAction:    '',
   missingInfo:   '',
@@ -48,7 +49,7 @@ export default function ProjectForm({
   function validate() {
     const e = {};
     if (!form.title.trim()) e.title = 'Il titolo è obbligatorio';
-    if (!form.clientId)     e.clientId = 'Seleziona un cliente';
+    if (!form.clientId && form.type !== 'premade') e.clientId = 'Seleziona un cliente';
     return e;
   }
 
@@ -60,6 +61,7 @@ export default function ProjectForm({
       ...form,
       price:       form.price       !== '' ? Number(form.price)       : null,
       retainerFee: form.retainerFee !== '' ? Number(form.retainerFee) : null,
+      salesCount:  form.salesCount  !== '' ? Number(form.salesCount)  : null,
       deadline:    form.deadline || null,
     });
   }
@@ -131,32 +133,35 @@ export default function ProjectForm({
 
         {/* Deadline + Price/Fee */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <Field label={form.type === 'retainer' ? 'Scadenza contratto' : 'Deadline'}>
-            <input
-              type="date"
-              value={form.deadline}
-              onChange={e => set('deadline', e.target.value)}
-            />
-          </Field>
-          {form.type === 'retainer' ? (
-            <Field label="Fee mensile (€)">
+          {form.type !== 'premade' && (
+            <Field label={form.type === 'retainer' ? 'Scadenza contratto' : 'Deadline'}>
               <input
-                type="number"
-                placeholder="0"
-                min="0"
-                value={form.retainerFee}
-                onChange={e => set('retainerFee', e.target.value)}
+                type="date"
+                value={form.deadline}
+                onChange={e => set('deadline', e.target.value)}
               />
             </Field>
+          )}
+          {form.type === 'retainer' ? (
+            <Field label="Fee mensile (€)">
+              <input type="number" placeholder="0" min="0"
+                value={form.retainerFee} onChange={e => set('retainerFee', e.target.value)} />
+            </Field>
+          ) : form.type === 'premade' ? (
+            <>
+              <Field label="Prezzo unitario (€)">
+                <input type="number" placeholder="0" min="0"
+                  value={form.price} onChange={e => set('price', e.target.value)} />
+              </Field>
+              <Field label="Unità vendute">
+                <input type="number" placeholder="0" min="0"
+                  value={form.salesCount} onChange={e => set('salesCount', e.target.value)} />
+              </Field>
+            </>
           ) : (
             <Field label="Prezzo totale (€)">
-              <input
-                type="number"
-                placeholder="0"
-                min="0"
-                value={form.price}
-                onChange={e => set('price', e.target.value)}
-              />
+              <input type="number" placeholder="0" min="0"
+                value={form.price} onChange={e => set('price', e.target.value)} />
             </Field>
           )}
         </div>
