@@ -11,6 +11,7 @@ import Btn from '../components/Btn';
 import Field from '../components/Field';
 import Modal from '../components/Modal';
 import BriefSection from '../components/BriefSection';
+import DeliverySection from '../components/DeliverySection';
 import ProjectForm from '../forms/ProjectForm';
 import { uploadProjectFile } from '../lib/db';
 import { useClients, useProjects } from '../hooks/useStore';
@@ -514,6 +515,15 @@ export default function ProjectDetail() {
           brief={project.brief ?? {}}
           projectId={id}
           onUpdate={(brief) => updateProject(id, { brief })}
+        />
+      </div>
+
+      {/* ── Consegna ── */}
+      <div className="mt-3">
+        <DeliverySection
+          files={project.files ?? []}
+          projectId={id}
+          onUpdate={(files) => updateProject(id, { files })}
         />
       </div>
 
