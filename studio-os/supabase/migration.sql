@@ -64,7 +64,7 @@ alter table public.projects
 alter table public.projects drop constraint if exists projects_type_check;
 alter table public.projects
   add constraint projects_type_check
-  check (type in ('fashion','branding','edilizia','retainer','other'));
+  check (type in ('fashion','branding','edilizia','app','retainer','other'));
 
 -- ── Storage bucket per immagini di progetto ───────────────────
 insert into storage.buckets (id, name, public)
