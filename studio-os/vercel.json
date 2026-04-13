@@ -1,6 +1,6 @@
 {
   "rewrites": [{ "source": "/(.*)", "destination": "/" }],
   "crons": [
-    { "path": "/api/cron-reminders", "schedule": "0 7,12,17 * * *" }
+    { "path": "/api/cron-reminders", "schedule": "0 9 * * *" }
   ]
 }
