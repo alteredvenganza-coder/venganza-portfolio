@@ -147,7 +147,7 @@ export default function Dashboard() {
       <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5 mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-4">
           <p className="label-meta">Obiettivo mensile — {new Date().toLocaleString('it-IT', { month: 'long', year: 'numeric' })}</p>
-          <p className="text-xs font-mono text-subtle">{formatEur(incassatoMese)} / {formatEur(MONTHLY_GOAL)}</p>
+          <p className="text-xs font-mono text-subtle">{formatEur(incassato + mrr)} / {formatEur(MONTHLY_GOAL)}</p>
         </div>
 
         {/* Progress bar */}
