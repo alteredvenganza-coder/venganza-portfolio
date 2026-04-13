@@ -6,6 +6,8 @@ export const STAGES = [
   'waiting',
   'review',
   'completed',
+  'delivered',
+  'archived',
 ];
 
 export const STAGE_LABELS = {
@@ -15,6 +17,8 @@ export const STAGE_LABELS = {
   waiting:     'Waiting',
   review:      'Review',
   completed:   'Completed',
+  delivered:   'Delivered',
+  archived:    'Archived',
 };
 
 // Warm, light background tints — no dark/gray
@@ -25,6 +29,8 @@ export const STAGE_BG = {
   waiting:     '#fff8e1',
   review:      '#fce8e6',
   completed:   '#e6f4ea',
+  delivered:   '#e8f0fe',
+  archived:    '#f3efe8',
 };
 
 export const STAGE_TEXT = {
@@ -34,6 +40,8 @@ export const STAGE_TEXT = {
   waiting:     '#7a6010',
   review:      '#7b1f24',
   completed:   '#276749',
+  delivered:   '#1a56db',
+  archived:    '#6b6460',
 };
 
 // ─── Project types ────────────────────────────────────────────────────────────

@@ -14,6 +14,7 @@ import BriefSection from '../components/BriefSection';
 import DeliverySection from '../components/DeliverySection';
 import ProjectForm from '../forms/ProjectForm';
 import { uploadProjectFile } from '../lib/db';
+import CompletionSection from '../components/CompletionSection';
 import { useClients, useProjects } from '../hooks/useStore';
 import {
   STAGE_LABELS, STAGE_BG, STAGE_TEXT,
@@ -158,6 +159,13 @@ export default function ProjectDetail() {
           </p>
         )}
       </div>
+
+      {/* ── Completion Phase ── */}
+      {project.stage === 'completed' && (
+        <div className="mb-6">
+          <CompletionSection project={project} client={client} />
+        </div>
+      )}
 
       {/* Main grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-5">
