@@ -101,3 +101,32 @@ create policy "Owner push subs"
   on public.push_subscriptions for all
   using  (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+-- ── Aggiorna stage per includere delivered e archived ─────────
+alter table public.projects drop constraint if exists projects_stage_check;
+alter table public.projects
+  add constraint projects_stage_check
+  check (stage in ('lead','onboarding','in_progress','waiting','review','completed','delivered','archived'));
+
+-- ── Deliveries (link pubblici di consegna file) ───────────────
+create table if not exists public.deliveries (
+  token       text primary key default replace(gen_random_uuid()::text, '-', ''),
+  project_id  uuid references public.projects(id) on delete cascade,
+  title       text not null,
+  files       jsonb not null default '[]',
+  message     text,
+  expires_at  timestamptz not null,
+  created_at  timestamptz default now()
+);
+
+alter table public.deliveries enable row level security;
+
+-- Chiunque può leggere una delivery (il cliente non è autenticato)
+create policy "Public read deliveries"
+  on public.deliveries for select
+  using (true);
+
+-- Solo utenti autenticati possono creare delivery
+create policy "Auth insert deliveries"
+  on public.deliveries for insert to authenticated
+  with check (true);

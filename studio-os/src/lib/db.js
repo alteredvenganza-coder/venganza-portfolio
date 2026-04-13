@@ -180,3 +180,26 @@ export async function deleteProjectFile(storagePath) {
   const { error } = await supabase.storage.from('project-files').remove([storagePath]);
   if (error) throw error;
 }
+
+// ── Deliveries (link pubblici per i clienti) ──────────────────────────────────
+
+export async function createDelivery({ projectId, title, files, message, expiresInDays = 7 }) {
+  const expires_at = new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000).toISOString();
+  const { data, error } = await supabase
+    .from('deliveries')
+    .insert({ project_id: projectId, title, files, message, expires_at })
+    .select()
+    .single();
+  if (error) throw error;
+  return data; // { token, title, files, expires_at, ... }
+}
+
+export async function getDelivery(token) {
+  const { data, error } = await supabase
+    .from('deliveries')
+    .select('*')
+    .eq('token', token)
+    .single();
+  if (error) throw error;
+  return data;
+}

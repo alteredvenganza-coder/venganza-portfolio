@@ -7,7 +7,7 @@ import {
 import Btn from './Btn';
 import Field from './Field';
 import FileItem from './FileItem';
-import { uploadProjectFile, createSharedLink } from '../lib/db';
+import { uploadProjectFile, createDelivery } from '../lib/db';
 import { useProjects } from '../hooks/useStore';
 import { formatDate } from '../lib/utils';
 
@@ -68,17 +68,20 @@ export default function CompletionSection({ project, client }) {
       alert('Carica almeno un file per generare un link condiviso.');
       return;
     }
-    
+
     setGenerating(true);
     try {
-      // For now, we sign the first file or wait for a "ZIP all" feature.
-      // Alternatively, we could create a public folder view link if storage allowed.
-      // Since we want "WeTransfer style", we'll sign the most relevant file or the first one.
-      const firstFilePath = project.files[0].path;
-      const url = await createSharedLink(firstFilePath, 60 * 60 * 24 * 7); // 7 days
+      const delivery = await createDelivery({
+        projectId: project.id,
+        title:     project.title,
+        files:     project.files,
+        message:   emailConfig.message,
+        expiresInDays: 7,
+      });
+      const url = `${window.location.origin}/consegna/${delivery.token}`;
       setSharedLink(url);
     } catch (err) {
-      alert('Errore nella generazione del link.');
+      alert('Errore nella generazione del link: ' + err.message);
     } finally {
       setGenerating(false);
     }

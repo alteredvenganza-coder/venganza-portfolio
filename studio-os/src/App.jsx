@@ -28,6 +28,7 @@ import ClientsPage from './pages/ClientsPage';
 import ClientDetail from './pages/ClientDetail';
 import ProjectDetail from './pages/ProjectDetail';
 import LoginPage from './pages/LoginPage';
+import DeliveryPage from './pages/DeliveryPage';
 
 // ── Loading screen ─────────────────────────────────────────────────────────────
 function Spinner() {
@@ -90,8 +91,9 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/*"     element={<ProtectedApp />} />
+          <Route path="/login"          element={<LoginPage />} />
+          <Route path="/consegna/:token" element={<DeliveryPage />} />
+          <Route path="/*"              element={<ProtectedApp />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
