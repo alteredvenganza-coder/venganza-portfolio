@@ -45,9 +45,10 @@ function projectFromDb(row) {
     paymentStatus: row.payment_status,
     nextAction:    row.next_action,
     missingInfo:   row.missing_info,
-    tasks:         row.tasks  ?? [],
-    files:         row.files  ?? [],
-    brief:         row.brief  ?? {},
+    tasks:         row.tasks        ?? [],
+    files:         row.files        ?? [],
+    brief:         row.brief        ?? {},
+    coverImage:    row.cover_image  ?? null,
     createdAt:     row.created_at,
   };
 }
@@ -73,6 +74,7 @@ function projectToDb(p) {
   if ('tasks'         in p) row.tasks          = p.tasks  ?? [];
   if ('files'         in p) row.files          = p.files  ?? [];
   if ('brief'         in p) row.brief          = p.brief  ?? {};
+  if ('coverImage'    in p) row.cover_image    = p.coverImage ?? null;
   return row;
 }
 

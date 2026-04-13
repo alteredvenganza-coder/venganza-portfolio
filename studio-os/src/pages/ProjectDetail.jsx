@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Edit2, Trash2, Pause, Play, Plus, Check,
-  X, AlertCircle, Calendar, DollarSign, MessageSquare, Info,
+  X, AlertCircle, Calendar, DollarSign, MessageSquare, Info, ImagePlus,
 } from 'lucide-react';
 import StageStepper from '../components/StageStepper';
 import Badge from '../components/Badge';
@@ -12,6 +12,7 @@ import Field from '../components/Field';
 import Modal from '../components/Modal';
 import BriefSection from '../components/BriefSection';
 import ProjectForm from '../forms/ProjectForm';
+import { uploadProjectFile } from '../lib/db';
 import { useClients, useProjects } from '../hooks/useStore';
 import {
   STAGE_LABELS, STAGE_BG, STAGE_TEXT,
@@ -37,9 +38,11 @@ export default function ProjectDetail() {
   const [pauseOpen,   setPauseOpen]   = useState(false);
   const [pauseReason, setPauseReason] = useState('');
   // Local price state — salva solo onBlur per evitare race conditions DB
-  const [priceLocal,      setPriceLocal]      = useState('');
-  const [paidLocal,       setPaidLocal]       = useState('');
+  const [priceLocal,       setPriceLocal]       = useState('');
+  const [paidLocal,        setPaidLocal]        = useState('');
   const [retainerFeeLocal, setRetainerFeeLocal] = useState('');
+  const [coverUploading,   setCoverUploading]   = useState(false);
+  const coverRef = useRef(null);
   const [newTask,     setNewTask]     = useState('');
 
   // Sync local price fields when project loads or changes from outside
@@ -98,6 +101,21 @@ export default function ProjectDetail() {
     navigate('/');
   }
 
+  async function handleCoverUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCoverUploading(true);
+    try {
+      const { url } = await uploadProjectFile(id, file);
+      await updateProject(id, { coverImage: url });
+    } catch (err) {
+      alert('Errore upload: ' + err.message);
+    } finally {
+      setCoverUploading(false);
+      if (coverRef.current) coverRef.current.value = '';
+    }
+  }
+
   function handlePaymentCycle() {
     const order = PAYMENT_STATUSES;
     const next  = order[(order.indexOf(project.paymentStatus) + 1) % order.length];
@@ -144,6 +162,41 @@ export default function ProjectDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-5">
         {/* ── Left column (main info) ── */}
         <div className="lg:col-span-2 flex flex-col gap-3 lg:gap-5">
+
+          {/* Cover image */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white border border-border rounded-lg shadow-card overflow-hidden"
+          >
+            {project.coverImage ? (
+              <div className="relative group">
+                <img src={project.coverImage} alt={project.title} className="w-full h-48 sm:h-64 object-cover" />
+                <div className="absolute inset-0 bg-ink/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <label className="cursor-pointer">
+                    <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverUpload} />
+                    <Btn as="span" variant="secondary" size="sm" onClick={() => coverRef.current?.click()}>
+                      <ImagePlus size={13} /> {coverUploading ? 'Caricamento…' : 'Cambia'}
+                    </Btn>
+                  </label>
+                  <Btn variant="secondary" size="sm" onClick={() => updateProject(id, { coverImage: null })}>
+                    <X size={13} /> Rimuovi
+                  </Btn>
+                </div>
+              </div>
+            ) : (
+              <label className="cursor-pointer block">
+                <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverUpload} />
+                <div
+                  onClick={() => coverRef.current?.click()}
+                  className="flex items-center gap-2 px-4 py-3 text-xs text-muted hover:text-ink hover:bg-paper transition-colors"
+                >
+                  <ImagePlus size={14} />
+                  {coverUploading ? 'Caricamento…' : 'Aggiungi immagine copertina'}
+                </div>
+              </label>
+            )}
+          </motion.div>
 
           {/* Title card */}
           <motion.div

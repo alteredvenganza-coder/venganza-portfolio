@@ -77,11 +77,20 @@ export default function ProjectCard({ project, clientName, compact = false }) {
       <Link
         to={`/projects/${project.id}`}
         className={[
-          'block bg-white border rounded-lg shadow-card hover:border-burgundy-muted transition-colors',
+          'block bg-white border rounded-lg shadow-card hover:border-burgundy-muted transition-colors overflow-hidden',
           project.isPaused ? 'border-[#e8e4dc] opacity-80' : 'border-border',
           overdue ? 'border-l-2 border-l-burgundy' : '',
         ].join(' ')}
       >
+        {project.coverImage && (
+          <div className="w-full h-28 overflow-hidden bg-paper">
+            <img
+              src={project.coverImage}
+              alt={project.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
         <div className={compact ? 'p-3' : 'p-4'}>
           {/* Top row: type + stage + countdown */}
           <div className="flex items-center gap-1.5 mb-2 flex-wrap">

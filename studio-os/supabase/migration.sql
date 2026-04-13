@@ -59,7 +59,8 @@ alter table public.projects
   add column if not exists paid_amount   numeric,
   add column if not exists contract_sent boolean default false,
   add column if not exists retainer_fee  numeric,
-  add column if not exists sales_count   integer;
+  add column if not exists sales_count   integer,
+  add column if not exists cover_image   text;
 
 -- Aggiorna check constraint tipo per includere retainer
 alter table public.projects drop constraint if exists projects_type_check;

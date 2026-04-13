@@ -293,7 +293,7 @@ export default function Dashboard() {
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="w-40 sm:w-52 shrink-0"
+                      className="w-52 sm:w-72 shrink-0"
                     >
                       {/* Column header */}
                       <div
