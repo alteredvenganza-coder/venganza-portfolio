@@ -146,11 +146,28 @@ export async function removeProject(id) {
 
 export async function uploadProjectFile(projectId, file) {
   const ext  = file.name.split('.').pop().toLowerCase();
-  const path = `${projectId}/${Date.now()}.${ext}`;
+  const path = `${projectId}/${Date.now()}-${file.name}`;
   const { error } = await supabase.storage.from('project-files').upload(path, file);
   if (error) throw error;
+
   const { data } = supabase.storage.from('project-files').getPublicUrl(path);
-  return { url: data.publicUrl, path };
+
+  return {
+    name: file.name,
+    size: file.size,
+    type: file.type,
+    url: data.publicUrl,
+    path
+  };
+}
+
+export async function createSharedLink(path, expiresIn = 60 * 60 * 24 * 7) {
+  const { data, error } = await supabase.storage
+    .from('project-files')
+    .createSignedUrl(path, expiresIn);
+
+  if (error) throw error;
+  return data.signedUrl;
 }
 
 export async function deleteProjectFile(storagePath) {
