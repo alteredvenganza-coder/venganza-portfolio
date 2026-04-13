@@ -70,21 +70,15 @@ export default function Dashboard() {
   const [activeProject,  setActiveProject]  = useState(null);
 
   // ── Finance calculations ───────────────────────────────────────────────────
-  const now         = new Date();
-  const thisMonth   = now.getMonth();
-  const thisYear    = now.getFullYear();
-
-  const thisMonthProjects = projects.filter(p => {
-    const d = new Date(p.createdAt);
-    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
-  });
-
-  const incassatoMese   = thisMonthProjects.reduce((s, p) => s + (p.paidAmount ?? 0), 0);
-  const fatturatoMese   = thisMonthProjects.reduce((s, p) => s + (p.price ?? 0), 0);
-  const pipeline        = projects.filter(p => p.stage !== 'completed').reduce((s, p) => s + (p.price ?? 0), 0);
-  const daIncassare     = projects.filter(p => p.stage !== 'completed').reduce((s, p) => s + Math.max(0, (p.price ?? 0) - (p.paidAmount ?? 0)), 0);
-  const goalPct         = Math.min(100, Math.round((incassatoMese / MONTHLY_GOAL) * 100));
-  const mancaAlGoal     = Math.max(0, MONTHLY_GOAL - incassatoMese);
+  const activeProjects  = projects.filter(p => p.stage !== 'completed' && p.type !== 'retainer' && p.type !== 'premade');
+  const incassato       = activeProjects.reduce((s, p) => s + (p.paidAmount ?? 0), 0);
+  const fatturato       = activeProjects.reduce((s, p) => s + (p.price ?? 0), 0);
+  const pipeline        = projects.filter(p => ['lead','onboarding'].includes(p.stage) && p.type !== 'retainer' && p.type !== 'premade').reduce((s, p) => s + (p.price ?? 0), 0);
+  const daIncassare     = activeProjects.reduce((s, p) => s + Math.max(0, (p.price ?? 0) - (p.paidAmount ?? 0)), 0);
+  const mrr             = projects.filter(p => p.type === 'retainer' && p.stage !== 'completed').reduce((s, p) => s + (p.retainerFee ?? 0), 0);
+  const premadeRev      = projects.filter(p => p.type === 'premade').reduce((s, p) => s + ((p.price ?? 0) * (p.salesCount ?? 0)), 0);
+  const goalPct         = Math.min(100, Math.round(((incassato + mrr + premadeRev) / MONTHLY_GOAL) * 100));
+  const mancaAlGoal     = Math.max(0, MONTHLY_GOAL - incassato - mrr - premadeRev);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -154,7 +148,7 @@ export default function Dashboard() {
       <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5 mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-4">
           <p className="label-meta">Obiettivo mensile — {new Date().toLocaleString('it-IT', { month: 'long', year: 'numeric' })}</p>
-          <p className="text-xs font-mono text-subtle">{formatEur(incassatoMese)} / {formatEur(MONTHLY_GOAL)}</p>
+          <p className="text-xs font-mono text-subtle">{formatEur(incassato + mrr)} / {formatEur(MONTHLY_GOAL)}</p>
         </div>
 
         {/* Progress bar */}
@@ -171,15 +165,15 @@ export default function Dashboard() {
           {goalPct >= 100 ? '🎯 Obiettivo raggiunto!' : `Mancano ${formatEur(mancaAlGoal)} al goal`}
         </p>
 
-        {/* 4 stat boxes */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* Stat boxes */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           <div className="bg-paper rounded-lg p-3">
-            <p className="label-meta mb-1">Incassato (mese)</p>
-            <p className="text-base font-display font-semibold text-ink">{formatEur(incassatoMese)}</p>
+            <p className="label-meta mb-1">Incassato</p>
+            <p className="text-base font-display font-semibold text-ink">{formatEur(incassato)}</p>
           </div>
           <div className="bg-paper rounded-lg p-3">
-            <p className="label-meta mb-1">Fatturato (mese)</p>
-            <p className="text-base font-display font-semibold text-ink">{formatEur(fatturatoMese)}</p>
+            <p className="label-meta mb-1">Fatturato attivo</p>
+            <p className="text-base font-display font-semibold text-ink">{formatEur(fatturato)}</p>
           </div>
           <div className="bg-paper rounded-lg p-3">
             <p className="label-meta mb-1">Pipeline totale</p>
@@ -189,6 +183,18 @@ export default function Dashboard() {
             <p className="label-meta mb-1">Da incassare</p>
             <p className={`text-base font-display font-semibold ${daIncassare > 0 ? 'text-burgundy' : 'text-ink'}`}>
               {formatEur(daIncassare)}
+            </p>
+          </div>
+          <div className="bg-[#ede8fe] rounded-lg p-3">
+            <p className="label-meta mb-1" style={{ color: '#5b21b6' }}>MRR Retainer</p>
+            <p className="text-base font-display font-semibold" style={{ color: '#5b21b6' }}>
+              {formatEur(mrr)}<span className="text-xs font-mono font-normal opacity-60">/mese</span>
+            </p>
+          </div>
+          <div className="bg-[#fff3e0] rounded-lg p-3">
+            <p className="label-meta mb-1" style={{ color: '#c2410c' }}>Premade venduti</p>
+            <p className="text-base font-display font-semibold" style={{ color: '#c2410c' }}>
+              {formatEur(premadeRev)}
             </p>
           </div>
         </div>
@@ -287,7 +293,7 @@ export default function Dashboard() {
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="w-40 sm:w-52 shrink-0"
+                      className="w-52 sm:w-72 shrink-0"
                     >
                       {/* Column header */}
                       <div

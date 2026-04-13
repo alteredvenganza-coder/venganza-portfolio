@@ -57,7 +57,16 @@ alter table public.projects
   add column if not exists files         jsonb   default '[]',
   add column if not exists brief         jsonb   default '{}',
   add column if not exists paid_amount   numeric,
-  add column if not exists contract_sent boolean default false;
+  add column if not exists contract_sent boolean default false,
+  add column if not exists retainer_fee  numeric,
+  add column if not exists sales_count   integer,
+  add column if not exists cover_image   text;
+
+-- Aggiorna check constraint tipo per includere retainer
+alter table public.projects drop constraint if exists projects_type_check;
+alter table public.projects
+  add constraint projects_type_check
+  check (type in ('fashion','branding','edilizia','app','premade','retainer','other'));
 
 -- ── Storage bucket per immagini di progetto ───────────────────
 insert into storage.buckets (id, name, public)
@@ -75,3 +84,20 @@ create policy "Public read project-files"
 create policy "Auth delete project-files"
   on storage.objects for delete to authenticated
   using (bucket_id = 'project-files');
+
+-- ── Push Subscriptions ────────────────────────────────────────
+create table if not exists public.push_subscriptions (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid references auth.users(id) on delete cascade not null,
+  endpoint     text not null,
+  subscription jsonb not null,
+  created_at   timestamptz default now(),
+  unique(user_id, endpoint)
+);
+
+alter table public.push_subscriptions enable row level security;
+
+create policy "Owner push subs"
+  on public.push_subscriptions for all
+  using  (auth.uid() = user_id)
+  with check (auth.uid() = user_id);

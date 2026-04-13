@@ -40,12 +40,15 @@ function projectFromDb(row) {
     price:         row.price,
     paidAmount:    row.paid_amount    ?? null,
     contractSent:  row.contract_sent  ?? false,
+    retainerFee:   row.retainer_fee   ?? null,
+    salesCount:    row.sales_count    ?? null,
     paymentStatus: row.payment_status,
     nextAction:    row.next_action,
     missingInfo:   row.missing_info,
-    tasks:         row.tasks  ?? [],
-    files:         row.files  ?? [],
-    brief:         row.brief  ?? {},
+    tasks:         row.tasks        ?? [],
+    files:         row.files        ?? [],
+    brief:         row.brief        ?? {},
+    coverImage:    row.cover_image  ?? null,
     createdAt:     row.created_at,
   };
 }
@@ -63,12 +66,15 @@ function projectToDb(p) {
   if ('price'         in p) row.price          = p.price ? Number(p.price) : null;
   if ('paidAmount'    in p) row.paid_amount    = p.paidAmount ? Number(p.paidAmount) : null;
   if ('contractSent'  in p) row.contract_sent  = Boolean(p.contractSent);
+  if ('retainerFee'   in p) row.retainer_fee   = p.retainerFee ? Number(p.retainerFee) : null;
+  if ('salesCount'    in p) row.sales_count    = p.salesCount  ? Number(p.salesCount)  : null;
   if ('paymentStatus' in p) row.payment_status = p.paymentStatus;
   if ('nextAction'    in p) row.next_action    = p.nextAction;
   if ('missingInfo'   in p) row.missing_info   = p.missingInfo;
   if ('tasks'         in p) row.tasks          = p.tasks  ?? [];
   if ('files'         in p) row.files          = p.files  ?? [];
   if ('brief'         in p) row.brief          = p.brief  ?? {};
+  if ('coverImage'    in p) row.cover_image    = p.coverImage ?? null;
   return row;
 }
 

@@ -45,12 +45,15 @@ export const STAGE_TEXT = {
 };
 
 // ─── Project types ────────────────────────────────────────────────────────────
-export const PROJECT_TYPES = ['fashion', 'branding', 'edilizia', 'other'];
+export const PROJECT_TYPES = ['fashion', 'branding', 'edilizia', 'app', 'premade', 'retainer', 'other'];
 
 export const TYPE_LABELS = {
   fashion:   'Fashion',
   branding:  'Branding',
   edilizia:  'Edilizia',
+  app:       'App',
+  premade:   'Premade',
+  retainer:  'Retainer',
   other:     'Other',
 };
 
@@ -58,6 +61,9 @@ export const TYPE_BG = {
   fashion:   '#fce8f3',
   branding:  '#e8f0fe',
   edilizia:  '#e8f4e8',
+  app:       '#e8f6fe',
+  premade:   '#fff3e0',
+  retainer:  '#ede8fe',
   other:     '#f3efe8',
 };
 
@@ -65,6 +71,9 @@ export const TYPE_TEXT = {
   fashion:   '#7b1f5a',
   branding:  '#1a56db',
   edilizia:  '#276749',
+  app:       '#0369a1',
+  premade:   '#c2410c',
+  retainer:  '#5b21b6',
   other:     '#6b6460',
 };
 

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { genId } from '../lib/utils';
 import * as db from '../lib/db';
 import { useAuth } from './useAuth';
+import { fireWebhook } from '../lib/webhook';
 
 // ── Store context ──────────────────────────────────────────────────────────────
 
@@ -82,7 +83,14 @@ export function useProjects() {
     const current = projects.find(p => p.id === id);
     const merged  = { ...current, ...patch };
     setProjects(prev => prev.map(p => p.id === id ? merged : p)); // optimistic
-    await db.patchProject(id, patch);
+    try {
+      await db.patchProject(id, patch);
+    } catch (err) {
+      console.error('[db] patchProject failed:', err);
+      // revert optimistic update
+      setProjects(prev => prev.map(p => p.id === id ? current : p));
+      alert('Errore salvataggio: ' + (err?.message ?? err));
+    }
   }
 
   async function deleteProject(id) {
@@ -102,6 +110,7 @@ export function useProjects() {
     const project = projects.find(p => p.id === projectId);
     const tasks   = [...(project.tasks ?? []), { id: genId(), text, done: false }];
     await updateProject(projectId, { tasks });
+    fireWebhook({ event: 'task_added', project: project.title, task: text });
   }
 
   async function toggleTask(projectId, taskId) {

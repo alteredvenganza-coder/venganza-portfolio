@@ -4,6 +4,7 @@ import { Plus, Trash2, Check, Upload, X, ChevronDown, ChevronUp, Image, Sparkles
 import Btn from './Btn';
 import { genId } from '../lib/utils';
 import { uploadProjectFile, deleteProjectFile } from '../lib/db';
+import { fireWebhook } from '../lib/webhook';
 
 /*
   brief = {
@@ -35,7 +36,9 @@ export default function BriefSection({ brief: rawBrief, projectId, onUpdate }) {
   function addStep(e) {
     e.preventDefault();
     if (!newStep.trim()) return;
-    update({ steps: [...brief.steps, { id: genId(), label: newStep.trim(), done: false }] });
+    const label = newStep.trim();
+    update({ steps: [...brief.steps, { id: genId(), label, done: false }] });
+    fireWebhook({ event: 'step_added', projectId, step: label });
     setNewStep('');
   }
 
