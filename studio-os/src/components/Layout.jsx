@@ -47,14 +47,14 @@ export default function Layout({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen">
       {/* ── Header ── */}
-      <header className="sticky top-0 z-40 bg-white border-b border-border">
+      <header className="sticky top-0 z-40 glass border-b border-white/10 border-x-0 border-t-0">
         <div className="max-w-6xl mx-auto px-3 sm:px-6 h-14 flex items-center gap-6">
           {/* Logo */}
           <Link to="/" className="shrink-0">
             <span className="font-display text-base font-semibold text-ink tracking-tight">
-              Venganza <span className="text-burgundy">OS</span>
+              Venganza <span className="text-burgundy-muted">OS</span>
             </span>
           </Link>
 
@@ -68,8 +68,8 @@ export default function Layout({ children }) {
                 className={({ isActive }) =>
                   `flex items-center gap-1.5 px-3 py-1.5 rounded text-sm transition-colors ${
                     isActive
-                      ? 'bg-burgundy-pale text-burgundy font-medium'
-                      : 'text-muted hover:text-ink hover:bg-paper'
+                      ? 'bg-burgundy/20 text-burgundy-muted border border-burgundy/20 font-medium'
+                      : 'text-muted hover:text-ink hover:bg-white/8'
                   }`
                 }
               >
@@ -82,7 +82,7 @@ export default function Layout({ children }) {
           {/* Settings icon */}
           <button
             onClick={() => setSettings(true)}
-            className="ml-auto shrink-0 p-1.5 rounded text-muted hover:text-ink hover:bg-paper transition-colors"
+            className="ml-auto shrink-0 p-1.5 rounded text-muted hover:text-ink hover:bg-white/8 transition-colors"
             title="Impostazioni"
           >
             <Settings size={16} />
@@ -99,7 +99,7 @@ export default function Layout({ children }) {
                 onChange={e => setQuery(e.target.value)}
                 onFocus={() => setFocused(true)}
                 onBlur={() => setTimeout(() => setFocused(false), 200)}
-                className="w-full pl-9 pr-8 py-1.5 text-sm border border-border rounded-md focus:border-burgundy-muted bg-cream placeholder-subtle"
+                className="w-full pl-9 pr-8 py-1.5 text-sm rounded-md"
               />
               {query && (
                 <button
@@ -113,7 +113,7 @@ export default function Layout({ children }) {
 
             {/* Results dropdown */}
             {focused && q && (
-              <div className="absolute top-full mt-1 w-full bg-white border border-border rounded-lg shadow-modal overflow-hidden z-50 max-h-72 overflow-y-auto">
+              <div className="absolute top-full mt-1 w-full glass-strong rounded-lg overflow-hidden z-50 max-h-72 overflow-y-auto">
                 {!hasResults && (
                   <p className="px-4 py-3 text-xs text-subtle">Nessun risultato per "{q}"</p>
                 )}
@@ -125,7 +125,7 @@ export default function Layout({ children }) {
                       <button
                         key={c.id}
                         onMouseDown={() => handleSelect(`/clients/${c.id}`)}
-                        className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm hover:bg-paper transition-colors"
+                        className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm hover:bg-white/8 transition-colors"
                       >
                         <Users size={13} className="text-subtle shrink-0" />
                         <span className="text-ink">{c.name}</span>
@@ -142,7 +142,7 @@ export default function Layout({ children }) {
                       <button
                         key={p.id}
                         onMouseDown={() => handleSelect(`/projects/${p.id}`)}
-                        className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm hover:bg-paper transition-colors"
+                        className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm hover:bg-white/8 transition-colors"
                       >
                         <FolderKanban size={13} className="text-subtle shrink-0" />
                         <span className="text-ink">{p.title}</span>

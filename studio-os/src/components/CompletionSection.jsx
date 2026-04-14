@@ -140,10 +140,10 @@ export default function CompletionSection({ project, client }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white border-2 border-burgundy/10 rounded-xl shadow-xl overflow-hidden"
+      className="glass-strong rounded-xl shadow-xl overflow-hidden"
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-burgundy/5 to-transparent p-6 border-b border-border">
+      <div className="bg-gradient-to-r from-burgundy/20 to-transparent p-6 border-b border-white/10">
         <div className="flex items-center gap-3 mb-1">
           <div className="w-10 h-10 rounded-full bg-burgundy/10 flex items-center justify-center text-burgundy">
             <PackageCheck size={24} />
@@ -175,7 +175,7 @@ export default function CompletionSection({ project, client }) {
                     <FileItem file={file} onRemove={handleRemoveFile} onDownload={handleDownloadFile} />
                   </motion.div>
                 )) : (
-                  <div className="border-2 border-dashed border-border rounded-lg py-10 flex flex-col items-center justify-center text-subtle">
+                  <div className="border-2 border-dashed border-white/20 rounded-lg py-10 flex flex-col items-center justify-center text-subtle">
                     <Upload size={28} className="mb-2 opacity-20" />
                     <p className="text-sm">Nessun file caricato.</p>
                   </div>
@@ -185,7 +185,7 @@ export default function CompletionSection({ project, client }) {
           </div>
 
           {/* ── Sfondi carosello ── */}
-          <div className="border-t border-border pt-5">
+          <div className="border-t border-white/10 pt-5">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h3 className="text-sm font-semibold uppercase tracking-wider text-muted">Sfondi carosello</h3>
@@ -208,7 +208,7 @@ export default function CompletionSection({ project, client }) {
             {bgImages.length === 0 ? (
               <div
                 onClick={() => bgInputRef.current?.click()}
-                className="border-2 border-dashed border-border rounded-lg py-8 flex flex-col items-center justify-center text-subtle cursor-pointer hover:border-burgundy-muted hover:text-ink transition-colors"
+                className="border-2 border-dashed border-white/20 rounded-lg py-8 flex flex-col items-center justify-center text-subtle cursor-pointer hover:border-burgundy-muted hover:text-ink transition-colors"
               >
                 <Image size={28} className="mb-2 opacity-20" />
                 <p className="text-sm">Clicca per aggiungere foto di sfondo</p>
@@ -237,7 +237,7 @@ export default function CompletionSection({ project, client }) {
                   {/* Add more button */}
                   <motion.button
                     onClick={() => bgInputRef.current?.click()}
-                    className="aspect-square rounded-md border-2 border-dashed border-border flex items-center justify-center text-subtle hover:border-burgundy-muted hover:text-ink transition-colors"
+                    className="aspect-square rounded-md border-2 border-dashed border-white/20 flex items-center justify-center text-subtle hover:border-burgundy-muted hover:text-ink transition-colors"
                   >
                     <Plus size={18} />
                   </motion.button>
@@ -247,10 +247,10 @@ export default function CompletionSection({ project, client }) {
           </div>
 
           {/* Link */}
-          <div className="border-t border-border pt-4">
+          <div className="border-t border-white/10 pt-4">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted mb-3">Link cliente</h3>
             <div className="flex gap-2">
-              <div className="flex-1 bg-paper border border-border rounded px-3 py-2 text-sm font-mono truncate text-muted">
+              <div className="flex-1 bg-white/5 border border-white/15 rounded px-3 py-2 text-sm font-mono truncate text-muted">
                 {sharedLink || 'Ancora non generato…'}
               </div>
               {sharedLink ? (
@@ -280,7 +280,7 @@ export default function CompletionSection({ project, client }) {
             </Field>
           </div>
 
-          <div className="space-y-3 pt-4 border-t border-border">
+          <div className="space-y-3 pt-4 border-t border-white/10">
             <Btn variant="primary" className="w-full py-3" onClick={handleSendEmail} disabled={sending || !client?.email}>
               {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
               Invia via Email

@@ -24,11 +24,11 @@ export default function Btn({
     primary:
       'bg-burgundy text-white hover:bg-burgundy-light disabled:opacity-50',
     secondary:
-      'bg-white border border-border text-ink hover:border-burgundy-muted hover:text-burgundy disabled:opacity-50',
+      'bg-white/10 border border-white/15 text-ink hover:bg-white/15 hover:border-white/25 disabled:opacity-50',
     ghost:
-      'text-muted hover:text-ink hover:bg-paper disabled:opacity-50',
+      'text-muted hover:text-ink hover:bg-white/8 disabled:opacity-50',
     danger:
-      'bg-[#fce8e6] text-[#7b1f24] border border-[#f5c6c6] hover:bg-[#f5c6c6] disabled:opacity-50',
+      'bg-red-950/60 text-red-300 border border-red-800/50 hover:bg-red-900/60 disabled:opacity-50',
   };
 
   return (

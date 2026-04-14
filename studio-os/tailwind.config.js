@@ -14,17 +14,17 @@ export default {
           DEFAULT: '#7b1f24',
           light:   '#a33030',
           muted:   '#c9888b',
-          pale:    '#f5e8e8',
+          pale:    '#2d1015',   // dark burgundy tint (nav active bg)
         },
-        // Surface
-        cream:   '#faf8f5',
-        paper:   '#f3efe8',
-        border:  '#e8e4dc',
-        // Text
-        ink:     '#1a1a1a',
-        muted:   '#6b6460',
-        subtle:  '#9e9690',
-        // Stage colors (warm, light)
+        // Surface (dark glass theme)
+        cream:   '#0e0c14',                  // app background base
+        paper:   'rgba(255,255,255,0.06)',   // inner surface on glass
+        border:  'rgba(255,255,255,0.12)',   // glass border
+        // Text (inverted for dark)
+        ink:     '#f0ede8',   // primary text (warm near-white)
+        muted:   '#b0acaa',   // secondary text
+        subtle:  '#8c8884',   // tertiary text
+        // Stage colors — kept for badges (small pills on any bg)
         stage: {
           lead:        '#fdf3e3',
           onboarding:  '#e8f0fe',
@@ -47,8 +47,8 @@ export default {
         xl:      '16px',
       },
       boxShadow: {
-        card:  '0 1px 3px rgba(26,26,26,0.07), 0 1px 2px rgba(26,26,26,0.04)',
-        modal: '0 8px 32px rgba(26,26,26,0.12)',
+        card:  '0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07)',
+        modal: '0 16px 64px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1)',
       },
     },
   },

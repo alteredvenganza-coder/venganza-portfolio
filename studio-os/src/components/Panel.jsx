@@ -6,9 +6,9 @@ export default function Panel({ title, count, children, className = '', action }
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className={`bg-white border border-border rounded-lg shadow-card ${className}`}
+      className={`glass rounded-lg shadow-card ${className}`}
     >
-      <header className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-border">
+      <header className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-white/10">
         <div className="flex items-center gap-2">
           <h3 className="font-display text-base font-semibold text-ink">{title}</h3>
           {count !== undefined && (

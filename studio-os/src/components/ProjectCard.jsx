@@ -50,15 +50,15 @@ function CountdownPill({ deadline }) {
 
   const days = diff ? Math.floor(diff / 86400000) : 0;
   let bg, color;
-  if (overdue)      { bg = '#f5e8e8'; color = '#7b1f24'; }
-  else if (days <= 3)  { bg = '#fce8e6'; color = '#c0392b'; }
-  else if (days <= 7)  { bg = '#fff8e1'; color = '#9a6b00'; }
-  else if (days <= 30) { bg = '#f3efe8'; color = '#6b6460'; }
-  else                 { bg = '#f3efe8'; color = '#9e9690'; }
+  if (overdue)         { bg = 'rgba(123,31,36,0.4)';  color = '#f5b8b8'; }
+  else if (days <= 3)  { bg = 'rgba(192,57,43,0.3)';  color = '#f5b8b8'; }
+  else if (days <= 7)  { bg = 'rgba(122,96,16,0.3)';  color = '#f5e0a0'; }
+  else if (days <= 30) { bg = 'rgba(255,255,255,0.08)'; color = '#b0acaa'; }
+  else                 { bg = 'rgba(255,255,255,0.06)'; color = '#8c8884'; }
 
   return (
     <span
-      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-medium tabular-nums"
+      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-medium tabular-nums border border-white/10"
       style={{ background: bg, color }}
     >
       {overdue && <AlertCircle size={9} />}
@@ -77,13 +77,13 @@ export default function ProjectCard({ project, clientName, compact = false }) {
       <Link
         to={`/projects/${project.id}`}
         className={[
-          'block bg-white border rounded-lg shadow-card hover:border-burgundy-muted transition-colors overflow-hidden',
-          project.isPaused ? 'border-[#e8e4dc] opacity-80' : 'border-border',
+          'block glass rounded-lg shadow-card hover:border-burgundy-muted transition-colors overflow-hidden',
+          project.isPaused ? 'opacity-70' : '',
           overdue ? 'border-l-2 border-l-burgundy' : '',
         ].join(' ')}
       >
         {project.coverImage && (
-          <div className="w-full h-28 overflow-hidden bg-paper">
+          <div className="w-full h-28 overflow-hidden bg-white/5">
             <img
               src={project.coverImage}
               alt={project.title}
@@ -107,7 +107,7 @@ export default function ProjectCard({ project, clientName, compact = false }) {
               />
             )}
             {project.isPaused && (
-              <span className="flex items-center gap-0.5 text-[10px] font-mono text-[#7a6010]">
+              <span className="flex items-center gap-0.5 text-[10px] font-mono text-yellow-300/70">
                 <Pause size={9} /> Pausa
               </span>
             )}
@@ -125,7 +125,7 @@ export default function ProjectCard({ project, clientName, compact = false }) {
 
           {/* Next action */}
           {project.nextAction && !compact && (
-            <p className="text-xs text-muted mt-2 border-t border-border pt-2 line-clamp-2">
+            <p className="text-xs text-muted mt-2 border-t border-white/10 pt-2 line-clamp-2">
               → {project.nextAction}
             </p>
           )}
@@ -138,7 +138,7 @@ export default function ProjectCard({ project, clientName, compact = false }) {
                   <span
                     className={[
                       'flex items-center gap-1 text-[11px] font-mono',
-                      overdue ? 'text-burgundy font-medium' : urgent ? 'text-[#7a6010]' : 'text-subtle',
+                      overdue ? 'text-red-300 font-medium' : urgent ? 'text-yellow-300/80' : 'text-subtle',
                     ].join(' ')}
                   >
                     {overdue && <AlertCircle size={11} />}

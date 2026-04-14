@@ -31,7 +31,7 @@ export default function Modal({ open, onClose, title, children, width = 'max-w-x
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="absolute inset-0 bg-ink/20"
+            className="absolute inset-0 bg-black/60"
           />
 
           {/* Dialog */}
@@ -41,10 +41,10 @@ export default function Modal({ open, onClose, title, children, width = 'max-w-x
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 8 }}
             transition={{ duration: 0.2 }}
-            className={`relative w-full ${width} bg-white rounded-lg shadow-modal z-10 max-h-[90vh] overflow-y-auto`}
+            className={`relative w-full ${width} glass-strong rounded-lg shadow-modal z-10 max-h-[90vh] overflow-y-auto`}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-border sticky top-0 bg-white rounded-t-lg">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/10 sticky top-0 bg-white/5 backdrop-blur-xl rounded-t-lg">
               <h2 className="font-display text-lg font-semibold text-ink">{title}</h2>
               <button
                 onClick={onClose}

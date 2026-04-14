@@ -11,11 +11,11 @@ export default function ClientCard({ client, projectCount = 0 }) {
     >
       <Link
         to={`/clients/${client.id}`}
-        className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white border border-border rounded-lg shadow-card hover:border-burgundy-muted transition-colors group"
+        className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 glass rounded-lg shadow-card hover:border-burgundy-muted transition-colors group"
       >
         {/* Avatar */}
-        <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-full bg-burgundy-pale flex items-center justify-center shrink-0">
-          <span className="font-display text-sm font-semibold text-burgundy">
+        <div className="w-9 sm:w-10 h-9 sm:h-10 rounded-full bg-burgundy/20 border border-burgundy/30 flex items-center justify-center shrink-0">
+          <span className="font-display text-sm font-semibold text-burgundy-muted">
             {initials(client.name)}
           </span>
         </div>
@@ -46,7 +46,7 @@ export default function ClientCard({ client, projectCount = 0 }) {
           <p className="label-meta">{projectCount === 1 ? 'progetto' : 'progetti'}</p>
         </div>
 
-        <ChevronRight size={16} className="text-subtle group-hover:text-burgundy transition-colors shrink-0" />
+        <ChevronRight size={16} className="text-subtle group-hover:text-burgundy-muted transition-colors shrink-0" />
       </Link>
     </motion.div>
   );

@@ -44,9 +44,9 @@ function DroppableColumn({ stage, projects, clientName }) {
       ref={setNodeRef}
       className="min-h-32 flex flex-col gap-2 p-2 border rounded-b-md transition-colors"
       style={{
-        borderColor: `${STAGE_TEXT[stage]}22`,
+        borderColor: `${STAGE_TEXT[stage]}44`,
         borderTopColor: 'transparent',
-        background: isOver ? '#f5e8e8' : undefined,
+        background: isOver ? 'rgba(123,31,36,0.25)' : 'rgba(255,255,255,0.03)',
       }}
     >
       {projects.map(p => (
@@ -145,14 +145,14 @@ export default function Dashboard() {
       </div>
 
       {/* ── Finance widget ── */}
-      <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5 mb-6 sm:mb-8">
+      <div className="glass rounded-lg shadow-card p-4 sm:p-5 mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-4">
           <p className="label-meta">Obiettivo mensile — {new Date().toLocaleString('it-IT', { month: 'long', year: 'numeric' })}</p>
           <p className="text-xs font-mono text-subtle">{formatEur(incassato + mrr)} / {formatEur(MONTHLY_GOAL)}</p>
         </div>
 
         {/* Progress bar */}
-        <div className="h-2 bg-paper rounded-full mb-1 overflow-hidden">
+        <div className="h-2 bg-white/10 rounded-full mb-1 overflow-hidden">
           <motion.div
             className="h-full rounded-full"
             style={{ background: goalPct >= 100 ? '#276749' : goalPct >= 60 ? '#7a6010' : '#7b1f24' }}
@@ -167,33 +167,33 @@ export default function Dashboard() {
 
         {/* Stat boxes */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <div className="bg-paper rounded-lg p-3">
+          <div className="bg-white/8 rounded-lg p-3 border border-white/8">
             <p className="label-meta mb-1">Incassato</p>
             <p className="text-base font-display font-semibold text-ink">{formatEur(incassato)}</p>
           </div>
-          <div className="bg-paper rounded-lg p-3">
+          <div className="bg-white/8 rounded-lg p-3 border border-white/8">
             <p className="label-meta mb-1">Fatturato attivo</p>
             <p className="text-base font-display font-semibold text-ink">{formatEur(fatturato)}</p>
           </div>
-          <div className="bg-paper rounded-lg p-3">
+          <div className="bg-white/8 rounded-lg p-3 border border-white/8">
             <p className="label-meta mb-1">Pipeline totale</p>
             <p className="text-base font-display font-semibold text-ink">{formatEur(pipeline)}</p>
           </div>
-          <div className="bg-paper rounded-lg p-3">
+          <div className="bg-white/8 rounded-lg p-3 border border-white/8">
             <p className="label-meta mb-1">Da incassare</p>
             <p className={`text-base font-display font-semibold ${daIncassare > 0 ? 'text-burgundy' : 'text-ink'}`}>
               {formatEur(daIncassare)}
             </p>
           </div>
-          <div className="bg-[#ede8fe] rounded-lg p-3">
-            <p className="label-meta mb-1" style={{ color: '#5b21b6' }}>MRR Retainer</p>
-            <p className="text-base font-display font-semibold" style={{ color: '#5b21b6' }}>
+          <div className="bg-purple-950/40 border border-purple-500/20 rounded-lg p-3">
+            <p className="label-meta mb-1" style={{ color: '#a78bfa' }}>MRR Retainer</p>
+            <p className="text-base font-display font-semibold" style={{ color: '#a78bfa' }}>
               {formatEur(mrr)}<span className="text-xs font-mono font-normal opacity-60">/mese</span>
             </p>
           </div>
-          <div className="bg-[#fff3e0] rounded-lg p-3">
-            <p className="label-meta mb-1" style={{ color: '#c2410c' }}>Premade venduti</p>
-            <p className="text-base font-display font-semibold" style={{ color: '#c2410c' }}>
+          <div className="bg-orange-950/40 border border-orange-500/20 rounded-lg p-3">
+            <p className="label-meta mb-1" style={{ color: '#fb923c' }}>Premade venduti</p>
+            <p className="text-base font-display font-semibold" style={{ color: '#fb923c' }}>
               {formatEur(premadeRev)}
             </p>
           </div>
@@ -206,8 +206,8 @@ export default function Dashboard() {
           onClick={() => setTypeFilter('all')}
           className={`px-2 sm:px-3 py-1.5 text-xs font-mono rounded border transition-colors whitespace-nowrap ${
             typeFilter === 'all'
-              ? 'bg-ink text-white border-ink'
-              : 'bg-white text-muted border-border hover:border-ink/30'
+              ? 'bg-burgundy text-white border-burgundy'
+              : 'bg-white/8 text-muted border-white/15 hover:border-white/30 hover:text-ink'
           }`}
         >
           Tutti
@@ -218,8 +218,8 @@ export default function Dashboard() {
             onClick={() => setTypeFilter(t)}
             className={`px-2 sm:px-3 py-1.5 text-xs font-mono rounded border transition-colors whitespace-nowrap ${
               typeFilter === t
-                ? 'bg-ink text-white border-ink'
-                : 'bg-white text-muted border-border hover:border-ink/30'
+                ? 'bg-burgundy text-white border-burgundy'
+                : 'bg-white/8 text-muted border-white/15 hover:border-white/30 hover:text-ink'
             }`}
           >
             {TYPE_LABELS[t]}
@@ -255,7 +255,7 @@ export default function Dashboard() {
           ) : (
             <div className="flex flex-col gap-2">
               {withNextAction.slice(0, 4).map(p => (
-                <Link key={p.id} to={`/projects/${p.id}`} className="block p-2 rounded border border-border bg-paper hover:border-burgundy-muted transition-colors">
+                <Link key={p.id} to={`/projects/${p.id}`} className="block p-2 rounded border border-white/10 bg-white/5 hover:border-burgundy-muted transition-colors">
                   <p className="text-xs font-medium text-ink mb-0.5 line-clamp-1">{p.title}</p>
                   <p className="text-xs text-muted line-clamp-2">→ {p.nextAction}</p>
                 </Link>
@@ -271,7 +271,7 @@ export default function Dashboard() {
         <p className="text-xs text-subtle mb-4 font-mono">Trascina le card per cambiare stage</p>
 
         {projects.length === 0 ? (
-          <div className="bg-white border border-border rounded-lg p-10 text-center">
+          <div className="glass rounded-lg p-10 text-center">
             <p className="text-sm text-muted mb-4">Nessun progetto ancora.</p>
             <Btn variant="primary" onClick={() => setShowAddProject(true)}>
               <Plus size={14} /> Aggiungi il primo progetto
@@ -298,7 +298,7 @@ export default function Dashboard() {
                       {/* Column header */}
                       <div
                         className="flex items-center justify-between px-3 py-2 rounded-t-md border border-b-0"
-                        style={{ backgroundColor: STAGE_BG[stage], borderColor: `${STAGE_TEXT[stage]}22` }}
+                        style={{ backgroundColor: `${STAGE_TEXT[stage]}22`, borderColor: `${STAGE_TEXT[stage]}44` }}
                       >
                         <span className="text-[11px] font-mono font-medium tracking-wide" style={{ color: STAGE_TEXT[stage] }}>
                           {STAGE_LABELS[stage]}
@@ -319,12 +319,13 @@ export default function Dashboard() {
                     animate={{ opacity: 1, y: 0 }}
                     className="w-40 sm:w-52 shrink-0"
                   >
-                    <div className="flex items-center justify-between px-3 py-2 rounded-t-md border border-b-0 bg-paper border-border">
+                    <div className="flex items-center justify-between px-3 py-2 rounded-t-md border border-b-0 bg-white/8 border-white/15">
                       <span className="text-[11px] font-mono font-medium tracking-wide text-muted">In pausa</span>
                       <span className="text-[11px] font-mono text-muted">{paused.length}</span>
                     </div>
                     <div
-                      className="min-h-32 flex flex-col gap-2 p-2 border border-border border-t-0 rounded-b-md"
+                      className="min-h-32 flex flex-col gap-2 p-2 border border-white/15 border-t-0 rounded-b-md"
+                      style={{ background: 'rgba(255,255,255,0.03)' }}
                     >
                       {paused.map(p => (
                         <DraggableCard key={p.id} project={p} clientName={clientName(p.clientId)} />
