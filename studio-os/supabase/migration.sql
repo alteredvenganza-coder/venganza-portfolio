@@ -130,3 +130,7 @@ create policy "Public read deliveries"
 create policy "Auth insert deliveries"
   on public.deliveries for insert to authenticated
   with check (true);
+
+-- ── Aggiungi colonna bg_images a deliveries ───────────────────
+alter table public.deliveries
+  add column if not exists bg_images jsonb default '[]';

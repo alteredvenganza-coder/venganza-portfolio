@@ -183,11 +183,11 @@ export async function deleteProjectFile(storagePath) {
 
 // ── Deliveries (link pubblici per i clienti) ──────────────────────────────────
 
-export async function createDelivery({ projectId, title, files, message, expiresInDays = 7 }) {
+export async function createDelivery({ projectId, title, files, message, bgImages = [], expiresInDays = 7 }) {
   const expires_at = new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000).toISOString();
   const { data, error } = await supabase
     .from('deliveries')
-    .insert({ project_id: projectId, title, files, message, expires_at })
+    .insert({ project_id: projectId, title, files, message, bg_images: bgImages, expires_at })
     .select()
     .single();
   if (error) throw error;

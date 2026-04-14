@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom';
 import { Download, FileText, AlertCircle, Clock } from 'lucide-react';
 import { getDelivery } from '../lib/db';
 
-// ── Curated background images ─────────────────────────────────────────────────
-const BG_IMAGES = [
+// ── Default background images (used when no custom ones are set) ──────────────
+const BG_IMAGES_DEFAULT = [
   'https://images.unsplash.com/photo-1617396900799-f4ec2b43c7d3?w=1920&q=80',
   'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=80',
   'https://images.unsplash.com/photo-1536329583941-14287ec6fc4e?w=1920&q=80',
@@ -36,16 +36,17 @@ export default function DeliveryPage() {
   const [fading,   setFading]   = useState(false);
 
   // ── Carousel ─────────────────────────────────────────────────────────────────
+  const bgCount = delivery?.bg_images?.length > 0 ? delivery.bg_images.length : BG_IMAGES_DEFAULT.length;
   useEffect(() => {
     const interval = setInterval(() => {
       setFading(true);
       setTimeout(() => {
-        setBgIndex(i => (i + 1) % BG_IMAGES.length);
+        setBgIndex(i => (i + 1) % bgCount);
         setFading(false);
       }, 700);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [bgCount]);
 
   // ── Fetch delivery ────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -67,11 +68,13 @@ export default function DeliveryPage() {
     ? Math.ceil((new Date(delivery.expires_at) - new Date()) / (1000 * 60 * 60 * 24))
     : 0;
 
+  const bgImages = delivery?.bg_images?.length > 0 ? delivery.bg_images : BG_IMAGES_DEFAULT;
+
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
 
       {/* ── Background carousel ─────────────────────────────────────────────── */}
-      {BG_IMAGES.map((src, i) => (
+      {bgImages.map((src, i) => (
         <div
           key={src}
           style={{
@@ -271,7 +274,7 @@ export default function DeliveryPage() {
         gap:            8,
         zIndex:         3,
       }}>
-        {BG_IMAGES.map((_, i) => (
+        {bgImages.map((_, i) => (
           <button
             key={i}
             onClick={() => setBgIndex(i)}
