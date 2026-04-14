@@ -106,6 +106,11 @@ export function useProjects() {
 
   async function updateProject(id, patch) {
     const current = projects.find(p => p.id === id);
+    // Auto-stamp completedAt when project first reaches a closed stage
+    const closedStages = ['completed', 'delivered', 'archived'];
+    if (patch.stage && closedStages.includes(patch.stage) && !current?.completedAt) {
+      patch = { ...patch, completedAt: new Date().toISOString() };
+    }
     const merged  = { ...current, ...patch };
     setProjects(prev => prev.map(p => p.id === id ? merged : p)); // optimistic
     try {

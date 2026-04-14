@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import Modal from '../components/Modal';
 import Field from '../components/Field';
 import Btn from '../components/Btn';
+import PricingSuggestion from '../components/PricingSuggestion';
 import { PROJECT_TYPES, TYPE_LABELS, STAGES, STAGE_LABELS, PAYMENT_STATUSES, PAYMENT_LABELS } from '../lib/constants';
 
 const EMPTY = {
@@ -130,6 +132,18 @@ export default function ProjectForm({
             </select>
           </Field>
         </div>
+
+        {/* Smart Pricing Suggestion — only for new projects, non-retainer */}
+        {!isEdit && !['retainer', 'premade'].includes(form.type) && (
+          <AnimatePresence>
+            <PricingSuggestion
+              key={form.type}
+              type={form.type}
+              clientId={form.clientId}
+              onApply={price => set('price', String(price))}
+            />
+          </AnimatePresence>
+        )}
 
         {/* Deadline + Price/Fee */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">

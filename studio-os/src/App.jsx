@@ -11,8 +11,8 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.error) {
       return (
-        <div className="min-h-screen bg-cream flex items-center justify-center p-6">
-          <div className="bg-white border border-border rounded-lg p-6 max-w-lg shadow-card">
+        <div className="min-h-screen flex items-center justify-center p-6">
+          <div className="glass rounded-lg p-6 max-w-lg shadow-card">
             <p className="label-meta text-burgundy mb-2">Errore di configurazione</p>
             <p className="text-sm text-ink font-mono whitespace-pre-wrap">{this.state.error.message}</p>
           </div>
@@ -27,6 +27,7 @@ import Dashboard from './pages/Dashboard';
 import ClientsPage from './pages/ClientsPage';
 import ClientDetail from './pages/ClientDetail';
 import ProjectDetail from './pages/ProjectDetail';
+import PricingMemoryPage from './pages/PricingMemoryPage';
 import LoginPage from './pages/LoginPage';
 import DeliveryPage from './pages/DeliveryPage';
 
@@ -51,6 +52,7 @@ function AppContent() {
         <Route path="/clients"       element={<ClientsPage />} />
         <Route path="/clients/:id"   element={<ClientDetail />} />
         <Route path="/projects/:id"  element={<ProjectDetail />} />
+        <Route path="/pricing"       element={<PricingMemoryPage />} />
         <Route path="*"              element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

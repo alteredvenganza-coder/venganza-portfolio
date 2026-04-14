@@ -49,6 +49,7 @@ function projectFromDb(row) {
     files:         row.files        ?? [],
     brief:         row.brief        ?? {},
     coverImage:    row.cover_image  ?? null,
+    completedAt:   row.completed_at ?? null,
     createdAt:     row.created_at,
   };
 }
@@ -74,7 +75,8 @@ function projectToDb(p) {
   if ('tasks'         in p) row.tasks          = p.tasks  ?? [];
   if ('files'         in p) row.files          = p.files  ?? [];
   if ('brief'         in p) row.brief          = p.brief  ?? {};
-  if ('coverImage'    in p) row.cover_image    = p.coverImage ?? null;
+  if ('coverImage'    in p) row.cover_image    = p.coverImage  ?? null;
+  if ('completedAt'   in p) row.completed_at  = p.completedAt ?? null;
   return row;
 }
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, LayoutDashboard, Users, FolderKanban, X, Settings } from 'lucide-react';
+import { Search, LayoutDashboard, Users, TrendingUp, X, Settings } from 'lucide-react';
 import { useClients } from '../hooks/useStore';
 import { useProjects } from '../hooks/useStore';
 import SettingsModal from './SettingsModal';
@@ -8,6 +8,7 @@ import SettingsModal from './SettingsModal';
 const NAV = [
   { to: '/',        label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/clients', label: 'Clienti',   icon: Users },
+  { to: '/pricing', label: 'Prezzi',    icon: TrendingUp },
 ];
 
 export default function Layout({ children }) {

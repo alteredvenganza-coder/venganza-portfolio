@@ -134,3 +134,7 @@ create policy "Auth insert deliveries"
 -- ── Aggiungi colonna bg_images a deliveries ───────────────────
 alter table public.deliveries
   add column if not exists bg_images jsonb default '[]';
+
+-- ── Smart Pricing Memory: data completamento progetto ────────
+alter table public.projects
+  add column if not exists completed_at timestamptz;
