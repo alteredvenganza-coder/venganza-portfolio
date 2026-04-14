@@ -4,6 +4,9 @@ import * as db from '../lib/db';
 import { useAuth } from './useAuth';
 import { fireWebhook } from '../lib/webhook';
 
+const GOALS_KEY      = 'venganza-goals';
+const GOALS_DEFAULTS = { monthly: 10000, yearly: 120000, byType: {} };
+
 // ── Store context ──────────────────────────────────────────────────────────────
 
 const StoreContext = createContext(null);
@@ -13,6 +16,23 @@ export function StoreProvider({ children }) {
   const [clients,  setClients]  = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading,  setLoading]  = useState(true);
+
+  const [goals, setGoals] = useState(() => {
+    try {
+      const s = localStorage.getItem(GOALS_KEY);
+      if (!s) return GOALS_DEFAULTS;
+      const p = JSON.parse(s);
+      return { ...GOALS_DEFAULTS, ...p, byType: { ...GOALS_DEFAULTS.byType, ...(p.byType ?? {}) } };
+    } catch { return GOALS_DEFAULTS; }
+  });
+
+  function updateGoals(patch) {
+    setGoals(prev => {
+      const next = { ...prev, ...patch };
+      localStorage.setItem(GOALS_KEY, JSON.stringify(next));
+      return next;
+    });
+  }
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
@@ -24,7 +44,7 @@ export function StoreProvider({ children }) {
   }, [user]);
 
   return (
-    <StoreContext.Provider value={{ clients, setClients, projects, setProjects, loading, user }}>
+    <StoreContext.Provider value={{ clients, setClients, projects, setProjects, loading, user, goals, updateGoals }}>
       {children}
     </StoreContext.Provider>
   );
@@ -32,6 +52,11 @@ export function StoreProvider({ children }) {
 
 export function useStore() {
   return useContext(StoreContext);
+}
+
+export function useGoals() {
+  const { goals, updateGoals } = useStore();
+  return { goals, updateGoals };
 }
 
 // ── Clients ────────────────────────────────────────────────────────────────────

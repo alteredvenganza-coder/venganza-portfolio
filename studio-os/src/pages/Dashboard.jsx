@@ -10,11 +10,10 @@ import Panel from '../components/Panel';
 import ProjectCard from '../components/ProjectCard';
 import Btn from '../components/Btn';
 import Badge from '../components/Badge';
-import { useClients, useProjects } from '../hooks/useStore';
+import { useClients, useProjects, useGoals } from '../hooks/useStore';
 import { STAGES, STAGE_LABELS, STAGE_BG, STAGE_TEXT, PROJECT_TYPES, TYPE_LABELS } from '../lib/constants';
 import { isOverdue, daysUntil, formatEur } from '../lib/utils';
 
-const MONTHLY_GOAL = 10000;
 import ProjectForm from '../forms/ProjectForm';
 import ClientForm from '../forms/ClientForm';
 
@@ -63,6 +62,7 @@ function DroppableColumn({ stage, projects, clientName }) {
 export default function Dashboard() {
   const { clients, addClient }              = useClients();
   const { projects, addProject, updateProject } = useProjects();
+  const { goals }                           = useGoals();
 
   const [typeFilter, setTypeFilter]         = useState('all');
   const [showAddProject, setShowAddProject] = useState(false);
@@ -77,8 +77,8 @@ export default function Dashboard() {
   const daIncassare     = activeProjects.reduce((s, p) => s + Math.max(0, (p.price ?? 0) - (p.paidAmount ?? 0)), 0);
   const mrr             = projects.filter(p => p.type === 'retainer' && p.stage !== 'completed').reduce((s, p) => s + (p.retainerFee ?? 0), 0);
   const premadeRev      = projects.filter(p => p.type === 'premade').reduce((s, p) => s + ((p.price ?? 0) * (p.salesCount ?? 0)), 0);
-  const goalPct         = Math.min(100, Math.round(((incassato + mrr + premadeRev) / MONTHLY_GOAL) * 100));
-  const mancaAlGoal     = Math.max(0, MONTHLY_GOAL - incassato - mrr - premadeRev);
+  const goalPct         = goals.monthly > 0 ? Math.min(100, Math.round(((incassato + mrr + premadeRev) / goals.monthly) * 100)) : 0;
+  const mancaAlGoal     = Math.max(0, goals.monthly - incassato - mrr - premadeRev);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -148,7 +148,7 @@ export default function Dashboard() {
       <div className="glass rounded-lg shadow-card p-4 sm:p-5 mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-4">
           <p className="label-meta">Obiettivo mensile — {new Date().toLocaleString('it-IT', { month: 'long', year: 'numeric' })}</p>
-          <p className="text-xs font-mono text-subtle">{formatEur(incassato + mrr)} / {formatEur(MONTHLY_GOAL)}</p>
+          <p className="text-xs font-mono text-subtle">{formatEur(incassato + mrr)} / {formatEur(goals.monthly)}</p>
         </div>
 
         {/* Progress bar */}
@@ -162,7 +162,7 @@ export default function Dashboard() {
           />
         </div>
         <p className="text-[11px] font-mono text-subtle mb-4">
-          {goalPct >= 100 ? '🎯 Obiettivo raggiunto!' : `Mancano ${formatEur(mancaAlGoal)} al goal`}
+          {goalPct >= 100 ? '🎯 Obiettivo raggiunto!' : `Mancano ${formatEur(mancaAlGoal)} al goal (${formatEur(goals.monthly)})`}
         </p>
 
         {/* Stat boxes */}
