@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Bell, BellOff, Webhook, Check, X, ExternalLink, Target } from 'lucide-react';
+import { Bell, BellOff, Webhook, Check, X, ExternalLink, Target, ImagePlus, Trash2 } from 'lucide-react';
 import Modal from './Modal';
 import Btn from './Btn';
 import Field from './Field';
 import GoalsSection from './GoalsSection';
 import { usePush } from '../hooks/usePush';
+import { useGoals } from '../hooks/useStore';
 import { getWebhookUrl, saveWebhookUrl } from '../lib/webhook';
 
 const TABS = [
@@ -14,10 +15,12 @@ const TABS = [
 
 export default function SettingsModal({ open, onClose }) {
   const { status, subscribe, unsubscribe, supported } = usePush();
+  const { goals, updateGoals } = useGoals();
   const [webhookUrl,   setWebhookUrl]   = useState('');
   const [webhookSaved, setWebhookSaved] = useState(false);
   const [pushError,    setPushError]    = useState('');
   const [activeTab,    setActiveTab]    = useState('settings');
+  const [bgDraft,      setBgDraft]      = useState('');
 
   useEffect(() => {
     if (open) {
@@ -159,6 +162,56 @@ export default function SettingsModal({ open, onClose }) {
                   <X size={13} /> Rimuovi
                 </Btn>
               )}
+            </div>
+          </div>
+
+          <hr className="border-white/10" />
+
+          {/* ── Sfondo app ── */}
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <ImagePlus size={14} className="text-burgundy" />
+              <p className="text-sm font-semibold text-ink">Sfondo app</p>
+            </div>
+            <p className="text-xs text-subtle mb-3">
+              Imposta una tua foto come sfondo — vision board, obiettivo, mood.
+              Incolla il link diretto di un'immagine (Unsplash, Google Drive, ecc.)
+            </p>
+
+            {goals.appBackground && (
+              <div className="relative mb-3 rounded-lg overflow-hidden h-28 group">
+                <img
+                  src={goals.appBackground}
+                  alt="Sfondo corrente"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <button
+                    onClick={() => updateGoals({ appBackground: null })}
+                    className="flex items-center gap-1.5 text-xs text-white bg-red-900/70 hover:bg-red-900 px-3 py-1.5 rounded transition-colors"
+                  >
+                    <Trash2 size={12} /> Rimuovi
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <input
+                type="url"
+                placeholder="https://images.unsplash.com/…"
+                value={bgDraft}
+                onChange={e => setBgDraft(e.target.value)}
+                className="flex-1 text-sm"
+              />
+              <Btn
+                variant="secondary"
+                size="sm"
+                onClick={() => { if (bgDraft.trim()) { updateGoals({ appBackground: bgDraft.trim() }); setBgDraft(''); } }}
+                disabled={!bgDraft.trim()}
+              >
+                <Check size={13} /> Imposta
+              </Btn>
             </div>
           </div>
 

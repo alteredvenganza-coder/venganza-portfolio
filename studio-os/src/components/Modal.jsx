@@ -24,14 +24,14 @@ export default function Modal({ open, onClose, title, children, width = 'max-w-x
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
-          {/* Backdrop */}
+          {/* Backdrop — frosted glass */}
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="absolute inset-0 bg-black/60"
+            className="absolute inset-0 bg-black/40 backdrop-blur-md"
           />
 
           {/* Dialog */}

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Search, LayoutDashboard, Users, TrendingUp, X, Settings } from 'lucide-react';
-import { useClients } from '../hooks/useStore';
-import { useProjects } from '../hooks/useStore';
+import { useClients, useProjects, useGoals } from '../hooks/useStore';
 import SettingsModal from './SettingsModal';
 
 const NAV = [
@@ -14,6 +13,7 @@ const NAV = [
 export default function Layout({ children }) {
   const { clients }  = useClients();
   const { projects } = useProjects();
+  const { goals }    = useGoals();
   const navigate     = useNavigate();
 
   const [query, setQuery]       = useState('');
@@ -47,10 +47,27 @@ export default function Layout({ children }) {
     navigate(path);
   }
 
+  const hasBg = Boolean(goals.appBackground);
+
   return (
-    <div className="min-h-screen">
+    <div
+      className="min-h-screen"
+      style={hasBg ? {
+        backgroundImage:      `url(${goals.appBackground})`,
+        backgroundSize:       'cover',
+        backgroundPosition:   'center',
+        backgroundAttachment: 'fixed',
+      } : {}}
+    >
+      {/* Dark overlay when custom bg is set */}
+      {hasBg && (
+        <div
+          className="fixed inset-0 pointer-events-none"
+          style={{ background: 'rgba(0,0,0,0.55)', zIndex: 0 }}
+        />
+      )}
       {/* ── Header ── */}
-      <header className="sticky top-0 z-40 glass border-b border-white/10 border-x-0 border-t-0">
+      <header className="sticky top-0 z-40 glass border-b border-white/10 border-x-0 border-t-0" style={{ position: 'sticky' }}>
         <div className="max-w-6xl mx-auto px-3 sm:px-6 h-14 flex items-center gap-6">
           {/* Logo */}
           <Link to="/" className="shrink-0">
@@ -158,7 +175,7 @@ export default function Layout({ children }) {
       </header>
 
       {/* ── Page content ── */}
-      <main className="max-w-6xl mx-auto px-6 py-8">
+      <main className="max-w-6xl mx-auto px-6 py-8 relative" style={{ zIndex: 1 }}>
         {children}
       </main>
 

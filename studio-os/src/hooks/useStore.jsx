@@ -5,7 +5,7 @@ import { useAuth } from './useAuth';
 import { fireWebhook } from '../lib/webhook';
 
 const GOALS_KEY      = 'venganza-goals';
-const GOALS_DEFAULTS = { monthly: 10000, yearly: 120000, byType: {} };
+const GOALS_DEFAULTS = { monthly: 10000, yearly: 120000, byType: {}, appBackground: null };
 
 // ── Store context ──────────────────────────────────────────────────────────────
 

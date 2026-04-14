@@ -9,8 +9,8 @@
 
   body {
     margin: 0;
-    /* Rich dark gradient — glassmorphism substrate */
-    background: linear-gradient(160deg, #1a0810 0%, #0e0c14 35%, #0c111a 65%, #160c0e 100%);
+    /* Warm dark gradient — glassmorphism substrate */
+    background: linear-gradient(150deg, #2a0e18 0%, #1a1228 30%, #141820 60%, #1e0f16 100%);
     background-attachment: fixed;
     min-height: 100vh;
     color: #f0ede8;
