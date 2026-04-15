@@ -31,10 +31,10 @@ export default function StageStepper({ current, onChange, disabled = false }) {
                 disabled ? 'cursor-default' : 'cursor-pointer',
               ].join(' ')}
               style={{
-                backgroundColor: isActive ? STAGE_BG[stage] : isDone ? '#f3efe8' : '#faf8f5',
-                color:           isActive ? STAGE_TEXT[stage] : isDone ? '#9e9690' : '#9e9690',
+                backgroundColor: isActive ? STAGE_BG[stage] : isDone ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+                color:           isActive ? STAGE_TEXT[stage] : isDone ? '#b0acaa' : '#8c8884',
                 ringColor:       isActive ? STAGE_TEXT[stage] : 'transparent',
-                border: isActive ? `1px solid ${STAGE_TEXT[stage]}33` : '1px solid #e8e4dc',
+                border: isActive ? `1px solid ${STAGE_TEXT[stage]}33` : '1px solid rgba(255,255,255,0.12)',
               }}
             >
               {STAGE_LABELS[stage]}
@@ -53,7 +53,7 @@ export default function StageStepper({ current, onChange, disabled = false }) {
             {idx < STAGES.length - 1 && (
               <div
                 className="w-3 sm:w-5 h-px shrink-0"
-                style={{ backgroundColor: idx < currentIdx ? '#c9888b' : '#e8e4dc' }}
+                style={{ backgroundColor: idx < currentIdx ? '#c9888b' : 'rgba(255,255,255,0.12)' }}
               />
             )}
           </div>

@@ -134,7 +134,7 @@ export default function BriefSection({ brief: rawBrief, projectId, onUpdate }) {
   const doneCount = brief.steps.filter(s => s.done).length;
 
   return (
-    <div className="bg-white border border-border rounded-lg shadow-card overflow-hidden">
+    <div className="glass rounded-lg overflow-hidden">
       {/* Header — click to expand */}
       <button
         onClick={() => setOpen(o => !o)}
@@ -306,9 +306,9 @@ export default function BriefSection({ brief: rawBrief, projectId, onUpdate }) {
                           onClick={() => toggleStep(step.id)}
                           className="shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all text-[11px] font-mono font-semibold"
                           style={{
-                            borderColor: step.done ? '#7b1f24' : '#e8e4dc',
-                            background:  step.done ? '#7b1f24' : '#fff',
-                            color:       step.done ? '#fff'    : '#9e9690',
+                            borderColor: step.done ? '#7b1f24' : 'rgba(255,255,255,0.15)',
+                            background:  step.done ? '#7b1f24' : 'rgba(255,255,255,0.07)',
+                            color:       step.done ? '#fff'    : '#b0acaa',
                           }}
                         >
                           {step.done ? <Check size={12} /> : i + 1}

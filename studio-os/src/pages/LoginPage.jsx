@@ -31,7 +31,7 @@ export default function LoginPage() {
           <p className="label-meta mt-1">CRM interno · Altered Venganza</p>
         </div>
 
-        <div className="bg-white border border-border rounded-lg p-6 shadow-card">
+        <div className="glass-strong rounded-lg p-6">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <label className="label-meta block mb-1.5">Email</label>

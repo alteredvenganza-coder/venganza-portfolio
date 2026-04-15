@@ -46,7 +46,7 @@ export default function DeliverySection({ files = [], projectId, onUpdate }) {
   }
 
   return (
-    <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5">
+    <div className="glass rounded-lg p-4 sm:p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-display text-base font-semibold text-ink">Consegna</h3>
         <label className="cursor-pointer">

@@ -146,7 +146,7 @@ export default function ProjectDetail() {
       </div>
 
       {/* Stage stepper */}
-      <div className="bg-white border border-border rounded-lg shadow-card px-3 sm:px-5 py-3 sm:py-4 mb-5">
+      <div className="glass rounded-lg px-3 sm:px-5 py-3 sm:py-4 mb-5">
         <StageStepper
           current={project.stage}
           onChange={handleStageChange}
@@ -176,7 +176,7 @@ export default function ProjectDetail() {
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-border rounded-lg shadow-card overflow-hidden"
+            className="glass rounded-lg overflow-hidden"
           >
             {project.coverImage ? (
               <div className="relative group">
@@ -211,7 +211,7 @@ export default function ProjectDetail() {
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5"
+            className="glass rounded-lg p-4 sm:p-5"
           >
             <div className="flex items-start justify-between gap-2 sm:gap-4 mb-4">
               <div>
@@ -260,7 +260,7 @@ export default function ProjectDetail() {
           </motion.div>
 
           {/* Tasks */}
-          <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5">
+          <div className="glass rounded-lg p-4 sm:p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-display text-base font-semibold text-ink">Checklist</h3>
               {tasks.length > 0 && (
@@ -339,7 +339,7 @@ export default function ProjectDetail() {
           </div>
 
           {/* Next action + missing info */}
-          <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
+          <div className="glass rounded-lg p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
             <div>
               <p className="label-meta mb-2 flex items-center gap-1">
                 <MessageSquare size={11} /> Prossima azione
@@ -367,7 +367,7 @@ export default function ProjectDetail() {
         <div className="flex flex-col gap-3 lg:gap-4">
 
           {/* Deadline */}
-          <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5">
+          <div className="glass rounded-lg p-4 sm:p-5">
             <p className="label-meta mb-3 flex items-center gap-1">
               <Calendar size={11} /> Deadline
             </p>
@@ -400,7 +400,7 @@ export default function ProjectDetail() {
           </div>
 
           {/* Price + payment */}
-          <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5 flex flex-col gap-3">
+          <div className="glass rounded-lg p-4 sm:p-5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <p className="label-meta flex items-center gap-1">
                 <DollarSign size={11} /> Pagamento
@@ -477,7 +477,7 @@ export default function ProjectDetail() {
                 {project.price != null && (
                   <div className="flex items-center justify-between pt-2 border-t border-border">
                     <p className="text-[11px] text-subtle font-mono">Da incassare</p>
-                    <p className={`text-sm font-semibold font-mono ${(project.price - (project.paidAmount ?? 0)) > 0 ? 'text-burgundy' : 'text-[#276749]'}`}>
+                    <p className={`text-sm font-semibold font-mono ${(project.price - (project.paidAmount ?? 0)) > 0 ? 'text-burgundy-muted' : 'text-[#4ade80]'}`}>
                       {formatEur(project.price - (project.paidAmount ?? 0))}
                     </p>
                   </div>
@@ -490,11 +490,11 @@ export default function ProjectDetail() {
               onClick={() => updateProject(id, { contractSent: !project.contractSent })}
               className={`flex items-center gap-2 px-3 py-2 rounded border text-xs font-mono transition-colors ${
                 project.contractSent
-                  ? 'bg-[#e6f4ea] border-[#276749] text-[#276749]'
+                  ? 'bg-[#276749]/20 border-[#4ade80]/40 text-[#4ade80]'
                   : 'bg-paper border-border text-muted hover:border-ink/30'
               }`}
             >
-              <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${project.contractSent ? 'bg-[#276749] border-[#276749]' : 'border-border'}`}>
+              <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${project.contractSent ? 'bg-[#276749] border-[#4ade80]/40' : 'border-border'}`}>
                 {project.contractSent && <Check size={10} className="text-white" />}
               </span>
               Contratto inviato
@@ -502,7 +502,7 @@ export default function ProjectDetail() {
           </div>
 
           {/* Stage shortcut */}
-          <div className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-5">
+          <div className="glass rounded-lg p-4 sm:p-5">
             <p className="label-meta mb-3">Stage attuale</p>
             <Badge
               label={STAGE_LABELS[project.stage]}

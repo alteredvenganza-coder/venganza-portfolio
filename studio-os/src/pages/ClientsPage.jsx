@@ -57,7 +57,7 @@ export default function ClientsPage() {
 
       {/* List */}
       {clients.length === 0 ? (
-        <div className="bg-white border border-border rounded-lg p-12 text-center">
+        <div className="glass rounded-lg p-12 text-center">
           <Users size={32} className="text-subtle mx-auto mb-3" />
           <p className="text-sm text-muted mb-4">Nessun cliente ancora.<br />Aggiungine uno per iniziare.</p>
           <Btn variant="primary" onClick={() => setShowForm(true)}>

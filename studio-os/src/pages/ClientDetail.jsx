@@ -55,7 +55,7 @@ export default function ClientDetail() {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white border border-border rounded-lg shadow-card p-4 sm:p-6 mb-6"
+        className="glass rounded-lg p-4 sm:p-6 mb-6"
       >
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
           <div className="flex items-start gap-3 sm:gap-4">
@@ -131,7 +131,7 @@ export default function ClientDetail() {
       </div>
 
       {projects.length === 0 ? (
-        <div className="bg-white border border-border rounded-lg p-8 text-center">
+        <div className="glass rounded-lg p-8 text-center">
           <FileText size={28} className="text-subtle mx-auto mb-3" />
           <p className="text-sm text-muted mb-4">Nessun progetto per questo cliente.</p>
           <Btn variant="primary" onClick={() => setAddProjOpen(true)}>

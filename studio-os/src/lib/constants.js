@@ -21,27 +21,27 @@ export const STAGE_LABELS = {
   archived:    'Archived',
 };
 
-// Warm, light background tints — no dark/gray
+// Dark-theme badge tints — translucent backgrounds with vivid text
 export const STAGE_BG = {
-  lead:        '#fdf3e3',
-  onboarding:  '#e8f0fe',
-  in_progress: '#e6f4ea',
-  waiting:     '#fff8e1',
-  review:      '#fce8e6',
-  completed:   '#e6f4ea',
-  delivered:   '#e8f0fe',
-  archived:    '#f3efe8',
+  lead:        'rgba(194,130,40,0.18)',
+  onboarding:  'rgba(56,120,220,0.18)',
+  in_progress: 'rgba(52,168,83,0.18)',
+  waiting:     'rgba(194,160,40,0.18)',
+  review:      'rgba(180,50,50,0.18)',
+  completed:   'rgba(52,168,83,0.18)',
+  delivered:   'rgba(56,120,220,0.18)',
+  archived:    'rgba(140,136,132,0.18)',
 };
 
 export const STAGE_TEXT = {
-  lead:        '#7a4f10',
-  onboarding:  '#1a56db',
-  in_progress: '#276749',
-  waiting:     '#7a6010',
-  review:      '#7b1f24',
-  completed:   '#276749',
-  delivered:   '#1a56db',
-  archived:    '#6b6460',
+  lead:        '#f5c563',
+  onboarding:  '#7bb3ff',
+  in_progress: '#6dd49e',
+  waiting:     '#f5e0a0',
+  review:      '#f5a0a3',
+  completed:   '#6dd49e',
+  delivered:   '#7bb3ff',
+  archived:    '#b0acaa',
 };
 
 // ─── Project types ────────────────────────────────────────────────────────────
@@ -58,23 +58,23 @@ export const TYPE_LABELS = {
 };
 
 export const TYPE_BG = {
-  fashion:   '#fce8f3',
-  branding:  '#e8f0fe',
-  edilizia:  '#e8f4e8',
-  app:       '#e8f6fe',
-  premade:   '#fff3e0',
-  retainer:  '#ede8fe',
-  other:     '#f3efe8',
+  fashion:   'rgba(200,60,120,0.18)',
+  branding:  'rgba(56,120,220,0.18)',
+  edilizia:  'rgba(52,168,83,0.18)',
+  app:       'rgba(14,165,233,0.18)',
+  premade:   'rgba(234,140,30,0.18)',
+  retainer:  'rgba(124,58,237,0.18)',
+  other:     'rgba(140,136,132,0.18)',
 };
 
 export const TYPE_TEXT = {
-  fashion:   '#7b1f5a',
-  branding:  '#1a56db',
-  edilizia:  '#276749',
-  app:       '#0369a1',
-  premade:   '#c2410c',
-  retainer:  '#5b21b6',
-  other:     '#6b6460',
+  fashion:   '#f5a0c8',
+  branding:  '#7bb3ff',
+  edilizia:  '#6dd49e',
+  app:       '#67d4f8',
+  premade:   '#f5c563',
+  retainer:  '#c4a5ff',
+  other:     '#b0acaa',
 };
 
 // ─── Payment status ───────────────────────────────────────────────────────────
@@ -87,15 +87,15 @@ export const PAYMENT_LABELS = {
 };
 
 export const PAYMENT_BG = {
-  unpaid:  '#fce8e6',
-  deposit: '#fff8e1',
-  paid:    '#e6f4ea',
+  unpaid:  'rgba(180,50,50,0.18)',
+  deposit: 'rgba(194,160,40,0.18)',
+  paid:    'rgba(52,168,83,0.18)',
 };
 
 export const PAYMENT_TEXT = {
-  unpaid:  '#7b1f24',
-  deposit: '#7a6010',
-  paid:    '#276749',
+  unpaid:  '#f5a0a3',
+  deposit: '#f5e0a0',
+  paid:    '#6dd49e',
 };
 
 // ─── localStorage keys ───────────────────────────────────────────────────────

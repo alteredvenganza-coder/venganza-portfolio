@@ -17,7 +17,7 @@ export default function FileItem({ file, onRemove, onDownload }) {
 
   return (
     <div className="flex items-center gap-3 p-3 bg-paper border border-border rounded-lg group hover:border-burgundy-muted transition-all">
-      <div className="w-10 h-10 rounded bg-white border border-border flex items-center justify-center shrink-0">
+      <div className="w-10 h-10 rounded bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
         <File size={20} className="text-muted" />
       </div>
       
