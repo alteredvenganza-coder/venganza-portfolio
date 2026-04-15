@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Bell, BellOff, Webhook, Check, X, ExternalLink, Target, ImagePlus, Trash2 } from 'lucide-react';
+import { Bell, BellOff, Webhook, Check, X, ExternalLink, Target, ImagePlus, Trash2, CreditCard } from 'lucide-react';
+
+const REVOLUT_KEY = 'revolut-api-token';
 import Modal from './Modal';
 import Btn from './Btn';
 import Field from './Field';
@@ -16,19 +18,30 @@ const TABS = [
 export default function SettingsModal({ open, onClose }) {
   const { status, subscribe, unsubscribe, supported } = usePush();
   const { goals, updateGoals } = useGoals();
-  const [webhookUrl,   setWebhookUrl]   = useState('');
-  const [webhookSaved, setWebhookSaved] = useState(false);
-  const [pushError,    setPushError]    = useState('');
-  const [activeTab,    setActiveTab]    = useState('settings');
-  const [bgDraft,      setBgDraft]      = useState('');
+  const [webhookUrl,      setWebhookUrl]      = useState('');
+  const [webhookSaved,    setWebhookSaved]    = useState(false);
+  const [pushError,       setPushError]       = useState('');
+  const [activeTab,       setActiveTab]       = useState('settings');
+  const [bgDraft,         setBgDraft]         = useState('');
+  const [revolutToken,    setRevolutToken]    = useState('');
+  const [revolutSaved,    setRevolutSaved]    = useState(false);
 
   useEffect(() => {
     if (open) {
       setWebhookUrl(getWebhookUrl());
       setWebhookSaved(false);
       setPushError('');
+      setRevolutToken(localStorage.getItem(REVOLUT_KEY) ?? '');
+      setRevolutSaved(false);
     }
   }, [open]);
+
+  function saveRevolutToken() {
+    if (revolutToken.trim()) localStorage.setItem(REVOLUT_KEY, revolutToken.trim());
+    else localStorage.removeItem(REVOLUT_KEY);
+    setRevolutSaved(true);
+    setTimeout(() => setRevolutSaved(false), 2000);
+  }
 
   async function handleSubscribe() {
     setPushError('');
@@ -212,6 +225,47 @@ export default function SettingsModal({ open, onClose }) {
               >
                 <Check size={13} /> Imposta
               </Btn>
+            </div>
+          </div>
+
+          <hr className="border-white/10" />
+
+          {/* ── Revolut API ── */}
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <CreditCard size={14} className="text-burgundy" />
+              <p className="text-sm font-semibold text-ink">Revolut Business API</p>
+            </div>
+            <p className="text-xs text-subtle mb-1">
+              Collega il tuo conto Revolut Business per sincronizzare automaticamente entrate e uscite nella pagina <strong className="text-muted">Finanze</strong>.
+              Le transazioni vengono auto-categorizzate (Ristoranti, Spesa, Software, ecc.)
+            </p>
+            <a
+              href="https://developer.revolut.com/docs/business/business-api"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-burgundy-muted hover:underline mb-3"
+            >
+              Come ottenere il Personal Access Token <ExternalLink size={11} />
+            </a>
+            <Field label="Personal Access Token">
+              <input
+                type="password"
+                placeholder="ey... (Revolut Business → API → Personal Access Token)"
+                value={revolutToken}
+                onChange={e => setRevolutToken(e.target.value)}
+                autoComplete="off"
+              />
+            </Field>
+            <div className="flex items-center gap-2 mt-2">
+              <Btn variant="secondary" size="sm" onClick={saveRevolutToken}>
+                {revolutSaved ? <><Check size={13} /> Salvato</> : 'Salva token'}
+              </Btn>
+              {revolutToken && (
+                <Btn variant="ghost" size="sm" onClick={() => { setRevolutToken(''); localStorage.removeItem(REVOLUT_KEY); }}>
+                  <X size={13} /> Rimuovi
+                </Btn>
+              )}
             </div>
           </div>
 

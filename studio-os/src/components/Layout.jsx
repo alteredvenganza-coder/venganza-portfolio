@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, LayoutDashboard, Users, TrendingUp, X, Settings } from 'lucide-react';
+import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings } from 'lucide-react';
 import { useClients, useProjects, useGoals } from '../hooks/useStore';
 import SettingsModal from './SettingsModal';
 
 const NAV = [
-  { to: '/',        label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/clients', label: 'Clienti',   icon: Users },
-  { to: '/pricing', label: 'Prezzi',    icon: TrendingUp },
+  { to: '/',          label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/clients',   label: 'Clienti',   icon: Users },
+  { to: '/pricing',   label: 'Prezzi',    icon: TrendingUp },
+  { to: '/cashflow',  label: 'Finanze',   icon: Wallet },
 ];
 
 export default function Layout({ children }) {

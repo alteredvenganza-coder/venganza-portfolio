@@ -28,6 +28,7 @@ import ClientsPage from './pages/ClientsPage';
 import ClientDetail from './pages/ClientDetail';
 import ProjectDetail from './pages/ProjectDetail';
 import PricingMemoryPage from './pages/PricingMemoryPage';
+import CashflowPage from './pages/CashflowPage';
 import LoginPage from './pages/LoginPage';
 import DeliveryPage from './pages/DeliveryPage';
 
@@ -53,6 +54,7 @@ function AppContent() {
         <Route path="/clients/:id"   element={<ClientDetail />} />
         <Route path="/projects/:id"  element={<ProjectDetail />} />
         <Route path="/pricing"       element={<PricingMemoryPage />} />
+        <Route path="/cashflow"      element={<CashflowPage />} />
         <Route path="*"              element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

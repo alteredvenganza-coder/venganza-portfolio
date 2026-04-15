@@ -138,3 +138,29 @@ alter table public.deliveries
 -- ── Smart Pricing Memory: data completamento progetto ────────
 alter table public.projects
   add column if not exists completed_at timestamptz;
+
+-- ── Cashflow: entrate e uscite (business + personali) ─────────
+create table if not exists public.cashflow_entries (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null references auth.users(id) on delete cascade,
+  type         text not null check (type in ('entrata', 'uscita')),
+  amount       numeric(12,2) not null check (amount > 0),
+  category     text,
+  description  text,
+  date         date not null default current_date,
+  source       text not null default 'manual' check (source in ('manual', 'revolut')),
+  revolut_id   text,
+  created_at   timestamptz not null default now()
+);
+
+alter table public.cashflow_entries enable row level security;
+
+create policy "Owner cashflow"
+  on public.cashflow_entries for all
+  using  (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+-- Indice unico per evitare duplicati dal sync Revolut
+create unique index if not exists cashflow_revolut_id_idx
+  on public.cashflow_entries (revolut_id)
+  where revolut_id is not null;
