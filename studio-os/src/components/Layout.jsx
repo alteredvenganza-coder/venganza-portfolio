@@ -96,15 +96,21 @@ export default function Layout({ children }) {
   const hasBg = Boolean(goals.appBackground);
 
   return (
-    <div
-      className="min-h-screen"
-      style={hasBg ? {
-        backgroundImage:      `url(${goals.appBackground})`,
-        backgroundSize:       'cover',
-        backgroundPosition:   'center',
-        backgroundAttachment: 'fixed',
-      } : {}}
-    >
+    <div className="min-h-screen relative">
+      {/* Blurred background image */}
+      {hasBg && (
+        <div
+          className="fixed inset-0 pointer-events-none"
+          style={{
+            backgroundImage:    `url(${goals.appBackground})`,
+            backgroundSize:     'cover',
+            backgroundPosition: 'center',
+            filter:             'blur(24px)',
+            transform:          'scale(1.1)', // compensa i bordi sfocati
+            zIndex:             -1,
+          }}
+        />
+      )}
       {/* Dark overlay when custom bg is set */}
       {hasBg && (
         <div
