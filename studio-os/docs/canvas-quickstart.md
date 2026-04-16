@@ -42,6 +42,10 @@ Drag dall'header per spostare. Drag dall'angolo basso-destra per ridimensionare.
 | `Wheel` | Pan |
 | `Ctrl/Cmd + Z` | Undo (move/resize) |
 | `Ctrl/Cmd + Shift + Z` / `Ctrl+Y` | Redo |
+| `Ctrl/Cmd + D` | Duplica card selezionata |
+| `Ctrl/Cmd + K` | Apre Command Palette |
+| `Alt + drag` | Muovi card fuori dalla griglia (disattiva snap) |
+| Click su connessione → `Backspace` | Elimina connessione |
 | Right-click | Menu contestuale (add elements, fit, clear) |
 
 ## Templates (Phase 1)
@@ -64,7 +68,16 @@ Tutto salvato su Supabase:
 
 Modifiche live (digitazione, drag, resize) → debounced (300ms) sync su Supabase. Pan/zoom salvati a fine drag/wheel.
 
+## Fatto
+
+- **Phase 2** — Smart cards (Budget, Tasks, Files, Project Overview) collegate ai dati CRM esistenti, ClientCanvasHub sostituisce ClientDetail — ✅
+- **Phase 3** — HomePage rinnovata + MAT AI panel + undo/redo (move/resize) + thumbnail — ✅
+- **Phase 3.5 (polish)** — bundle splitting, command palette Ctrl+K, delete connessioni, Ctrl+D duplicate, export PNG, snap-to-grid, save indicator, AI panel su endpoint Claude reale — ✅
+
 ## In Arrivo
 
-- **Phase 2** — Smart cards (Budget, Tasks, Files, Project Overview) collegate ai dati CRM esistenti, ClientCanvasHub sostituisce ClientDetail — ✅ done
-- **Phase 3** — HomePage rinnovata + MAT AI panel + undo/redo (move/resize) + thumbnail — ✅ done
+- Multi-select + group drag
+- Collaborazione real-time (Supabase Realtime o Yjs)
+- Versioning/history dei canvas
+- Canvas mobile (touch pinch-zoom)
+- Test E2E
