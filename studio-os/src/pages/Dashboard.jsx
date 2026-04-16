@@ -243,9 +243,35 @@ export default function Dashboard() {
             transition={{ duration: 0.6 }}
           />
         </div>
-        <p className="text-[11px] font-mono text-subtle mb-4">
+        <p className="text-[11px] font-mono text-subtle mb-1">
           {goalPct >= 100 ? '🎯 Obiettivo raggiunto!' : `Mancano ${formatEur(mancaAlGoal)} al goal (${formatEur(goals.monthly)})`}
         </p>
+
+        {/* Proiezione vendite per raggiungere il goal */}
+        {goalPct < 100 && (() => {
+          const mancano = mancaAlGoal;
+          const avgByType = {};
+          PROJECT_TYPES.filter(t => t !== 'retainer').forEach(type => {
+            const tp = projects.filter(p => p.type === type && (p.price ?? 0) > 0);
+            if (tp.length > 0) avgByType[type] = tp.reduce((s, p) => s + (p.price ?? 0), 0) / tp.length;
+          });
+          const rows = Object.entries(avgByType)
+            .map(([type, avg]) => ({ type, count: Math.ceil(mancano / avg) }))
+            .sort((a, b) => a.count - b.count)
+            .slice(0, 4);
+          if (rows.length === 0) return null;
+          return (
+            <p className="text-[10px] font-mono text-subtle/70 mb-4 leading-relaxed">
+              Equivale a: {rows.map((r, i) => (
+                <span key={r.type}>
+                  {i > 0 && <span className="text-subtle/40"> · </span>}
+                  <span className="text-muted">{r.count}×</span> {TYPE_LABELS[r.type].toLowerCase()}
+                </span>
+              ))}
+            </p>
+          );
+        })()}
+        {goalPct >= 100 && <div className="mb-4" />}
 
         {/* Stat boxes */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">

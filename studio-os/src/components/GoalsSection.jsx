@@ -255,6 +255,58 @@ export default function GoalsSection() {
         </div>
       )}
 
+      {/* ── Proiezione vendite per raggiungere il goal mensile ── */}
+      {(() => {
+        const mancanoMese = Math.max(0, goals.monthly - incassatoMese);
+        if (mancanoMese <= 0) return null;
+
+        // Calcola prezzo medio per tipo dai progetti storici
+        const avgByType = {};
+        PROJECT_TYPES.filter(t => t !== 'retainer').forEach(type => {
+          const tp = projects.filter(p => p.type === type && (p.price ?? 0) > 0);
+          if (tp.length > 0) {
+            avgByType[type] = tp.reduce((s, p) => s + (p.price ?? 0), 0) / tp.length;
+          }
+        });
+
+        // Filtra solo i tipi che hanno un prezzo medio calcolabile
+        const rows = Object.entries(avgByType)
+          .filter(([, avg]) => avg > 0)
+          .map(([type, avg]) => ({
+            type,
+            avg,
+            count: Math.ceil(mancanoMese / avg),
+          }))
+          .sort((a, b) => a.count - b.count);
+
+        if (rows.length === 0) return null;
+
+        return (
+          <div className="px-4 py-3 rounded-lg bg-white/3 border border-white/8">
+            <p className="label-meta mb-2">Per raggiungere l&apos;obiettivo mensile</p>
+            <p className="text-[11px] text-subtle font-mono mb-2">
+              Mancano <span className="text-burgundy-muted">{formatEur(mancanoMese)}</span> — potresti vendere:
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {rows.map(({ type, count, avg }) => (
+                <span
+                  key={type}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-mono"
+                  style={{
+                    background: `${TYPE_TEXT[type]}15`,
+                    color: TYPE_TEXT[type],
+                    border: `1px solid ${TYPE_TEXT[type]}30`,
+                  }}
+                  title={`Prezzo medio: ${formatEur(avg)}`}
+                >
+                  {count}× {TYPE_LABELS[type]}
+                </span>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* ── Per-type breakdown ── */}
       <div>
         <p className="label-meta mb-3">Breakdown per tipo — {currentYear}</p>
