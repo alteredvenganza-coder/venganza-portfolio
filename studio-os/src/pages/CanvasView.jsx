@@ -6,6 +6,7 @@ import CanvasEngine from '../canvas/CanvasEngine';
 import CanvasToolbar from '../canvas/CanvasToolbar';
 import CanvasSidebar from '../canvas/CanvasSidebar';
 import { renderCard } from '../canvas/cards';
+import Connections from '../canvas/Connections';
 
 export default function CanvasView() {
   const { canvasId, id: clientId } = useParams();
@@ -26,8 +27,11 @@ export default function CanvasView() {
       });
   }, [canvasId, clientId, addCanvas, navigate, resolvedId]);
 
-  const { canvas, cards, loading, updateCanvas, addCard, updateCard, deleteCard } = useCanvas(resolvedId);
+  const { canvas, cards, connections, loading, updateCanvas, addCard, updateCard, deleteCard, addConnection } = useCanvas(resolvedId);
   const [tool, setTool] = useState('select');
+  const [connectFrom, setConnectFrom] = useState(null);
+
+  useEffect(() => { if (tool !== 'connect') setConnectFrom(null); }, [tool]);
 
   useEffect(() => {
     function onKey(e) {
@@ -72,6 +76,7 @@ export default function CanvasView() {
           };
           addCard({ type, x: x - 110, y: y - 30, w: 230, ...(defaults[type] || {}) });
         }}
+        svgChildren={<Connections connections={connections} cards={cards} refresh={cards} />}
       >
         {cards.map(c => renderCard(c, {
           ctx: {
@@ -87,8 +92,14 @@ export default function CanvasView() {
             onDuplicate: () => addCard({
               type: c.type, x: c.x + 20, y: c.y + 20, w: c.w, data: c.data,
             }),
-            onConnectStart: () => {},
-            onConnectFinish: () => {},
+            onConnectStart: () => { setTool('connect'); setConnectFrom(c.id); },
+            onConnectFinish: () => {
+              if (connectFrom && connectFrom !== c.id) {
+                addConnection(connectFrom, c.id);
+                setConnectFrom(null);
+                setTool('select');
+              }
+            },
             onPlusClick: () => {},
           },
           onUpdate: (patch) => updateCard(c.id, patch),
