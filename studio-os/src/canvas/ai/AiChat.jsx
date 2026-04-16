@@ -78,21 +78,19 @@ export default function AiChat({ onAddCard }) {
 }
 
 async function callAI(prompt) {
-  // Try the existing analyze-brief endpoint as a generic Claude proxy.
-  // If unavailable, fall back to a stubbed response.
   try {
-    const res = await fetch('/api/analyze-brief', {
+    const res = await fetch('/api/mat-ai-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        brief: prompt,
+        prompt,
         system: 'Sei MAT AI, assistente creativo per brand di moda. Rispondi in italiano, conciso e ispirazionale. Massimo 3 frasi salvo richiesta esplicita.',
       }),
     });
     if (!res.ok) throw new Error('AI endpoint ' + res.status);
     const data = await res.json();
-    return data.text || data.response || data.analysis || '(risposta vuota)';
+    return data.text || '(risposta vuota)';
   } catch (e) {
-    return `[MAT AI offline] Risposta simulata per: "${prompt.slice(0, 60)}…"`;
+    return `[MAT AI offline — controlla ANTHROPIC_API_KEY su Vercel] "${prompt.slice(0, 60)}…"`;
   }
 }

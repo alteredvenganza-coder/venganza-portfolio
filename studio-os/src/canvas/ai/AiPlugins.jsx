@@ -19,14 +19,14 @@ export default function AiPlugins({ onAddCard }) {
     setBusy(plug.id);
     try {
       const sys = `Sei MAT AI. Genera contenuto plugin=${plug.id}, stile=${styleSel[plug.id] || plug.styles[0]}. Sii conciso e creativo. Italiano.`;
-      const res = await fetch('/api/analyze-brief', {
+      const res = await fetch('/api/mat-ai-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ brief: p, system: sys }),
+        body: JSON.stringify({ prompt: p, system: sys }),
       });
       const data = await res.json().catch(() => ({}));
-      const text = data?.text || data?.response || data?.analysis
-        || `[MAT AI offline] Plugin ${plug.name} su: "${p.slice(0,60)}"`;
+      const text = data?.text
+        || `[MAT AI offline — controlla ANTHROPIC_API_KEY su Vercel] ${plug.name}: "${p.slice(0,60)}"`;
       onAddCard({ data: { title: `${plug.icon} ${plug.name}`, text } });
     } finally {
       setBusy(null);
