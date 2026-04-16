@@ -7,6 +7,7 @@ import CanvasToolbar from '../canvas/CanvasToolbar';
 import CanvasSidebar from '../canvas/CanvasSidebar';
 import { renderCard } from '../canvas/cards';
 import Connections from '../canvas/Connections';
+import TemplatePanel from '../canvas/TemplatePanel';
 
 export default function CanvasView() {
   const { canvasId, id: clientId } = useParams();
@@ -30,6 +31,7 @@ export default function CanvasView() {
   const { canvas, cards, connections, loading, updateCanvas, addCard, updateCard, deleteCard, addConnection } = useCanvas(resolvedId);
   const [tool, setTool] = useState('select');
   const [connectFrom, setConnectFrom] = useState(null);
+  const [showTemplates, setShowTemplates] = useState(false);
 
   useEffect(() => { if (tool !== 'connect') setConnectFrom(null); }, [tool]);
 
@@ -57,7 +59,7 @@ export default function CanvasView() {
     <div className="canvas-root">
       <CanvasSidebar
         onHome={() => navigate(clientId ? `/clients/${clientId}` : '/')}
-        onTemplates={() => {/* TODO: open template panel */}}
+        onTemplates={() => setShowTemplates(true)}
       />
       <CanvasEngine
         panX={canvas?.panX ?? 0}
@@ -125,6 +127,30 @@ export default function CanvasView() {
             panX: (window.innerWidth  - w * z) / 2 - minX * z + pad * z,
             panY: (window.innerHeight - h * z) / 2 - minY * z + pad * z,
           });
+        }}
+      />
+      <TemplatePanel
+        open={showTemplates}
+        onClose={() => setShowTemplates(false)}
+        onApply={(tmpl) => {
+          const z = canvas?.zoom ?? 1;
+          const px = canvas?.panX ?? 0;
+          const py = canvas?.panY ?? 0;
+          const centerWorldX = (window.innerWidth  / 2 - px) / z;
+          const centerWorldY = (window.innerHeight / 2 - py) / z;
+          const dx = centerWorldX - 3000;
+          const dy = centerWorldY - 3000;
+          tmpl.cards.forEach((c) => {
+            const { type, x, y, w, ...rest } = c;
+            addCard({
+              type,
+              x: x + dx,
+              y: y + dy,
+              w: w || 230,
+              data: rest,
+            });
+          });
+          setShowTemplates(false);
         }}
       />
     </div>
