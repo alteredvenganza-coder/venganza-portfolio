@@ -260,17 +260,31 @@ export default function GoalsSection() {
         const mancanoMese = Math.max(0, goals.monthly - incassatoMese);
         if (mancanoMese <= 0) return null;
 
-        // Calcola prezzo medio per tipo dai progetti storici
-        const avgByType = {};
-        PROJECT_TYPES.filter(t => t !== 'retainer').forEach(type => {
+        // Prezzi per tipo:
+        //  - premade: fisso €220 (media tra 190 e 250)
+        //  - retainer: fee media dai retainer esistenti
+        //  - altri tipi: prezzo medio dai progetti storici
+        //  - 'other' (custom): escluso
+        const priceByType = {};
+
+        // Premade fisso
+        priceByType.premade = 220;
+
+        // Retainer: fee media
+        const retainersWithFee = projects.filter(p => p.type === 'retainer' && (p.retainerFee ?? 0) > 0);
+        if (retainersWithFee.length > 0) {
+          priceByType.retainer = retainersWithFee.reduce((s, p) => s + (p.retainerFee ?? 0), 0) / retainersWithFee.length;
+        }
+
+        // Altri tipi (esclusi premade, retainer, other)
+        PROJECT_TYPES.filter(t => !['retainer', 'premade', 'other'].includes(t)).forEach(type => {
           const tp = projects.filter(p => p.type === type && (p.price ?? 0) > 0);
           if (tp.length > 0) {
-            avgByType[type] = tp.reduce((s, p) => s + (p.price ?? 0), 0) / tp.length;
+            priceByType[type] = tp.reduce((s, p) => s + (p.price ?? 0), 0) / tp.length;
           }
         });
 
-        // Filtra solo i tipi che hanno un prezzo medio calcolabile
-        const rows = Object.entries(avgByType)
+        const rows = Object.entries(priceByType)
           .filter(([, avg]) => avg > 0)
           .map(([type, avg]) => ({
             type,
@@ -297,12 +311,15 @@ export default function GoalsSection() {
                     color: TYPE_TEXT[type],
                     border: `1px solid ${TYPE_TEXT[type]}30`,
                   }}
-                  title={`Prezzo medio: ${formatEur(avg)}`}
+                  title={`Prezzo${type === 'retainer' ? ' mensile' : ''} medio: ${formatEur(avg)}`}
                 >
                   {count}× {TYPE_LABELS[type]}
                 </span>
               ))}
             </div>
+            <p className="text-[10px] text-subtle/60 font-mono mt-2">
+              Premade €220 · Retainer {priceByType.retainer ? formatEur(priceByType.retainer) + '/mese' : 'N/D'} · Custom escluso
+            </p>
           </div>
         );
       })()}

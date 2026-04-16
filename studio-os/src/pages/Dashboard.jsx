@@ -250,15 +250,23 @@ export default function Dashboard() {
         {/* Proiezione vendite per raggiungere il goal */}
         {goalPct < 100 && (() => {
           const mancano = mancaAlGoal;
-          const avgByType = {};
-          PROJECT_TYPES.filter(t => t !== 'retainer').forEach(type => {
+          const priceByType = { premade: 220 };
+
+          const retainersWithFee = projects.filter(p => p.type === 'retainer' && (p.retainerFee ?? 0) > 0);
+          if (retainersWithFee.length > 0) {
+            priceByType.retainer = retainersWithFee.reduce((s, p) => s + (p.retainerFee ?? 0), 0) / retainersWithFee.length;
+          }
+
+          PROJECT_TYPES.filter(t => !['retainer', 'premade', 'other'].includes(t)).forEach(type => {
             const tp = projects.filter(p => p.type === type && (p.price ?? 0) > 0);
-            if (tp.length > 0) avgByType[type] = tp.reduce((s, p) => s + (p.price ?? 0), 0) / tp.length;
+            if (tp.length > 0) priceByType[type] = tp.reduce((s, p) => s + (p.price ?? 0), 0) / tp.length;
           });
-          const rows = Object.entries(avgByType)
+
+          const rows = Object.entries(priceByType)
+            .filter(([, avg]) => avg > 0)
             .map(([type, avg]) => ({ type, count: Math.ceil(mancano / avg) }))
             .sort((a, b) => a.count - b.count)
-            .slice(0, 4);
+            .slice(0, 5);
           if (rows.length === 0) return null;
           return (
             <p className="text-[10px] font-mono text-subtle/70 mb-4 leading-relaxed">
