@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Edit2, Trash2, Plus, Mail, Phone, Globe, FileText } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Plus, Mail, Phone, Globe, FileText, Check, Clock, Calendar } from 'lucide-react';
 import ProjectCard from '../components/ProjectCard';
 import Btn from '../components/Btn';
 import Panel from '../components/Panel';
 import Modal from '../components/Modal';
 import ClientForm from '../forms/ClientForm';
 import ProjectForm from '../forms/ProjectForm';
-import { useClients, useProjects } from '../hooks/useStore';
+import * as db from '../lib/db';
+import { useClients, useProjects, useCalendarTasks } from '../hooks/useStore';
 import { formatDate, initials } from '../lib/utils';
 
 export default function ClientDetail() {
@@ -16,6 +17,13 @@ export default function ClientDetail() {
   const navigate     = useNavigate();
   const { getClient, updateClient, deleteClient, clients } = useClients();
   const { getProjectsByClient, addProject } = useProjects();
+  const { updateCalendarTask } = useCalendarTasks();
+  const [clientTasks, setClientTasks] = useState([]);
+
+  useEffect(() => {
+    if (!id) return;
+    db.fetchCalendarTasksByClient(id).then(setClientTasks).catch(console.error);
+  }, [id]);
 
   const client   = getClient(id);
   const projects = getProjectsByClient(id);
@@ -162,6 +170,70 @@ export default function ClientDetail() {
           )}
         </>
       )}
+
+      {/* Calendar tasks for this client */}
+      <div className="mt-6">
+        <h2 className="font-display text-lg sm:text-xl font-semibold text-ink mb-3 sm:mb-4">
+          Task Calendario <span className="text-muted font-sans text-base font-normal">({clientTasks.length})</span>
+        </h2>
+
+        {clientTasks.length === 0 ? (
+          <div className="glass rounded-lg p-6 text-center">
+            <Calendar size={24} className="text-subtle mx-auto mb-2" />
+            <p className="text-sm text-muted">Nessuna task collegata a questo cliente.</p>
+          </div>
+        ) : (
+          <div className="glass rounded-lg divide-y divide-border">
+            {clientTasks.map(task => {
+              const TASK_COLORS = {
+                burgundy: '#c9888b', blue: '#7bb3ff', green: '#6dd49e',
+                yellow: '#f5e0a0', purple: '#c4a5ff',
+              };
+              const dotColor = TASK_COLORS[task.color] ?? TASK_COLORS.burgundy;
+              return (
+                <div key={task.id} className="flex items-center gap-3 px-4 py-3">
+                  {/* Checkbox */}
+                  <button
+                    onClick={async () => {
+                      const newVal = !task.isDone;
+                      await updateCalendarTask(task.id, { isDone: newVal });
+                      setClientTasks(prev => prev.map(t => t.id === task.id ? { ...t, isDone: newVal } : t));
+                    }}
+                    className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${
+                      task.isDone ? 'bg-white/20 border-white/30' : 'border-white/20 hover:border-white/40'
+                    }`}
+                  >
+                    {task.isDone && <Check size={10} className="text-muted" />}
+                  </button>
+
+                  {/* Color dot */}
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
+
+                  {/* Title */}
+                  <div className="flex-1 min-w-0">
+                    <span className={`text-sm text-ink truncate block ${task.isDone ? 'line-through opacity-50' : ''}`}>
+                      {task.title}
+                    </span>
+                  </div>
+
+                  {/* Time */}
+                  {task.timeStart && (
+                    <span className="text-[11px] font-mono text-subtle flex items-center gap-1 shrink-0">
+                      <Clock size={10} />
+                      {task.timeStart}{task.timeEnd ? ` - ${task.timeEnd}` : ''}
+                    </span>
+                  )}
+
+                  {/* Date */}
+                  <span className="text-[11px] font-mono text-subtle shrink-0">
+                    {task.date}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       {/* Edit modal */}
       <ClientForm
