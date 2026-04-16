@@ -33,7 +33,7 @@ export default function CanvasView() {
       });
   }, [canvasId, clientId, addCanvas, navigate, resolvedId]);
 
-  const { canvas, cards, connections, loading, updateCanvas, addCard, updateCard, deleteCard, addConnection, deleteConnection, commitCardPatch, undo, redo } = useCanvas(resolvedId);
+  const { canvas, cards, connections, loading, saveState, updateCanvas, addCard, updateCard, deleteCard, addConnection, deleteConnection, commitCardPatch, undo, redo } = useCanvas(resolvedId);
   const dragBeforeRef = useRef(null); // { id, patch }
   const [tool, setTool] = useState('select');
   const [selectedId, setSelectedId] = useState(null);
@@ -242,6 +242,21 @@ export default function CanvasView() {
           setAddPopup(null);
         }}
       />
+
+      {/* Save indicator */}
+      <div style={{
+        position: 'absolute', top: 12, right: 16, zIndex: 50,
+        fontSize: 10.5, letterSpacing: 1.5, textTransform: 'uppercase',
+        color: saveState === 'saving' ? 'var(--cv-muted)' : saveState === 'saved' ? 'var(--cv-gold2)' : 'transparent',
+        transition: 'color .3s ease, opacity .3s ease',
+        opacity: saveState === 'idle' ? 0 : 1,
+        padding: '4px 10px', borderRadius: 5,
+        background: 'rgba(255,255,255,0.7)',
+        backdropFilter: 'blur(4px)',
+        pointerEvents: 'none',
+      }}>
+        {saveState === 'saving' ? 'Salvando…' : saveState === 'saved' ? 'Salvato ✓' : ''}
+      </div>
 
       <AiPanel
         open={showAi}

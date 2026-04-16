@@ -12,6 +12,7 @@ export function useCanvas(canvasId) {
   const [connections, setConnections] = useState([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
+  const [saveState, setSaveState]     = useState('idle'); // idle | saving | saved
 
   // Pending patches keyed by entity id. Flushed on debounce timer.
   const pendingCardPatches    = useRef(new Map());
@@ -49,6 +50,7 @@ export function useCanvas(canvasId) {
 
   // ─── Debounced flush ───────────────────────────────────────────────────────
   const scheduleFlush = useCallback(() => {
+    setSaveState('saving');
     if (flushTimer.current) clearTimeout(flushTimer.current);
     flushTimer.current = setTimeout(async () => {
       flushTimer.current = null;
@@ -66,6 +68,8 @@ export function useCanvas(canvasId) {
         try { await db.patchCanvas(canvasId, cvPatch); }
         catch (e) { console.error('[useCanvas] patchCanvas failed', e); }
       }
+      setSaveState('saved');
+      setTimeout(() => setSaveState(s => s === 'saved' ? 'idle' : s), 1500);
     }, 300);
   }, [canvasId]);
 
@@ -193,7 +197,7 @@ export function useCanvas(canvasId) {
 
   return {
     canvas, cards, connections,
-    loading, error,
+    loading, error, saveState,
     addCard, updateCard, deleteCard,
     addConnection, deleteConnection,
     updateCanvas,

@@ -75,14 +75,21 @@ export default function CardShell({
   }
 
   useEffect(() => {
+    const GRID = 20;
     let lastX = null, lastY = null;
     function move(e) {
       if (!dragRef.current) return;
       const dx = (e.clientX - dragRef.current.startClientX) / zoom;
       const dy = (e.clientY - dragRef.current.startClientY) / zoom;
-      lastX = dragRef.current.startX + dx;
-      lastY = dragRef.current.startY + dy;
-      onMove && onMove(lastX, lastY);
+      let nx = dragRef.current.startX + dx;
+      let ny = dragRef.current.startY + dy;
+      // Snap to 20px grid unless Alt held
+      if (!e.altKey) {
+        nx = Math.round(nx / GRID) * GRID;
+        ny = Math.round(ny / GRID) * GRID;
+      }
+      lastX = nx; lastY = ny;
+      onMove && onMove(nx, ny);
     }
     function up() {
       if (dragRef.current) {
