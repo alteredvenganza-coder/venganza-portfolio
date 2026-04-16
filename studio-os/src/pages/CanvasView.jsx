@@ -8,6 +8,8 @@ import CanvasSidebar from '../canvas/CanvasSidebar';
 import { renderCard } from '../canvas/cards';
 import Connections from '../canvas/Connections';
 import TemplatePanel from '../canvas/TemplatePanel';
+import AddPopup from '../canvas/AddPopup';
+import ContextMenu from '../canvas/ContextMenu';
 
 export default function CanvasView() {
   const { canvasId, id: clientId } = useParams();
@@ -32,6 +34,8 @@ export default function CanvasView() {
   const [tool, setTool] = useState('select');
   const [connectFrom, setConnectFrom] = useState(null);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [addPopup, setAddPopup] = useState(null); // { x, y, refCard? }
+  const [ctxMenu,  setCtxMenu]  = useState(null); // { x, y, worldX, worldY }
 
   useEffect(() => { if (tool !== 'connect') setConnectFrom(null); }, [tool]);
 
@@ -79,6 +83,7 @@ export default function CanvasView() {
           addCard({ type, x: x - 110, y: y - 30, w: 230, ...(defaults[type] || {}) });
         }}
         svgChildren={<Connections connections={connections} cards={cards} refresh={cards} />}
+        onContextMenu={(cx, cy, wx, wy) => setCtxMenu({ x: cx, y: cy, worldX: wx, worldY: wy })}
       >
         {cards.map(c => renderCard(c, {
           ctx: {
@@ -102,7 +107,7 @@ export default function CanvasView() {
                 setTool('select');
               }
             },
-            onPlusClick: () => {},
+            onPlusClick: (cx, cy) => setAddPopup({ x: cx, y: cy, refCard: c }),
           },
           onUpdate: (patch) => updateCard(c.id, patch),
         }))}
@@ -151,6 +156,49 @@ export default function CanvasView() {
             });
           });
           setShowTemplates(false);
+        }}
+      />
+
+      <AddPopup
+        x={addPopup?.x} y={addPopup?.y}
+        onClose={() => setAddPopup(null)}
+        onPick={(type) => {
+          const ref = addPopup.refCard;
+          const x = ref ? ref.x + ref.w + 20 : 3000;
+          const y = ref ? ref.y : 3000;
+          const defaults = {
+            note:    { data: { title: 'Note',  text: '' } },
+            image:   { data: { title: 'Image' } },
+            link:    { data: { title: 'Link',  url: '' } },
+            todo:    { data: { title: 'To-do', items: [] } },
+            board:   { data: { title: 'Board', subCards: [] } },
+            heading: { data: { title: 'NEW HEADING' } },
+          };
+          addCard({ type, x, y, w: 230, ...(defaults[type] || {}) });
+          setAddPopup(null);
+        }}
+      />
+
+      <ContextMenu
+        x={ctxMenu?.x} y={ctxMenu?.y}
+        onClose={() => setCtxMenu(null)}
+        onAdd={(type) => {
+          const defaults = {
+            note: { data: { title:'Note', text:'' } },
+            image: { data: { title:'Image' } },
+            todo: { data: { title:'To-do', items:[] } },
+            board: { data: { title:'Board', subCards:[] } },
+            heading: { data: { title:'NEW HEADING' } },
+          };
+          addCard({ type, x: ctxMenu.worldX - 110, y: ctxMenu.worldY - 30, w: 230, ...(defaults[type] || {}) });
+          setCtxMenu(null);
+        }}
+        onFit={() => { setCtxMenu(null); }}
+        onClear={() => {
+          if (confirm('Svuotare il canvas?')) {
+            cards.forEach(c => deleteCard(c.id));
+          }
+          setCtxMenu(null);
         }}
       />
     </div>
