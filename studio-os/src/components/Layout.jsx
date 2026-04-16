@@ -97,25 +97,31 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen relative">
-      {/* Blurred background image */}
+      {/* Blurred background image — works on mobile */}
       {hasBg && (
         <div
-          className="fixed inset-0 pointer-events-none"
-          style={{
-            backgroundImage:    `url(${goals.appBackground})`,
-            backgroundSize:     'cover',
-            backgroundPosition: 'center',
-            filter:             'blur(24px)',
-            transform:          'scale(1.1)', // compensa i bordi sfocati
-            zIndex:             -1,
-          }}
-        />
+          className="fixed inset-0 pointer-events-none overflow-hidden"
+          style={{ zIndex: 0 }}
+        >
+          <div
+            style={{
+              position:           'absolute',
+              inset:              '-5%',
+              backgroundImage:    `url(${goals.appBackground})`,
+              backgroundSize:     'cover',
+              backgroundPosition: 'center',
+              filter:             'blur(24px)',
+              WebkitFilter:       'blur(24px)',
+              transform:          'scale(1.1)',
+            }}
+          />
+        </div>
       )}
       {/* Dark overlay when custom bg is set */}
       {hasBg && (
         <div
           className="fixed inset-0 pointer-events-none"
-          style={{ background: 'rgba(0,0,0,0.55)', zIndex: 0 }}
+          style={{ background: 'rgba(0,0,0,0.55)', zIndex: 1 }}
         />
       )}
 
@@ -323,7 +329,7 @@ export default function Layout({ children }) {
       </header>
 
       {/* ── Page content ── */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 relative" style={{ zIndex: 1 }}>
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 relative" style={{ zIndex: 2 }}>
         {children}
       </main>
 
