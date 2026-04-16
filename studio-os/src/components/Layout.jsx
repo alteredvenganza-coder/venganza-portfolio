@@ -94,12 +94,20 @@ export default function Layout({ children }) {
     navigate(path);
   }
 
-  const hasBg = Boolean(goals.appBackground);
+  const bgValue = goals.appBackground;
+  const hasBg = Boolean(bgValue);
+  const bgKind = !bgValue
+    ? null
+    : /^(linear|radial|conic)-gradient\(/i.test(bgValue.trim())
+      ? 'gradient'
+      : /^#|^rgb|^hsl/i.test(bgValue.trim())
+        ? 'solid'
+        : 'image';
 
   return (
     <div className="min-h-screen relative">
-      {/* Blurred background image — works on mobile */}
-      {hasBg && (
+      {/* ── Custom background ── */}
+      {hasBg && bgKind === 'image' && (
         <div
           className="fixed inset-0 pointer-events-none overflow-hidden"
           style={{ zIndex: 0 }}
@@ -108,7 +116,7 @@ export default function Layout({ children }) {
             style={{
               position:           'absolute',
               inset:              '-5%',
-              backgroundImage:    `url(${goals.appBackground})`,
+              backgroundImage:    `url(${bgValue})`,
               backgroundSize:     'cover',
               backgroundPosition: 'center',
               filter:             'blur(24px)',
@@ -118,8 +126,20 @@ export default function Layout({ children }) {
           />
         </div>
       )}
-      {/* Dark overlay when custom bg is set */}
-      {hasBg && (
+      {hasBg && bgKind === 'gradient' && (
+        <div
+          className="fixed inset-0 pointer-events-none"
+          style={{ background: bgValue, zIndex: 0 }}
+        />
+      )}
+      {hasBg && bgKind === 'solid' && (
+        <div
+          className="fixed inset-0 pointer-events-none"
+          style={{ background: bgValue, zIndex: 0 }}
+        />
+      )}
+      {/* Dark overlay only for images (gradients/solids are designed already) */}
+      {hasBg && bgKind === 'image' && (
         <div
           className="fixed inset-0 pointer-events-none"
           style={{ background: 'rgba(0,0,0,0.55)', zIndex: 1 }}

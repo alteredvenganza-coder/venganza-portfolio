@@ -221,32 +221,86 @@ export default function SettingsModal({ open, onClose }) {
               <p className="text-sm font-semibold text-ink">Sfondo app</p>
             </div>
             <p className="text-xs text-subtle mb-3">
-              Imposta una tua foto come sfondo — vision board, obiettivo, mood.
-              Incolla il link diretto di un'immagine (Unsplash, Google Drive, ecc.)
+              Scegli un colore solido, un gradient o incolla l'URL di un'immagine
+              (Unsplash, Google Drive, ecc.)
             </p>
 
-            {goals.appBackground && (
-              <div className="relative mb-3 rounded-lg overflow-hidden h-28 group">
-                <img
-                  src={goals.appBackground}
-                  alt="Sfondo corrente"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <button
-                    onClick={() => updateGoals({ appBackground: null })}
-                    className="flex items-center gap-1.5 text-xs text-white bg-red-900/70 hover:bg-red-900 px-3 py-1.5 rounded transition-colors"
-                  >
-                    <Trash2 size={12} /> Rimuovi
-                  </button>
+            {goals.appBackground && (() => {
+              const v = goals.appBackground;
+              const isImage = !/^(linear|radial|conic)-gradient\(|^#|^rgb|^hsl/i.test(v.trim());
+              return (
+                <div className="relative mb-3 rounded-lg overflow-hidden h-28 group border border-white/10">
+                  {isImage ? (
+                    <img src={v} alt="Sfondo corrente" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full" style={{ background: v }} />
+                  )}
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button
+                      onClick={() => updateGoals({ appBackground: null })}
+                      className="flex items-center gap-1.5 text-xs text-white bg-red-900/70 hover:bg-red-900 px-3 py-1.5 rounded transition-colors"
+                    >
+                      <Trash2 size={12} /> Rimuovi
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
+            {/* Preset: solidi */}
+            <p className="text-[10px] uppercase tracking-wide text-subtle mb-2">Solidi</p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {[
+                '#0a0a0a', '#1a1a1a', '#171923', '#1e1b3a',
+                '#1a2332', '#0f1f1a', '#2a1820', '#3a1f1f',
+              ].map(c => (
+                <button
+                  key={c}
+                  onClick={() => updateGoals({ appBackground: c })}
+                  className={`w-8 h-8 rounded border transition-transform hover:scale-110 ${
+                    goals.appBackground === c ? 'border-burgundy ring-2 ring-burgundy/40' : 'border-white/15'
+                  }`}
+                  style={{ background: c }}
+                  title={c}
+                />
+              ))}
+            </div>
+
+            {/* Preset: gradienti */}
+            <p className="text-[10px] uppercase tracking-wide text-subtle mb-2">Gradients</p>
+            <div className="grid grid-cols-4 gap-2 mb-3">
+              {[
+                'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+                'linear-gradient(135deg, #2c1338 0%, #4a1942 50%, #6e1f3d 100%)',
+                'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
+                'linear-gradient(135deg, #232526 0%, #414345 100%)',
+                'linear-gradient(135deg, #1f4037 0%, #99f2c8 100%)',
+                'linear-gradient(135deg, #ee9ca7 0%, #ffdde1 100%)',
+                'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',
+                'linear-gradient(135deg, #5b247a 0%, #1bcedf 100%)',
+                'radial-gradient(ellipse at top, #1a1a2e 0%, #0a0a0f 100%)',
+                'radial-gradient(circle at top right, #4a1942 0%, #0f0c29 70%)',
+                'linear-gradient(135deg, #000428 0%, #004e92 100%)',
+                'linear-gradient(135deg, #093028 0%, #237a57 100%)',
+              ].map(g => (
+                <button
+                  key={g}
+                  onClick={() => updateGoals({ appBackground: g })}
+                  className={`h-10 rounded border transition-transform hover:scale-105 ${
+                    goals.appBackground === g ? 'border-burgundy ring-2 ring-burgundy/40' : 'border-white/15'
+                  }`}
+                  style={{ background: g }}
+                  title={g}
+                />
+              ))}
+            </div>
+
+            {/* Custom: URL immagine o CSS */}
+            <p className="text-[10px] uppercase tracking-wide text-subtle mb-2">Custom</p>
             <div className="flex gap-2">
               <input
-                type="url"
-                placeholder="https://images.unsplash.com/…"
+                type="text"
+                placeholder="https://… oppure linear-gradient(…) oppure #1a1a1a"
                 value={bgDraft}
                 onChange={e => setBgDraft(e.target.value)}
                 className="flex-1 text-sm"
