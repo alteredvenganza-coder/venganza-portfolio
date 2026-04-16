@@ -376,6 +376,9 @@ export default function CashflowPage() {
                     {entry.source === 'revolut' && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-900/40 text-purple-300 border border-purple-700/30">Revolut</span>
                     )}
+                    {entry.source === 'stripe' && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-900/40 text-indigo-300 border border-indigo-700/30">Stripe</span>
+                    )}
                   </div>
                 </div>
 

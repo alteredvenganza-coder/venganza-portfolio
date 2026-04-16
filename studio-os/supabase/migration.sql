@@ -152,7 +152,7 @@ create table if not exists public.cashflow_entries (
   category     text,
   description  text,
   date         date not null default current_date,
-  source       text not null default 'manual' check (source in ('manual', 'revolut')),
+  source       text not null default 'manual' check (source in ('manual', 'revolut', 'stripe')),
   revolut_id   text,
   created_at   timestamptz not null default now()
 );
