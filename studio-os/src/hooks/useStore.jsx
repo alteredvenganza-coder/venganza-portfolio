@@ -51,6 +51,7 @@ export function StoreProvider({ children }) {
   const { user } = useAuth();
   const [clients,  setClients]  = useState([]);
   const [projects, setProjects] = useState([]);
+  const [calendarTasks, setCalendarTasks] = useState([]);
   const [loading,  setLoading]  = useState(true);
 
   const [goals, setGoals] = useState(() => {
@@ -74,13 +75,13 @@ export function StoreProvider({ children }) {
     if (!user) { setLoading(false); return; }
 
     setLoading(true);
-    Promise.all([db.fetchClients(user.id), db.fetchProjects(user.id)])
-      .then(([c, p]) => { setClients(c); setProjects(p); })
+    Promise.all([db.fetchClients(user.id), db.fetchProjects(user.id), db.fetchCalendarTasks(user.id)])
+      .then(([c, p, ct]) => { setClients(c); setProjects(p); setCalendarTasks(ct); })
       .finally(() => setLoading(false));
   }, [user]);
 
   return (
-    <StoreContext.Provider value={{ clients, setClients, projects, setProjects, loading, user, goals, updateGoals }}>
+    <StoreContext.Provider value={{ clients, setClients, projects, setProjects, calendarTasks, setCalendarTasks, loading, user, goals, updateGoals }}>
       {children}
     </StoreContext.Provider>
   );
@@ -212,4 +213,35 @@ export function useProjects() {
     getProject, getProjectsByClient,
     addTask, toggleTask, deleteTask,
   };
+}
+
+// ── Calendar Tasks ────────────────────────────────────────────────────────────
+
+export function useCalendarTasks() {
+  const { calendarTasks, setCalendarTasks, user } = useStore();
+
+  async function addCalendarTask(data) {
+    const task = await db.insertCalendarTask(user.id, data);
+    setCalendarTasks(prev => [...prev, task]);
+    return task;
+  }
+
+  async function updateCalendarTask(id, patch) {
+    const current = calendarTasks.find(t => t.id === id);
+    const merged = { ...current, ...patch };
+    setCalendarTasks(prev => prev.map(t => t.id === id ? merged : t));
+    try {
+      await db.patchCalendarTask(id, patch);
+    } catch (err) {
+      console.error('[db] patchCalendarTask failed:', err);
+      setCalendarTasks(prev => prev.map(t => t.id === id ? current : t));
+    }
+  }
+
+  async function deleteCalendarTask(id) {
+    setCalendarTasks(prev => prev.filter(t => t.id !== id));
+    await db.removeCalendarTask(id);
+  }
+
+  return { calendarTasks, addCalendarTask, updateCalendarTask, deleteCalendarTask };
 }

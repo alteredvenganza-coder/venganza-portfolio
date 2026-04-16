@@ -168,3 +168,25 @@ create policy "Owner cashflow"
 create unique index if not exists cashflow_revolut_id_idx
   on public.cashflow_entries (revolut_id)
   where revolut_id is not null;
+
+-- ── Calendar Tasks ──────────────────────────────────────────
+create table if not exists public.calendar_tasks (
+  id                uuid primary key default gen_random_uuid(),
+  user_id           uuid references auth.users(id) on delete cascade not null,
+  title             text not null,
+  description       text,
+  date              date not null,
+  time_start        text,   -- "09:00" format, nullable for all-day tasks
+  time_end          text,   -- "10:30" format
+  color             text default 'burgundy',
+  is_done           boolean default false,
+  reminder_minutes  integer,
+  created_at        timestamptz default now()
+);
+
+alter table public.calendar_tasks enable row level security;
+
+create policy "Owner calendar tasks"
+  on public.calendar_tasks for all
+  using  (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
