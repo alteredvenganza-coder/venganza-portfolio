@@ -205,3 +205,15 @@ export async function getDelivery(token) {
   if (error) throw error;
   return data;
 }
+
+// ── Standalone transfers (project_id is null) ────────────────────────────────
+
+export async function fetchTransfers() {
+  const { data, error } = await supabase
+    .from('deliveries')
+    .select('*')
+    .is('project_id', null)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}

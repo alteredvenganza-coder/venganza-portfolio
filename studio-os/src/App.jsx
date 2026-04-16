@@ -31,6 +31,8 @@ import PricingMemoryPage from './pages/PricingMemoryPage';
 import CashflowPage from './pages/CashflowPage';
 import LoginPage from './pages/LoginPage';
 import DeliveryPage from './pages/DeliveryPage';
+import TransferPage from './pages/TransferPage';
+import SendFilePage from './pages/SendFilePage';
 
 // ── Loading screen ─────────────────────────────────────────────────────────────
 function Spinner() {
@@ -55,6 +57,7 @@ function AppContent() {
         <Route path="/projects/:id"  element={<ProjectDetail />} />
         <Route path="/pricing"       element={<PricingMemoryPage />} />
         <Route path="/cashflow"      element={<CashflowPage />} />
+        <Route path="/send"          element={<SendFilePage />} />
         <Route path="*"              element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
@@ -97,6 +100,7 @@ export default function App() {
         <Routes>
           <Route path="/login"          element={<LoginPage />} />
           <Route path="/consegna/:token" element={<DeliveryPage />} />
+          <Route path="/transfer/:token" element={<TransferPage />} />
           <Route path="/*"              element={<ProtectedApp />} />
         </Routes>
       </BrowserRouter>

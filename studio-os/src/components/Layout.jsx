@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings, FolderKanban } from 'lucide-react';
+import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings, FolderKanban, Send } from 'lucide-react';
 import { useClients, useProjects, useGoals } from '../hooks/useStore';
 import SettingsModal from './SettingsModal';
 
@@ -9,6 +9,7 @@ const NAV = [
   { to: '/clients',   label: 'Clienti',   icon: Users },
   { to: '/pricing',   label: 'Prezzi',    icon: TrendingUp },
   { to: '/cashflow',  label: 'Finanze',   icon: Wallet },
+  { to: '/send',      label: 'Invia File', icon: Send },
 ];
 
 export default function Layout({ children }) {
