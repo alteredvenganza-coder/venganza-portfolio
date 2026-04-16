@@ -11,6 +11,7 @@ import TemplatePanel from '../canvas/TemplatePanel';
 import AddPopup from '../canvas/AddPopup';
 import ContextMenu from '../canvas/ContextMenu';
 import CanvasMinimap from '../canvas/CanvasMinimap';
+import AiPanel from '../canvas/AiPanel';
 
 export default function CanvasView() {
   const { canvasId, id: clientId } = useParams();
@@ -36,6 +37,7 @@ export default function CanvasView() {
   const [selectedId, setSelectedId] = useState(null);
   const [connectFrom, setConnectFrom] = useState(null);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showAi, setShowAi] = useState(false);
   const [addPopup, setAddPopup] = useState(null); // { x, y, refCard? }
   const [ctxMenu,  setCtxMenu]  = useState(null); // { x, y, worldX, worldY }
 
@@ -70,6 +72,7 @@ export default function CanvasView() {
       <CanvasSidebar
         onHome={() => navigate(clientId ? `/clients/${clientId}` : '/')}
         onTemplates={() => setShowTemplates(true)}
+        onAi={() => setShowAi(v => !v)}
       />
       <CanvasEngine
         panX={canvas?.panX ?? 0}
@@ -204,6 +207,25 @@ export default function CanvasView() {
           };
           addCard({ type, x, y, w: 230, ...(defaults[type] || {}) });
           setAddPopup(null);
+        }}
+      />
+
+      <AiPanel
+        open={showAi}
+        onClose={() => setShowAi(false)}
+        onAddCard={(payload) => {
+          const z  = canvas?.zoom ?? 1;
+          const px = canvas?.panX ?? 0;
+          const py = canvas?.panY ?? 0;
+          const cx = (window.innerWidth  / 2 - px) / z;
+          const cy = (window.innerHeight / 2 - py) / z;
+          addCard({
+            type: payload.type || 'note',
+            x: cx - 115,
+            y: cy - 40,
+            w: 230,
+            data: payload.data || { title: '✨ MAT AI', text: '' },
+          });
         }}
       />
 

@@ -14,7 +14,7 @@ const SMART_ITEMS = [
   { type: 'project-overview', label: 'Project', icon: '📋' },
 ];
 
-export default function CanvasSidebar({ onHome, onTemplates }) {
+export default function CanvasSidebar({ onHome, onTemplates, onAi }) {
   return (
     <div style={{
       position: 'absolute', top: 0, left: 0, bottom: 0, width: 60,
@@ -31,6 +31,7 @@ export default function CanvasSidebar({ onHome, onTemplates }) {
       ))}
       <div style={{ width: 32, height: 1, background: 'var(--cv-border2)', margin: '6px 0' }} />
       <SideBtn icon="▦" label="Templ" onClick={onTemplates} />
+      <SideBtn icon="✨" label="AI" onClick={onAi} />
       <div style={{ flex: 1 }} />
       <SideBtn icon="⌂" label="Home" onClick={onHome} />
     </div>
