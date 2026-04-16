@@ -200,7 +200,7 @@ alter table public.calendar_tasks
 
 create table if not exists public.canvases (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users not null,
+  user_id uuid references auth.users(id) on delete cascade not null,
   client_id uuid references public.clients(id) on delete cascade,
   name text not null default 'Untitled Canvas',
   template text,
