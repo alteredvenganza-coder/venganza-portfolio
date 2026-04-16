@@ -5,6 +5,7 @@ import LinkCard from './LinkCard';
 import TodoCard from './TodoCard';
 import BoardCard from './BoardCard';
 import BudgetCard from './BudgetCard';
+import TasksCard from './TasksCard';
 
 export const CARD_COMPONENTS = {
   note:    NoteCard,
@@ -14,6 +15,7 @@ export const CARD_COMPONENTS = {
   todo:    TodoCard,
   board:   BoardCard,
   budget:  BudgetCard,
+  tasks:   TasksCard,
 };
 
 export function renderCard(card, ctx) {
