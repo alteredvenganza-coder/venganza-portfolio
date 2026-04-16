@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings, FolderKanban, Send, CalendarDays } from 'lucide-react';
+import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings, FolderKanban, Send, CalendarDays, Gift } from 'lucide-react';
 import { useClients, useProjects, useGoals } from '../hooks/useStore';
 import { useI18n } from '../lib/i18n';
+import { useUserProfile } from '../hooks/useUserProfile';
 import SettingsModal from './SettingsModal';
 
 const NAV = [
@@ -12,6 +13,7 @@ const NAV = [
   { to: '/cashflow',   i18nKey: 'nav.cashflow',   icon: Wallet },
   { to: '/calendario', i18nKey: 'nav.calendar',   icon: CalendarDays },
   { to: '/send',       i18nKey: 'nav.sendFile',   icon: Send },
+  { to: '/inviti',     label: 'Inviti',           icon: Gift, adminOnly: true },
 ];
 
 export default function Layout({ children }) {
@@ -19,7 +21,11 @@ export default function Layout({ children }) {
   const { projects } = useProjects();
   const { goals }    = useGoals();
   const { t }        = useI18n();
+  const { isAdmin }  = useUserProfile();
   const navigate     = useNavigate();
+
+  // Filter nav: admin-only items hidden for non-admins
+  const navItems = NAV.filter(item => !item.adminOnly || isAdmin);
 
   const [query, setQuery]       = useState('');
   const [focused, setFocused]   = useState(false);
@@ -104,7 +110,7 @@ export default function Layout({ children }) {
 
           {/* Nav */}
           <nav className="flex items-center gap-0.5 sm:gap-1">
-            {NAV.map(({ to, i18nKey, icon: Icon, end }) => (
+            {navItems.map(({ to, i18nKey, label, icon: Icon, end }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -118,7 +124,7 @@ export default function Layout({ children }) {
                 }
               >
                 <Icon size={14} />
-                <span className="hidden sm:inline">{t(i18nKey)}</span>
+                <span className="hidden sm:inline">{i18nKey ? t(i18nKey) : label}</span>
               </NavLink>
             ))}
           </nav>

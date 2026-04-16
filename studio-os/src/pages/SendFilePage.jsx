@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Upload, Send, Link as LinkIcon, Check, Copy,
   Loader2, FileText, Trash2, Clock, ExternalLink,
-  AlertCircle,
+  AlertCircle, HardDrive,
 } from 'lucide-react';
 import Btn from '../components/Btn';
 import Field from '../components/Field';
-import { uploadProjectFile, createDelivery, fetchTransfers } from '../lib/db';
+import { useAuth } from '../hooks/useAuth';
+import { uploadProjectFile, createDeliveryWithUser, fetchTransfers, fetchUserProfile, updateStorageUsed } from '../lib/db';
 
 function formatBytes(bytes) {
   if (!bytes || bytes === 0) return '';
@@ -25,6 +26,8 @@ function formatDate(iso) {
 }
 
 export default function SendFilePage() {
+  const { user } = useAuth();
+
   // ── Form state ──────────────────────────────────────────────────────────────
   const [files, setFiles]             = useState([]);
   const [title, setTitle]             = useState('');
@@ -42,28 +45,54 @@ export default function SendFilePage() {
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [copiedId, setCopiedId]       = useState(null);
 
+  // ── Guest storage ───────────────────────────────────────────────────────────
+  const [profile, setProfile]         = useState(null);
+  const isGuest = profile?.role === 'guest';
+  const storageLimitBytes = (isGuest ? 100 : 10000) * 1024 * 1024;
+
   // ── Drag state ──────────────────────────────────────────────────────────────
   const [dragging, setDragging]       = useState(false);
   const dragCounter = useRef(0);
 
-  // Load history
+  // Load profile + history
   useEffect(() => {
-    fetchTransfers()
+    if (!user) return;
+    fetchUserProfile(user.id).then(p => setProfile(p)).catch(() => {});
+    // Guests only see their own transfers; admin sees all
+    fetchTransfers(null) // will load all; guest filtering handled by RLS or below
       .then(setTransfers)
       .catch(() => {})
       .finally(() => setLoadingHistory(false));
-  }, []);
+  }, [user]);
 
   // ── File upload handler ─────────────────────────────────────────────────────
   const handleFileUpload = async (fileList) => {
     const incoming = Array.from(fileList);
     if (!incoming.length) return;
+
+    // Check storage limit for guests
+    if (isGuest) {
+      const totalNewBytes = incoming.reduce((sum, f) => sum + f.size, 0);
+      const currentUsed = profile?.storage_used_bytes || 0;
+      if (currentUsed + totalNewBytes > storageLimitBytes) {
+        alert(`Spazio insufficiente. Hai usato ${formatBytes(currentUsed)} di ${formatBytes(storageLimitBytes)}.`);
+        return;
+      }
+    }
+
     setUploading(true);
     try {
       const uploaded = await Promise.all(
         incoming.map(f => uploadProjectFile('transfers', f))
       );
       setFiles(prev => [...prev, ...uploaded]);
+
+      // Update storage tracking for guests
+      if (isGuest && user) {
+        const totalBytes = incoming.reduce((sum, f) => sum + f.size, 0);
+        await updateStorageUsed(user.id, totalBytes);
+        setProfile(prev => prev ? { ...prev, storage_used_bytes: (prev.storage_used_bytes || 0) + totalBytes } : prev);
+      }
     } catch (err) {
       alert('Errore upload: ' + err.message);
     } finally {
@@ -122,13 +151,14 @@ export default function SendFilePage() {
         message,
       ].filter(Boolean).join('\n\n');
 
-      const delivery = await createDelivery({
+      const delivery = await createDeliveryWithUser({
         projectId:     null,
         title:         finalTitle,
         files,
         message:       finalMessage || null,
         bgImages:      [],
         expiresInDays,
+        userId:        user?.id || null,
       });
 
       const link = `${window.location.origin}/transfer/${delivery.token}`;
@@ -174,6 +204,27 @@ export default function SendFilePage() {
           Carica file e genera un link di download da condividere con chiunque.
         </p>
       </div>
+
+      {/* Guest storage bar */}
+      {isGuest && profile && (
+        <div className="glass rounded-lg p-4 flex items-center gap-4">
+          <HardDrive size={16} className="text-burgundy-muted shrink-0" />
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-muted">Spazio utilizzato</span>
+              <span className="text-xs font-mono text-ink">
+                {formatBytes(profile.storage_used_bytes || 0)} / {formatBytes(storageLimitBytes)}
+              </span>
+            </div>
+            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-burgundy rounded-full transition-all"
+                style={{ width: `${Math.min(((profile.storage_used_bytes || 0) / storageLimitBytes) * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 

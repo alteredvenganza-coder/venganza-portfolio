@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Component } from 'react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
+import { UserProfileProvider, useUserProfile } from './hooks/useUserProfile';
 import { StoreProvider, useStore } from './hooks/useStore';
 import { supabaseConfigured } from './lib/supabase';
 import { I18nProvider } from './lib/i18n';
@@ -24,6 +25,7 @@ class ErrorBoundary extends Component {
   }
 }
 import Layout from './components/Layout';
+import GuestLayout from './components/GuestLayout';
 import Dashboard from './pages/Dashboard';
 import ClientsPage from './pages/ClientsPage';
 import ClientDetail from './pages/ClientDetail';
@@ -31,10 +33,12 @@ import ProjectDetail from './pages/ProjectDetail';
 import PricingMemoryPage from './pages/PricingMemoryPage';
 import CashflowPage from './pages/CashflowPage';
 import LoginPage from './pages/LoginPage';
+import GuestSignupPage from './pages/GuestSignupPage';
 import DeliveryPage from './pages/DeliveryPage';
 import TransferPage from './pages/TransferPage';
 import SendFilePage from './pages/SendFilePage';
 import CalendarPage from './pages/CalendarPage';
+import AdminInvitesPage from './pages/AdminInvitesPage';
 
 // ── Loading screen ─────────────────────────────────────────────────────────────
 function Spinner() {
@@ -45,8 +49,20 @@ function Spinner() {
   );
 }
 
-// ── Inner app (needs StoreContext) ─────────────────────────────────────────────
-function AppContent() {
+// ── Guest app (only /send and /transfer) ──────────────────────────────────────
+function GuestApp() {
+  return (
+    <GuestLayout>
+      <Routes>
+        <Route path="/send"          element={<SendFilePage />} />
+        <Route path="*"              element={<Navigate to="/send" replace />} />
+      </Routes>
+    </GuestLayout>
+  );
+}
+
+// ── Admin app (full CRM) ──────────────────────────────────────────────────────
+function AdminContent() {
   const { loading } = useStore();
   if (loading) return <Spinner />;
 
@@ -61,21 +77,30 @@ function AppContent() {
         <Route path="/cashflow"      element={<CashflowPage />} />
         <Route path="/calendario"    element={<CalendarPage />} />
         <Route path="/send"          element={<SendFilePage />} />
+        <Route path="/inviti"        element={<AdminInvitesPage />} />
         <Route path="*"              element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
   );
 }
 
-// ── Protected area ─────────────────────────────────────────────────────────────
+// ── Protected area — routes based on role ─────────────────────────────────────
 function ProtectedApp() {
-  const { user, loading } = useAuth();
-  if (loading) return <Spinner />;
-  if (!user)   return <Navigate to="/login" replace />;
+  const { user, loading: authLoading } = useAuth();
+  const { isGuest, loading: profileLoading } = useUserProfile();
 
+  if (authLoading || profileLoading) return <Spinner />;
+  if (!user) return <Navigate to="/login" replace />;
+
+  // Guest users only get the transfer UI
+  if (isGuest) {
+    return <GuestApp />;
+  }
+
+  // Admin/default users get the full CRM
   return (
     <StoreProvider>
-      <AppContent />
+      <AdminContent />
     </StoreProvider>
   );
 }
@@ -100,14 +125,17 @@ export default function App() {
     <ErrorBoundary>
     <I18nProvider>
     <AuthProvider>
+    <UserProfileProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login"          element={<LoginPage />} />
+          <Route path="/login"           element={<LoginPage />} />
+          <Route path="/signup"          element={<GuestSignupPage />} />
           <Route path="/consegna/:token" element={<DeliveryPage />} />
           <Route path="/transfer/:token" element={<TransferPage />} />
-          <Route path="/*"              element={<ProtectedApp />} />
+          <Route path="/*"               element={<ProtectedApp />} />
         </Routes>
       </BrowserRouter>
+    </UserProfileProvider>
     </AuthProvider>
     </I18nProvider>
     </ErrorBoundary>

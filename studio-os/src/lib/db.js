@@ -288,12 +288,106 @@ export async function getDelivery(token) {
 
 // ── Standalone transfers (project_id is null) ────────────────────────────────
 
-export async function fetchTransfers() {
-  const { data, error } = await supabase
+export async function fetchTransfers(userId) {
+  let query = supabase
     .from('deliveries')
     .select('*')
     .is('project_id', null)
     .order('created_at', { ascending: false });
+  // If userId is provided, filter by created_by (for guests)
+  if (userId) query = query.eq('created_by', userId);
+  const { data, error } = await query;
   if (error) throw error;
   return data;
+}
+
+// ── Invite codes ─────────────────────────────────────────────────────────────
+
+export async function fetchInviteCodes(userId) {
+  const { data, error } = await supabase
+    .from('invite_codes')
+    .select('*')
+    .eq('created_by', userId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+export async function createInviteCode(userId) {
+  const code = Math.random().toString(36).slice(2, 10).toUpperCase();
+  const { data, error } = await supabase
+    .from('invite_codes')
+    .insert({ code, created_by: userId })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+// ── User profiles ────────────────────────────────────────────────────────────
+
+export async function fetchUserProfile(userId) {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('id', userId)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function upsertUserProfile(userId, profile) {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .upsert({ id: userId, ...profile })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchAllGuestProfiles() {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('role', 'guest')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+// ── Delivery with created_by ─────────────────────────────────────────────────
+
+export async function createDeliveryWithUser({ projectId, title, files, message, bgImages = [], expiresInDays = 7, userId }) {
+  const expires_at = new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000).toISOString();
+  const { data, error } = await supabase
+    .from('deliveries')
+    .insert({
+      project_id: projectId,
+      title,
+      files,
+      message,
+      bg_images: bgImages,
+      expires_at,
+      created_by: userId || null,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateStorageUsed(userId, bytesAdded) {
+  // Increment storage_used_bytes atomically via RPC or read-then-write
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('storage_used_bytes')
+    .eq('id', userId)
+    .single();
+  const current = profile?.storage_used_bytes || 0;
+  const { error } = await supabase
+    .from('user_profiles')
+    .update({ storage_used_bytes: current + bytesAdded })
+    .eq('id', userId);
+  if (error) throw error;
 }
