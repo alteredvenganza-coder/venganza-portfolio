@@ -346,6 +346,24 @@ export async function upsertUserProfile(userId, profile) {
   return data;
 }
 
+export async function fetchAppBackground(userId) {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('app_background')
+    .eq('id', userId)
+    .maybeSingle();
+  if (error) throw error;
+  return data?.app_background ?? null;
+}
+
+export async function updateAppBackground(userId, url) {
+  // Upsert in case the profile row doesn't exist yet
+  const { error } = await supabase
+    .from('user_profiles')
+    .upsert({ id: userId, app_background: url || null }, { onConflict: 'id' });
+  if (error) throw error;
+}
+
 export async function fetchAllGuestProfiles() {
   const { data, error } = await supabase
     .from('user_profiles')

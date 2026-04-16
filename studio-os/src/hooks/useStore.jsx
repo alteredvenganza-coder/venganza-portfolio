@@ -69,14 +69,38 @@ export function StoreProvider({ children }) {
       localStorage.setItem(GOALS_KEY, JSON.stringify(next));
       return next;
     });
+
+    // Sync appBackground to Supabase so it's visible on all devices
+    if ('appBackground' in patch && user) {
+      db.updateAppBackground(user.id, patch.appBackground).catch(err => {
+        console.error('Failed to sync app background:', err);
+      });
+    }
   }
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
 
     setLoading(true);
-    Promise.all([db.fetchClients(user.id), db.fetchProjects(user.id), db.fetchCalendarTasks(user.id)])
-      .then(([c, p, ct]) => { setClients(c); setProjects(p); setCalendarTasks(ct); })
+    Promise.all([
+      db.fetchClients(user.id),
+      db.fetchProjects(user.id),
+      db.fetchCalendarTasks(user.id),
+      db.fetchAppBackground(user.id),
+    ])
+      .then(([c, p, ct, bg]) => {
+        setClients(c);
+        setProjects(p);
+        setCalendarTasks(ct);
+        // Override local appBackground with Supabase value (cross-device sync)
+        if (bg !== undefined) {
+          setGoals(prev => {
+            const next = { ...prev, appBackground: bg };
+            localStorage.setItem(GOALS_KEY, JSON.stringify(next));
+            return next;
+          });
+        }
+      })
       .finally(() => setLoading(false));
   }, [user]);
 
