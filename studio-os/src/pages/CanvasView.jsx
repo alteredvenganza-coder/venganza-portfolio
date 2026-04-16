@@ -10,6 +10,7 @@ import Connections from '../canvas/Connections';
 import TemplatePanel from '../canvas/TemplatePanel';
 import AddPopup from '../canvas/AddPopup';
 import ContextMenu from '../canvas/ContextMenu';
+import CanvasMinimap from '../canvas/CanvasMinimap';
 
 export default function CanvasView() {
   const { canvasId, id: clientId } = useParams();
@@ -133,6 +134,12 @@ export default function CanvasView() {
             panY: (window.innerHeight - h * z) / 2 - minY * z + pad * z,
           });
         }}
+      />
+      <CanvasMinimap
+        panX={canvas?.panX ?? 0}
+        panY={canvas?.panY ?? 0}
+        zoom={canvas?.zoom ?? 1}
+        cards={cards}
       />
       <TemplatePanel
         open={showTemplates}
