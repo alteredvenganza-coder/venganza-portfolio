@@ -18,13 +18,14 @@ function emptyBrief() {
   return { notes: '', images: [], steps: [] };
 }
 
-export default function BriefSection({ brief: rawBrief, projectId, onUpdate }) {
+export default function BriefSection({ brief: rawBrief, projectId, onUpdate, onProjectUpdate }) {
   const brief   = { ...emptyBrief(), ...rawBrief };
   const [open,       setOpen]      = useState(false);
   const [uploading,  setUploading] = useState(false);
   const [analyzing,  setAnalyzing] = useState(false);
   const [analyzeErr, setAnalyzeErr]= useState('');
   const [newStep,    setNewStep]   = useState('');
+  const [aiExtras,   setAiExtras]  = useState(null); // enriched AI extraction results
   const fileRef    = useRef(null);
   const aiFileRef  = useRef(null);
 
@@ -77,12 +78,17 @@ export default function BriefSection({ brief: rawBrief, projectId, onUpdate }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Errore analisi');
 
-      const { notes: aiNotes, steps: aiSteps } = data;
+      const { notes: aiNotes, steps: aiSteps, budget, deadline, projectType, clientInfo, materials, toneOfVoice, references } = data;
 
-      // Append notes (don't overwrite existing)
+      // Append notes — include extras inline
+      let fullNotes = aiNotes || '';
+      if (toneOfVoice) fullNotes += `\n\n🎨 Tone of voice: ${toneOfVoice}`;
+      if (references)  fullNotes += `\n📌 Reference: ${references}`;
+      if (materials?.length) fullNotes += `\n📦 Materiali: ${materials.join(', ')}`;
+
       const newNotes = brief.notes
-        ? brief.notes + '\n\n— Estratto dall\'AI —\n' + aiNotes
-        : aiNotes;
+        ? brief.notes + '\n\n— Estratto dall\'AI —\n' + fullNotes
+        : fullNotes;
 
       // Append steps
       const newSteps = [
@@ -91,6 +97,18 @@ export default function BriefSection({ brief: rawBrief, projectId, onUpdate }) {
       ];
 
       update({ notes: newNotes, steps: newSteps });
+
+      // Auto-fill project fields if extracted
+      if (onProjectUpdate) {
+        const patch = {};
+        if (budget)      patch.price    = budget;
+        if (deadline)    patch.deadline = deadline;
+        if (projectType) patch.type     = projectType;
+        if (Object.keys(patch).length) onProjectUpdate(patch);
+      }
+
+      // Store extras for display
+      setAiExtras({ budget, deadline, projectType, clientInfo, materials, toneOfVoice, references });
     } catch (err) {
       setAnalyzeErr(err.message);
     } finally {
@@ -193,6 +211,35 @@ export default function BriefSection({ brief: rawBrief, projectId, onUpdate }) {
                   </label>
                 </div>
                 {analyzeErr && <p className="text-xs text-burgundy mt-2">{analyzeErr}</p>}
+                {aiExtras && (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {aiExtras.budget && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-[rgba(52,168,83,0.18)] text-[#6dd49e]">
+                        💰 {aiExtras.budget}€ → aggiornato
+                      </span>
+                    )}
+                    {aiExtras.deadline && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-[rgba(56,120,220,0.18)] text-[#7bb3ff]">
+                        📅 {aiExtras.deadline} → aggiornato
+                      </span>
+                    )}
+                    {aiExtras.projectType && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-[rgba(124,58,237,0.18)] text-[#c4a5ff]">
+                        🏷️ {aiExtras.projectType} → aggiornato
+                      </span>
+                    )}
+                    {aiExtras.clientInfo?.name && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-[rgba(255,255,255,0.08)] text-muted">
+                        👤 {aiExtras.clientInfo.name}{aiExtras.clientInfo.brand ? ` · ${aiExtras.clientInfo.brand}` : ''}
+                      </span>
+                    )}
+                    {aiExtras.toneOfVoice && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-[rgba(200,60,120,0.18)] text-[#f5a0c8]">
+                        🎨 {aiExtras.toneOfVoice}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* ── Note generali ── */}

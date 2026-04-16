@@ -523,6 +523,7 @@ export default function ProjectDetail() {
           brief={project.brief ?? {}}
           projectId={id}
           onUpdate={(brief) => updateProject(id, { brief })}
+          onProjectUpdate={(patch) => updateProject(id, patch)}
         />
       </div>
 
