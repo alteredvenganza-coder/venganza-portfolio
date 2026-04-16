@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
  * Renders SVG paths for each connection. Reads card positions from the DOM
  * (since cards are absolute-positioned by id) so it's always in sync.
  */
-export default function Connections({ connections, cards, refresh }) {
+export default function Connections({ connections, cards, refresh, selectedConnectionId, onSelectConnection }) {
   const [tick, setTick] = useState(0);
 
   // Re-render when refresh changes (called on drag/zoom)
@@ -20,16 +20,22 @@ export default function Connections({ connections, cards, refresh }) {
     const bx = b.x + b.w / 2;
     const by = b.y + 60;
     const cx = (ax + bx) / 2;
+    const selected = selectedConnectionId === conn.id;
+    const d = `M${ax},${ay} C${cx},${ay} ${cx},${by} ${bx},${by}`;
     return (
-      <path
-        key={conn.id}
-        d={`M${ax},${ay} C${cx},${ay} ${cx},${by} ${bx},${by}`}
-        fill="none"
-        stroke="rgba(154,115,16,0.5)"
-        strokeWidth="1.5"
-        strokeDasharray="5 3"
-        markerEnd="url(#cv-arr)"
-      />
+      <g key={conn.id} style={{ cursor: 'pointer' }}
+         onClick={(e) => { e.stopPropagation(); onSelectConnection && onSelectConnection(conn.id); }}>
+        {/* Invisible wide hit-area for easy click */}
+        <path d={d} fill="none" stroke="transparent" strokeWidth="14" />
+        <path
+          d={d}
+          fill="none"
+          stroke={selected ? 'rgba(154,115,16,1)' : 'rgba(154,115,16,0.5)'}
+          strokeWidth={selected ? 2.5 : 1.5}
+          strokeDasharray="5 3"
+          markerEnd="url(#cv-arr)"
+        />
+      </g>
     );
   }).filter(Boolean);
 

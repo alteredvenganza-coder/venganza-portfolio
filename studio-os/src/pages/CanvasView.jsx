@@ -32,10 +32,11 @@ export default function CanvasView() {
       });
   }, [canvasId, clientId, addCanvas, navigate, resolvedId]);
 
-  const { canvas, cards, connections, loading, updateCanvas, addCard, updateCard, deleteCard, addConnection, commitCardPatch, undo, redo } = useCanvas(resolvedId);
+  const { canvas, cards, connections, loading, updateCanvas, addCard, updateCard, deleteCard, addConnection, deleteConnection, commitCardPatch, undo, redo } = useCanvas(resolvedId);
   const dragBeforeRef = useRef(null); // { id, patch }
   const [tool, setTool] = useState('select');
   const [selectedId, setSelectedId] = useState(null);
+  const [selectedConnId, setSelectedConnId] = useState(null);
   const [connectFrom, setConnectFrom] = useState(null);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showAi, setShowAi] = useState(false);
@@ -57,19 +58,25 @@ export default function CanvasView() {
         redo();
         return;
       }
+      if (isCtrl && (e.key === 'd' || e.key === 'D') && selectedId) {
+        e.preventDefault();
+        const c = cards.find(cd => cd.id === selectedId);
+        if (c) addCard({ type: c.type, x: c.x + 20, y: c.y + 20, w: c.w, data: c.data });
+        return;
+      }
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (e.key === 'v' || e.key === 'V') setTool('select');
       if (e.key === 'h' || e.key === 'H') setTool('pan');
       if (e.key === 'c' || e.key === 'C') setTool('connect');
-      if (e.key === 'Escape') { setTool('select'); setSelectedId(null); setAddPopup(null); setCtxMenu(null); }
-      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
-        deleteCard(selectedId);
-        setSelectedId(null);
+      if (e.key === 'Escape') { setTool('select'); setSelectedId(null); setSelectedConnId(null); setAddPopup(null); setCtxMenu(null); }
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedConnId) { deleteConnection(selectedConnId); setSelectedConnId(null); }
+        else if (selectedId) { deleteCard(selectedId); setSelectedId(null); }
       }
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [selectedId, deleteCard, undo, redo]);
+  }, [selectedId, selectedConnId, cards, addCard, deleteCard, deleteConnection, undo, redo]);
 
   if (!resolvedId || loading) {
     return (
@@ -107,9 +114,11 @@ export default function CanvasView() {
           };
           addCard({ type, x: x - 110, y: y - 30, w: 230, ...(defaults[type] || {}) });
         }}
-        svgChildren={<Connections connections={connections} cards={cards} refresh={cards} />}
+        svgChildren={<Connections connections={connections} cards={cards} refresh={cards}
+                                   selectedConnectionId={selectedConnId}
+                                   onSelectConnection={(id) => { setSelectedConnId(id); setSelectedId(null); }} />}
         onContextMenu={(cx, cy, wx, wy) => setCtxMenu({ x: cx, y: cy, worldX: wx, worldY: wy })}
-        onBackgroundClick={() => setSelectedId(null)}
+        onBackgroundClick={() => { setSelectedId(null); setSelectedConnId(null); }}
       >
         {cards.map(c => renderCard(c, {
           ctx: {
