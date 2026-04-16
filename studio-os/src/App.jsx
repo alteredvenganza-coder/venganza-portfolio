@@ -39,6 +39,7 @@ import TransferPage from './pages/TransferPage';
 import SendFilePage from './pages/SendFilePage';
 import CalendarPage from './pages/CalendarPage';
 import AdminInvitesPage from './pages/AdminInvitesPage';
+import CanvasView from './pages/CanvasView';
 
 // ── Loading screen ─────────────────────────────────────────────────────────────
 function Spinner() {
@@ -67,20 +68,29 @@ function AdminContent() {
   if (loading) return <Spinner />;
 
   return (
-    <Layout>
-      <Routes>
-        <Route path="/"              element={<Dashboard />} />
-        <Route path="/clients"       element={<ClientsPage />} />
-        <Route path="/clients/:id"   element={<ClientDetail />} />
-        <Route path="/projects/:id"  element={<ProjectDetail />} />
-        <Route path="/pricing"       element={<PricingMemoryPage />} />
-        <Route path="/cashflow"      element={<CashflowPage />} />
-        <Route path="/calendario"    element={<CalendarPage />} />
-        <Route path="/send"          element={<SendFilePage />} />
-        <Route path="/inviti"        element={<AdminInvitesPage />} />
-        <Route path="*"              element={<Navigate to="/" replace />} />
-      </Routes>
-    </Layout>
+    <Routes>
+      {/* Full-screen canvas routes — NO Layout wrapper */}
+      <Route path="/canvas/:canvasId"                 element={<CanvasView />} />
+      <Route path="/clients/:id/canvas/:canvasId"     element={<CanvasView />} />
+
+      {/* All other routes wrapped in Layout */}
+      <Route path="/*" element={
+        <Layout>
+          <Routes>
+            <Route path="/"              element={<Dashboard />} />
+            <Route path="/clients"       element={<ClientsPage />} />
+            <Route path="/clients/:id"   element={<ClientDetail />} />
+            <Route path="/projects/:id"  element={<ProjectDetail />} />
+            <Route path="/pricing"       element={<PricingMemoryPage />} />
+            <Route path="/cashflow"      element={<CashflowPage />} />
+            <Route path="/calendario"    element={<CalendarPage />} />
+            <Route path="/send"          element={<SendFilePage />} />
+            <Route path="/inviti"        element={<AdminInvitesPage />} />
+            <Route path="*"              element={<Navigate to="/" replace />} />
+          </Routes>
+        </Layout>
+      } />
+    </Routes>
   );
 }
 
