@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings, FolderKanban, Send, CalendarDays, Gift, Menu } from 'lucide-react';
+import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings, FolderKanban, Send, CalendarDays, Gift, Menu, LayoutGrid } from 'lucide-react';
 import { useClients, useProjects, useGoals } from '../hooks/useStore';
 import { useI18n } from '../lib/i18n';
 import { useUserProfile } from '../hooks/useUserProfile';
@@ -10,6 +10,7 @@ import SideNav from './SideNav';
 const NAV = [
   { to: '/',           i18nKey: 'nav.dashboard',  icon: LayoutDashboard, end: true },
   { to: '/clients',    i18nKey: 'nav.clients',    icon: Users },
+  { to: '/canvas/new', label: 'Canvas',           icon: LayoutGrid },
   { to: '/pricing',    i18nKey: 'nav.pricing',    icon: TrendingUp },
   { to: '/cashflow',   i18nKey: 'nav.cashflow',   icon: Wallet },
   { to: '/calendario', i18nKey: 'nav.calendar',   icon: CalendarDays },
