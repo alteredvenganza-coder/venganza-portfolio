@@ -190,3 +190,8 @@ create policy "Owner calendar tasks"
   on public.calendar_tasks for all
   using  (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+-- ── Calendar Tasks: client/project association ──────────────
+alter table public.calendar_tasks
+  add column if not exists client_id  uuid references public.clients(id)  on delete set null,
+  add column if not exists project_id uuid references public.projects(id) on delete set null;
