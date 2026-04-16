@@ -126,3 +126,66 @@
     margin: 0;
   }
 }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   Canvas — clean Milanote-style palette (scoped to .canvas-root subtree)
+   The dark CRM theme remains the global default.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+.canvas-root {
+  --cv-bg:       #EDEAE3;
+  --cv-bg2:     #E5E1D8;
+  --cv-surface: #F4F1EB;
+  --cv-white:   #FFFFFF;
+  --cv-border:  #DEDAD2;
+  --cv-border2: #E8E4DC;
+  --cv-text:    #1A1816;
+  --cv-muted:   #8C8880;
+  --cv-muted2:  #B0ACA4;
+  --cv-dot:     #C8C3B8;
+  --cv-red:     #B83025;
+  --cv-gold:    #9A7310;
+  --cv-gold2:   #D4B870;
+  --cv-orange:  #B04820;
+  --cv-sage:    #4A6A4A;
+  --cv-purple:  #6B5EA8;
+  --cv-shadow:  0 2px 14px rgba(26,24,22,.07);
+  --cv-shadow-lg: 0 6px 28px rgba(26,24,22,.11);
+
+  position: fixed;
+  inset: 0;
+  background: var(--cv-bg);
+  color: var(--cv-text);
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.canvas-root *, .canvas-root *::before, .canvas-root *::after {
+  box-sizing: border-box;
+}
+
+.canvas-root input,
+.canvas-root textarea,
+.canvas-root select {
+  background: transparent;
+  border: 1px solid var(--cv-border);
+  color: var(--cv-text);
+  border-radius: 5px;
+  padding: 6px 9px;
+  font-size: 12px;
+}
+.canvas-root input::placeholder,
+.canvas-root textarea::placeholder {
+  color: var(--cv-muted2);
+}
+.canvas-root input:focus,
+.canvas-root textarea:focus,
+.canvas-root select:focus {
+  border-color: var(--cv-gold2);
+  outline: none;
+}
+
+.canvas-root ::-webkit-scrollbar { width: 4px; height: 4px; }
+.canvas-root ::-webkit-scrollbar-track { background: transparent; }
+.canvas-root ::-webkit-scrollbar-thumb { background: var(--cv-border); border-radius: 2px; }
