@@ -117,6 +117,17 @@ export async function upsertRevolutEntries(userId, transactions) {
   return (data ?? []).map(entryFromDb);
 }
 
+export async function updateEntry(id, patch) {
+  const { data, error } = await supabase
+    .from('cashflow_entries')
+    .update(patch)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return entryFromDb(data);
+}
+
 export async function deleteEntry(id) {
   const { error } = await supabase
     .from('cashflow_entries')

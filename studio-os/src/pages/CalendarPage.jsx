@@ -1,15 +1,17 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ChevronLeft, ChevronRight, AlertTriangle,
   Plus, Check, Clock, Trash2, Edit2, Bell, Calendar,
-  User, Briefcase, ChevronDown,
+  User, Briefcase, ChevronDown, TrendingUp, TrendingDown, Wallet,
 } from 'lucide-react';
 import Badge from '../components/Badge';
 import Modal from '../components/Modal';
 import Btn from '../components/Btn';
 import Field from '../components/Field';
 import { useProjects, useClients, useCalendarTasks } from '../hooks/useStore';
+import { useAuth } from '../hooks/useAuth';
+import { fetchEntries } from '../lib/cashflow';
 import {
   TYPE_LABELS, TYPE_BG, TYPE_TEXT,
   STAGE_LABELS, STAGE_BG, STAGE_TEXT,
@@ -121,6 +123,14 @@ export default function CalendarPage() {
   const { projects, addTask, toggleTask } = useProjects();
   const { clients, getClient } = useClients();
   const { calendarTasks, addCalendarTask, updateCalendarTask, deleteCalendarTask } = useCalendarTasks();
+  const { user } = useAuth();
+
+  // ── Cashflow entries ──────────────────────────────────────────────────────
+  const [cashflowEntries, setCashflowEntries] = useState([]);
+  useEffect(() => {
+    if (!user) return;
+    fetchEntries(user.id).then(setCashflowEntries).catch(console.error);
+  }, [user]);
 
   const today = useMemo(() => startOfDay(new Date()), []);
 
@@ -177,6 +187,17 @@ export default function CalendarPage() {
     return map;
   }, [calendarTasks]);
 
+  // Map: "YYYY-MM-DD" -> [cashflow entry, ...]
+  const cashflowByDate = useMemo(() => {
+    const map = {};
+    for (const e of cashflowEntries) {
+      const key = e.date;
+      if (!map[key]) map[key] = [];
+      map[key].push(e);
+    }
+    return map;
+  }, [cashflowEntries]);
+
   // Overdue projects
   const overdue = useMemo(() => {
     const closedStages = ['completed', 'delivered', 'archived'];
@@ -205,6 +226,11 @@ export default function CalendarPage() {
       return 0;
     });
   }, [selectedKey, tasksByDate]);
+
+  const selectedCashflow = useMemo(
+    () => selectedKey ? (cashflowByDate[selectedKey] ?? []) : [],
+    [selectedKey, cashflowByDate],
+  );
 
   // ── Navigation ────────────────────────────────────────────────────────────
 
@@ -427,6 +453,7 @@ export default function CalendarPage() {
               const isSelected = selectedDay && isSameDay(cell.date, selectedDay);
               const dayProjects = projectsByDate[key] ?? [];
               const dayTasks = tasksByDate[key] ?? [];
+              const dayCashflow = cashflowByDate[key] ?? [];
               const totalItems = dayProjects.length + dayTasks.length;
 
               return (
@@ -498,6 +525,32 @@ export default function CalendarPage() {
                       })}
                     </div>
                   )}
+
+                  {/* Cashflow badges */}
+                  {dayCashflow.length > 0 && !cell.outside && (() => {
+                    const entrateSum = dayCashflow.filter(e => e.type === 'entrata').reduce((s, e) => s + e.amount, 0);
+                    const usciteSum  = dayCashflow.filter(e => e.type === 'uscita').reduce((s, e) => s + e.amount, 0);
+                    return (
+                      <div className="mt-0.5 flex flex-wrap gap-0.5">
+                        {entrateSum > 0 && (
+                          <span
+                            className="text-[9px] font-mono rounded px-0.5 leading-tight"
+                            style={{ backgroundColor: 'rgba(52,168,83,0.18)', color: '#6dd49e' }}
+                          >
+                            +€{entrateSum >= 1000 ? Math.round(entrateSum / 1000) + 'k' : Math.round(entrateSum)}
+                          </span>
+                        )}
+                        {usciteSum > 0 && (
+                          <span
+                            className="text-[9px] font-mono rounded px-0.5 leading-tight"
+                            style={{ backgroundColor: 'rgba(180,50,50,0.18)', color: '#f5a0a3' }}
+                          >
+                            -€{usciteSum >= 1000 ? Math.round(usciteSum / 1000) + 'k' : Math.round(usciteSum)}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                   {/* Overflow indicator */}
                   {totalItems > 3 && (
@@ -662,8 +715,59 @@ export default function CalendarPage() {
                 </div>
               )}
 
+              {/* Cashflow entries */}
+              {selectedCashflow.length > 0 && (
+                <div className="mb-4">
+                  <p className="label-meta mb-2 flex items-center gap-1.5">
+                    <Wallet size={12} /> Finanze ({selectedCashflow.length})
+                  </p>
+                  <div className="space-y-1.5">
+                    {selectedCashflow.map(entry => {
+                      const isEntrata = entry.type === 'entrata';
+                      return (
+                        <div
+                          key={entry.id}
+                          className="flex items-center gap-2.5 glass rounded-md p-2.5"
+                        >
+                          <div
+                            className="w-7 h-7 rounded-md flex items-center justify-center shrink-0"
+                            style={{
+                              backgroundColor: isEntrata ? 'rgba(52,168,83,0.18)' : 'rgba(180,50,50,0.18)',
+                            }}
+                          >
+                            {isEntrata
+                              ? <TrendingUp size={13} style={{ color: '#6dd49e' }} />
+                              : <TrendingDown size={13} style={{ color: '#f5a0a3' }} />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-ink truncate leading-tight">
+                              {entry.description || entry.category || '—'}
+                            </p>
+                            {entry.category && (
+                              <span className="text-[10px] text-subtle">{entry.category}</span>
+                            )}
+                          </div>
+                          <span
+                            className="font-mono text-sm font-semibold shrink-0"
+                            style={{ color: isEntrata ? '#6dd49e' : '#f5a0a3' }}
+                          >
+                            {isEntrata ? '+' : '-'}€{Math.round(entry.amount)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <Link
+                    to="/cashflow"
+                    className="text-[11px] text-burgundy-muted hover:text-burgundy transition-colors mt-2 inline-block"
+                  >
+                    Vai a Finanze →
+                  </Link>
+                </div>
+              )}
+
               {/* Empty state */}
-              {selectedTasks.length === 0 && selectedProjects.length === 0 && (
+              {selectedTasks.length === 0 && selectedProjects.length === 0 && selectedCashflow.length === 0 && (
                 <p className="text-sm text-subtle text-center py-6">
                   Nessun impegno per questo giorno.
                 </p>

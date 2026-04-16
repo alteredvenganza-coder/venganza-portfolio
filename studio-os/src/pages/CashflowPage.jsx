@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Plus, RefreshCw, ChevronLeft, ChevronRight, Trash2, Wallet, TrendingUp, TrendingDown, Sparkles, Check, X as XIcon, Loader2 } from 'lucide-react';
+import { Plus, RefreshCw, ChevronLeft, ChevronRight, Trash2, Wallet, TrendingUp, TrendingDown, Sparkles, Check, X as XIcon, Loader2, Download, Edit2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Btn from '../components/Btn';
 import Modal from '../components/Modal';
@@ -131,6 +131,11 @@ export default function CashflowPage() {
   const [scanInserting,  setScanInserting]  = useState(false);
   const [scanSuccessMsg, setScanSuccessMsg] = useState('');
 
+  // ── Expandable entry state ────────────────────────────────────────────────────
+  const [expandedId, setExpandedId] = useState(null);
+  const [editingField, setEditingField] = useState(null); // { id, field }
+  const [editValue, setEditValue] = useState('');
+
   const revolutToken = localStorage.getItem(REVOLUT_KEY) ?? '';
 
   // ── Load entries ──────────────────────────────────────────────────────────────
@@ -230,6 +235,59 @@ export default function CashflowPage() {
     } finally {
       setSyncLoading(false);
     }
+  }
+
+  // ── Export CSV ────────────────────────────────────────────────────────────────
+  function handleExportCSV() {
+    const BOM = '\uFEFF';
+    const header = 'Data;Tipo;Importo;Categoria;Descrizione;Fonte';
+    const rows = monthEntries.map(e => {
+      const date = new Date(e.date + 'T00:00:00').toLocaleDateString('it-IT');
+      const tipo = e.type === 'entrata' ? 'Entrata' : 'Uscita';
+      const importo = String(e.amount).replace('.', ',');
+      const cat = (e.category ?? '').replace(/;/g, ',');
+      const desc = (e.description ?? '').replace(/;/g, ',').replace(/\n/g, ' ');
+      const fonte = e.source ?? 'manual';
+      return `${date};${tipo};${importo};${cat};${desc};${fonte}`;
+    });
+    const csv = BOM + [header, ...rows].join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `finanze-${year}-${String(month + 1).padStart(2, '0')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── Inline edit ──────────────────────────────────────────────────────────────
+  function startEdit(entry, field) {
+    setEditingField({ id: entry.id, field });
+    setEditValue(field === 'amount' ? String(entry.amount) : (entry[field] ?? ''));
+  }
+
+  async function saveEdit(entry) {
+    if (!editingField) return;
+    const { field } = editingField;
+    let val = editValue;
+    if (field === 'amount') {
+      val = Math.abs(parseFloat(val));
+      if (isNaN(val) || val <= 0) { setEditingField(null); return; }
+    }
+    const patch = { [field]: val || null };
+    // Optimistic update
+    setEntries(prev => prev.map(e => e.id === entry.id ? { ...e, [field]: field === 'amount' ? Number(val) : val } : e));
+    setEditingField(null);
+    try {
+      await cf.updateEntry(entry.id, patch);
+    } catch (err) {
+      console.error('Failed to update entry:', err);
+    }
+  }
+
+  function handleEditKeyDown(e, entry) {
+    if (e.key === 'Enter') saveEdit(entry);
+    if (e.key === 'Escape') setEditingField(null);
   }
 
   // ── Receipt scanner ───────────────────────────────────────────────────────────
@@ -342,6 +400,9 @@ export default function CashflowPage() {
             className="hidden"
             onChange={handleScanFiles}
           />
+          <Btn variant="secondary" size="sm" onClick={handleExportCSV} disabled={monthEntries.length === 0}>
+            <Download size={13} /> Esporta Excel
+          </Btn>
           <Btn variant="primary" size="sm" onClick={() => { setForm(EMPTY_FORM); setAddOpen(true); }}>
             <Plus size={14} /> Aggiungi
           </Btn>
@@ -467,47 +528,177 @@ export default function CashflowPage() {
             animate={{ opacity: 1, y: 0 }}
             className="glass rounded-xl overflow-hidden"
           >
-            {monthEntries.map((entry, i) => (
-              <div
-                key={entry.id}
-                className={`flex items-center gap-3 px-4 py-3 group ${i > 0 ? 'border-t border-white/8' : ''}`}
-              >
-                {/* Color strip */}
-                <div className={`w-1 h-9 rounded-full flex-shrink-0 ${entry.type === 'entrata' ? 'bg-green-500/70' : 'bg-red-500/50'}`} />
+            {monthEntries.map((entry, i) => {
+              const isExpanded = expandedId === entry.id;
+              const isEntrata = entry.type === 'entrata';
+              return (
+                <div key={entry.id}>
+                  <div
+                    onClick={() => setExpandedId(isExpanded ? null : entry.id)}
+                    className={`flex items-center gap-3 px-4 py-3 group cursor-pointer hover:bg-white/4 transition-colors ${i > 0 ? 'border-t border-white/8' : ''}`}
+                  >
+                    {/* Color strip */}
+                    <div className={`w-1 h-9 rounded-full flex-shrink-0 ${isEntrata ? 'bg-green-500/70' : 'bg-red-500/50'}`} />
 
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-ink truncate leading-tight">
-                    {entry.description || entry.category || '—'}
-                  </p>
-                  <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                    <span className="text-[11px] text-subtle">
-                      {new Date(entry.date + 'T00:00:00').toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-ink truncate leading-tight">
+                        {entry.description || entry.category || '—'}
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                        <span className="text-[11px] text-subtle">
+                          {new Date(entry.date + 'T00:00:00').toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}
+                        </span>
+                        {entry.category && <CategoryBadge cat={entry.category} />}
+                        {entry.source === 'revolut' && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-900/40 text-purple-300 border border-purple-700/30">Revolut</span>
+                        )}
+                        {entry.source === 'stripe' && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-900/40 text-indigo-300 border border-indigo-700/30">Stripe</span>
+                        )}
+                        {entry.source === 'gmail' && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-900/40 text-rose-300 border border-rose-700/30">Gmail</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Amount */}
+                    <span className={`font-mono text-sm font-semibold flex-shrink-0 ${isEntrata ? 'text-green-400' : 'text-red-400'}`}>
+                      {isEntrata ? '+' : '-'}{fmt(entry.amount)}
                     </span>
-                    {entry.category && <CategoryBadge cat={entry.category} />}
-                    {entry.source === 'revolut' && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-900/40 text-purple-300 border border-purple-700/30">Revolut</span>
-                    )}
-                    {entry.source === 'stripe' && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-900/40 text-indigo-300 border border-indigo-700/30">Stripe</span>
-                    )}
+
+                    {/* Delete */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDelete(entry.id); }}
+                      className="p-2 text-subtle hover:text-red-400 transition-colors sm:opacity-0 sm:group-hover:opacity-100 flex-shrink-0 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+                    >
+                      <Trash2 size={13} />
+                    </button>
                   </div>
+
+                  {/* Expanded details */}
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-4 pb-4 pt-1 border-t border-white/5 ml-4 space-y-3">
+                          {/* Full description */}
+                          <div>
+                            <label className="text-[10px] uppercase tracking-wider text-subtle block mb-1">Descrizione</label>
+                            {editingField?.id === entry.id && editingField.field === 'description' ? (
+                              <input
+                                type="text"
+                                className="input text-sm w-full"
+                                value={editValue}
+                                onChange={e => setEditValue(e.target.value)}
+                                onBlur={() => saveEdit(entry)}
+                                onKeyDown={e => handleEditKeyDown(e, entry)}
+                                autoFocus
+                              />
+                            ) : (
+                              <p
+                                className="text-sm text-ink cursor-pointer hover:bg-white/5 rounded px-1.5 py-1 -mx-1.5 transition-colors group/edit"
+                                onClick={(e) => { e.stopPropagation(); startEdit(entry, 'description'); }}
+                              >
+                                {entry.description || <span className="text-subtle italic">Nessuna descrizione</span>}
+                                <Edit2 size={10} className="inline ml-1.5 text-subtle opacity-0 group-hover/edit:opacity-100 transition-opacity" />
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Amount editable */}
+                          <div>
+                            <label className="text-[10px] uppercase tracking-wider text-subtle block mb-1">Importo</label>
+                            {editingField?.id === entry.id && editingField.field === 'amount' ? (
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0.01"
+                                className="input text-sm w-32"
+                                value={editValue}
+                                onChange={e => setEditValue(e.target.value)}
+                                onBlur={() => saveEdit(entry)}
+                                onKeyDown={e => handleEditKeyDown(e, entry)}
+                                autoFocus
+                              />
+                            ) : (
+                              <span
+                                className={`font-mono text-sm font-semibold cursor-pointer hover:bg-white/5 rounded px-1.5 py-1 -mx-1.5 transition-colors inline-flex items-center gap-1 group/edit ${isEntrata ? 'text-green-400' : 'text-red-400'}`}
+                                onClick={(e) => { e.stopPropagation(); startEdit(entry, 'amount'); }}
+                              >
+                                €{entry.amount.toFixed(2)}
+                                <Edit2 size={10} className="text-subtle opacity-0 group-hover/edit:opacity-100 transition-opacity" />
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Category editable */}
+                          <div>
+                            <label className="text-[10px] uppercase tracking-wider text-subtle block mb-1">Categoria</label>
+                            {editingField?.id === entry.id && editingField.field === 'category' ? (
+                              <select
+                                className="input text-sm w-full"
+                                value={editValue}
+                                onChange={async (e) => {
+                                  const val = e.target.value;
+                                  setEntries(prev => prev.map(en => en.id === entry.id ? { ...en, category: val } : en));
+                                  setEditingField(null);
+                                  try { await cf.updateEntry(entry.id, { category: val }); } catch (err) { console.error(err); }
+                                }}
+                                onBlur={() => setEditingField(null)}
+                                autoFocus
+                              >
+                                {(isEntrata ? cf.CATEGORIES_ENTRATA : cf.CATEGORIES_USCITA).map(c => (
+                                  <option key={c} value={c}>{c}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <span
+                                className="cursor-pointer hover:bg-white/5 rounded px-1.5 py-1 -mx-1.5 transition-colors inline-flex items-center gap-1 group/edit"
+                                onClick={(e) => { e.stopPropagation(); startEdit(entry, 'category'); }}
+                              >
+                                <CategoryBadge cat={entry.category || 'Altro'} />
+                                <Edit2 size={10} className="text-subtle opacity-0 group-hover/edit:opacity-100 transition-opacity" />
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Meta row: date + source */}
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <div>
+                              <label className="text-[10px] uppercase tracking-wider text-subtle block mb-1">Data</label>
+                              <span className="text-sm text-muted">
+                                {new Date(entry.date + 'T00:00:00').toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                              </span>
+                            </div>
+                            <div>
+                              <label className="text-[10px] uppercase tracking-wider text-subtle block mb-1">Fonte</label>
+                              {entry.source === 'revolut' && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-900/40 text-purple-300 border border-purple-700/30">Revolut</span>
+                              )}
+                              {entry.source === 'stripe' && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-900/40 text-indigo-300 border border-indigo-700/30">Stripe</span>
+                              )}
+                              {entry.source === 'gmail' && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-900/40 text-rose-300 border border-rose-700/30">Gmail</span>
+                              )}
+                              {(!entry.source || entry.source === 'manual') && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/8 text-muted border border-white/10">Manuale</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-
-                {/* Amount */}
-                <span className={`font-mono text-sm font-semibold flex-shrink-0 ${entry.type === 'entrata' ? 'text-green-400' : 'text-red-400'}`}>
-                  {entry.type === 'entrata' ? '+' : '-'}{fmt(entry.amount)}
-                </span>
-
-                {/* Delete */}
-                <button
-                  onClick={() => handleDelete(entry.id)}
-                  className="p-2 text-subtle hover:text-red-400 transition-colors sm:opacity-0 sm:group-hover:opacity-100 flex-shrink-0 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
-                >
-                  <Trash2 size={13} />
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </motion.div>
         </AnimatePresence>
       )}
