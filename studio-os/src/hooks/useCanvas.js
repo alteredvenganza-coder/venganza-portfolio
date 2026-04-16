@@ -20,6 +20,11 @@ export function useCanvas(canvasId) {
   const thumbTimer            = useRef(null);
   const cardsRef              = useRef([]);
 
+  // Undo/redo stacks. Each entry is { undo: () => void, redo: () => void }.
+  // Scope (Option A): move/resize only. addCard/deleteCard clear both stacks.
+  const undoStack             = useRef([]);
+  const redoStack             = useRef([]);
+
   // ─── Load on mount / id change ─────────────────────────────────────────────
   useEffect(() => {
     if (!canvasId) { setLoading(false); return; }
@@ -100,6 +105,9 @@ export function useCanvas(canvasId) {
   async function addCard(partial) {
     const created = await db.insertCanvasCard(canvasId, partial);
     setCards(prev => [...prev, created]);
+    // Add invalidates undo history (re-inserting a deleted card is out of scope A).
+    undoStack.current = [];
+    redoStack.current = [];
     scheduleThumb();
     return created;
   }
@@ -118,7 +126,46 @@ export function useCanvas(canvasId) {
     pendingCardPatches.current.delete(id);
     try { await db.removeCanvasCard(id); }
     catch (e) { console.error('[useCanvas] deleteCard failed', e); }
+    // Delete invalidates undo history (same reasoning as addCard).
+    undoStack.current = [];
+    redoStack.current = [];
     scheduleThumb();
+  }
+
+  // ─── Undo / redo (move/resize commits) ───────────────────────────────────
+  // Caller captures the card's before-state at drag start and calls this
+  // after the drag ends. The forward change is already applied by incremental
+  // updateCard calls; we just register the reversible pair.
+  function commitCardPatch(id, prevPatch, nextPatch) {
+    const eq = (a, b) => Object.keys({ ...a, ...b }).every(k => a[k] === b[k]);
+    if (eq(prevPatch, nextPatch)) return;
+    const apply = (patch) => {
+      setCards(prev => prev.map(c => c.id === id ? { ...c, ...patch } : c));
+      const merged = { ...(pendingCardPatches.current.get(id) || {}), ...patch };
+      pendingCardPatches.current.set(id, merged);
+      scheduleFlush();
+      if ('x' in patch || 'y' in patch || 'w' in patch || 'h' in patch) scheduleThumb();
+    };
+    undoStack.current.push({
+      undo: () => apply(prevPatch),
+      redo: () => apply(nextPatch),
+    });
+    if (undoStack.current.length > 50) undoStack.current.shift();
+    redoStack.current = [];
+  }
+
+  function undo() {
+    const entry = undoStack.current.pop();
+    if (!entry) return;
+    entry.undo();
+    redoStack.current.push(entry);
+  }
+
+  function redo() {
+    const entry = redoStack.current.pop();
+    if (!entry) return;
+    entry.redo();
+    undoStack.current.push(entry);
   }
 
   // ─── Connection mutations ──────────────────────────────────────────────────
@@ -150,5 +197,6 @@ export function useCanvas(canvasId) {
     addCard, updateCard, deleteCard,
     addConnection, deleteConnection,
     updateCanvas,
+    commitCardPatch, undo, redo,
   };
 }

@@ -40,6 +40,8 @@ Drag dall'header per spostare. Drag dall'angolo basso-destra per ridimensionare.
 | `Delete` / `Backspace` | Elimina card selezionata |
 | `Ctrl/Cmd + Wheel` | Zoom |
 | `Wheel` | Pan |
+| `Ctrl/Cmd + Z` | Undo (move/resize) |
+| `Ctrl/Cmd + Shift + Z` / `Ctrl+Y` | Redo |
 | Right-click | Menu contestuale (add elements, fit, clear) |
 
 ## Templates (Phase 1)
@@ -64,5 +66,5 @@ Modifiche live (digitazione, drag, resize) → debounced (300ms) sync su Supabas
 
 ## In Arrivo
 
-- **Phase 2** — Smart cards (Budget, Tasks, Files, Project Overview) collegate ai dati CRM esistenti, ClientCanvasHub sostituisce ClientDetail
-- **Phase 3** — HomePage rinnovata + MAT AI panel + undo/redo + thumbnail
+- **Phase 2** — Smart cards (Budget, Tasks, Files, Project Overview) collegate ai dati CRM esistenti, ClientCanvasHub sostituisce ClientDetail — ✅ done
+- **Phase 3** — HomePage rinnovata + MAT AI panel + undo/redo (move/resize) + thumbnail — ✅ done

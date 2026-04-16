@@ -36,8 +36,8 @@ const STRIP_COLORS = {
  */
 export default function CardShell({
   card, zoom, selected, tool,
-  onSelect, onMove, onMoveEnd,
-  onResize, onResizeEnd,
+  onSelect, onMoveStart, onMove, onMoveEnd,
+  onResizeStart, onResize, onResizeEnd,
   onDelete, onDuplicate, onConnectStart, onConnectFinish,
   onPlusClick,
   title, onTitleChange,
@@ -56,6 +56,7 @@ export default function CardShell({
       return;
     }
     onSelect && onSelect();
+    onMoveStart && onMoveStart({ x: card.x, y: card.y });
     dragRef.current = {
       startClientX: e.clientX,
       startClientY: e.clientY,
@@ -74,16 +75,20 @@ export default function CardShell({
   }
 
   useEffect(() => {
+    let lastX = null, lastY = null;
     function move(e) {
       if (!dragRef.current) return;
       const dx = (e.clientX - dragRef.current.startClientX) / zoom;
       const dy = (e.clientY - dragRef.current.startClientY) / zoom;
-      onMove && onMove(dragRef.current.startX + dx, dragRef.current.startY + dy);
+      lastX = dragRef.current.startX + dx;
+      lastY = dragRef.current.startY + dy;
+      onMove && onMove(lastX, lastY);
     }
     function up() {
       if (dragRef.current) {
         dragRef.current = null;
-        onMoveEnd && onMoveEnd();
+        onMoveEnd && onMoveEnd(lastX != null ? { x: lastX, y: lastY } : null);
+        lastX = lastY = null;
       }
     }
     window.addEventListener('mousemove', move);
@@ -95,21 +100,25 @@ export default function CardShell({
   }, [zoom, onMove, onMoveEnd]);
 
   function onResizeMouseDown(e) {
+    onResizeStart && onResizeStart({ w: card.w });
     resizeRef.current = { startClientX: e.clientX, startW: card.w };
     e.stopPropagation();
     e.preventDefault();
   }
 
   useEffect(() => {
+    let lastW = null;
     function move(e) {
       if (!resizeRef.current) return;
       const dx = (e.clientX - resizeRef.current.startClientX) / zoom;
-      onResize && onResize(Math.max(180, resizeRef.current.startW + dx));
+      lastW = Math.max(180, resizeRef.current.startW + dx);
+      onResize && onResize(lastW);
     }
     function up() {
       if (resizeRef.current) {
         resizeRef.current = null;
-        onResizeEnd && onResizeEnd();
+        onResizeEnd && onResizeEnd(lastW != null ? { w: lastW } : null);
+        lastW = null;
       }
     }
     window.addEventListener('mousemove', move);

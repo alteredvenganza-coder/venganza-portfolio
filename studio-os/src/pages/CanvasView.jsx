@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCanvas } from '../hooks/useCanvas';
 import { useCanvases } from '../hooks/useStore';
@@ -32,7 +32,8 @@ export default function CanvasView() {
       });
   }, [canvasId, clientId, addCanvas, navigate, resolvedId]);
 
-  const { canvas, cards, connections, loading, updateCanvas, addCard, updateCard, deleteCard, addConnection } = useCanvas(resolvedId);
+  const { canvas, cards, connections, loading, updateCanvas, addCard, updateCard, deleteCard, addConnection, commitCardPatch, undo, redo } = useCanvas(resolvedId);
+  const dragBeforeRef = useRef(null); // { id, patch }
   const [tool, setTool] = useState('select');
   const [selectedId, setSelectedId] = useState(null);
   const [connectFrom, setConnectFrom] = useState(null);
@@ -45,6 +46,17 @@ export default function CanvasView() {
 
   useEffect(() => {
     function onKey(e) {
+      const isCtrl = e.ctrlKey || e.metaKey;
+      if (isCtrl && (e.key === 'z' || e.key === 'Z')) {
+        e.preventDefault();
+        if (e.shiftKey) redo(); else undo();
+        return;
+      }
+      if (isCtrl && (e.key === 'y' || e.key === 'Y')) {
+        e.preventDefault();
+        redo();
+        return;
+      }
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (e.key === 'v' || e.key === 'V') setTool('select');
       if (e.key === 'h' || e.key === 'H') setTool('pan');
@@ -57,7 +69,7 @@ export default function CanvasView() {
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [selectedId, deleteCard]);
+  }, [selectedId, deleteCard, undo, redo]);
 
   if (!resolvedId || loading) {
     return (
@@ -105,10 +117,20 @@ export default function CanvasView() {
             selected: selectedId === c.id,
             tool,
             onSelect: () => setSelectedId(c.id),
+            onMoveStart: (before) => { dragBeforeRef.current = { id: c.id, patch: before }; },
             onMove: (x, y) => updateCard(c.id, { x, y }),
-            onMoveEnd: () => {},
+            onMoveEnd: (final) => {
+              const b = dragBeforeRef.current;
+              dragBeforeRef.current = null;
+              if (b && final && b.id === c.id) commitCardPatch(c.id, b.patch, final);
+            },
+            onResizeStart: (before) => { dragBeforeRef.current = { id: c.id, patch: before }; },
             onResize: (w) => updateCard(c.id, { w }),
-            onResizeEnd: () => {},
+            onResizeEnd: (final) => {
+              const b = dragBeforeRef.current;
+              dragBeforeRef.current = null;
+              if (b && final && b.id === c.id) commitCardPatch(c.id, b.patch, final);
+            },
             onDelete: () => deleteCard(c.id),
             onDuplicate: () => addCard({
               type: c.type, x: c.x + 20, y: c.y + 20, w: c.w, data: c.data,
