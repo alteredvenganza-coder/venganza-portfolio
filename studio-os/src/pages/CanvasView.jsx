@@ -4,6 +4,7 @@ import { useCanvas } from '../hooks/useCanvas';
 import { useCanvases } from '../hooks/useStore';
 import CanvasEngine from '../canvas/CanvasEngine';
 import CanvasToolbar from '../canvas/CanvasToolbar';
+import CanvasSidebar from '../canvas/CanvasSidebar';
 import { renderCard } from '../canvas/cards';
 
 export default function CanvasView() {
@@ -50,12 +51,27 @@ export default function CanvasView() {
 
   return (
     <div className="canvas-root">
+      <CanvasSidebar
+        onHome={() => navigate(clientId ? `/clients/${clientId}` : '/')}
+        onTemplates={() => {/* TODO: open template panel */}}
+      />
       <CanvasEngine
         panX={canvas?.panX ?? 0}
         panY={canvas?.panY ?? 0}
         zoom={canvas?.zoom ?? 1}
         tool={tool}
         onViewportChange={({ panX, panY, zoom }) => updateCanvas({ panX, panY, zoom })}
+        onDrop={(type, x, y) => {
+          const defaults = {
+            note:    { data: { title: 'Note',  text: '' } },
+            image:   { data: { title: 'Image' } },
+            link:    { data: { title: 'Link',  url: '' } },
+            todo:    { data: { title: 'To-do', items: [] } },
+            board:   { data: { title: 'Board', subCards: [] } },
+            heading: { data: { title: 'NEW HEADING' } },
+          };
+          addCard({ type, x: x - 110, y: y - 30, w: 230, ...(defaults[type] || {}) });
+        }}
       >
         {cards.map(c => renderCard(c, {
           ctx: {
@@ -100,25 +116,6 @@ export default function CanvasView() {
           });
         }}
       />
-      {/* Top-left back button */}
-      <button
-        onClick={() => navigate(clientId ? `/clients/${clientId}` : '/')}
-        style={{
-          position:'absolute', top:14, left:14, zIndex:50,
-          padding:'6px 12px', border:'1px solid var(--cv-border)',
-          borderRadius:6, background:'var(--cv-white)', color:'var(--cv-text)',
-          fontSize:11, fontFamily:'DM Sans', cursor:'pointer',
-        }}
-      >← Indietro</button>
-      <button
-        onClick={() => addCard({ type: 'note', x: 3000, y: 3000, w: 230, data: { title: 'Note', text: '' } })}
-        style={{
-          position:'absolute', top:14, left:120, zIndex:50,
-          padding:'6px 12px', border:'1px solid var(--cv-border)',
-          borderRadius:6, background:'var(--cv-white)', color:'var(--cv-text)',
-          fontSize:11, fontFamily:'DM Sans', cursor:'pointer',
-        }}
-      >+ Note</button>
     </div>
   );
 }

@@ -20,7 +20,7 @@ const MAX_ZOOM = 4;
 export default function CanvasEngine({
   panX, panY, zoom, onViewportChange,
   tool = 'select',
-  onBackgroundClick, onContextMenu,
+  onBackgroundClick, onContextMenu, onDrop,
   children, svgChildren,
 }) {
   const wrapRef = useRef(null);
@@ -108,9 +108,20 @@ export default function CanvasEngine({
       onMouseDown={onMouseDown}
       onClick={onClick}
       onContextMenu={onContextMenuLocal}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault();
+        if (!onDrop) return;
+        const type = e.dataTransfer.getData('cardType');
+        if (!type) return;
+        const rect = wrapRef.current.getBoundingClientRect();
+        const wx = (e.clientX - rect.left - panX) / zoom;
+        const wy = (e.clientY - rect.top  - panY) / zoom;
+        onDrop(type, wx, wy);
+      }}
       style={{
         position: 'absolute',
-        inset: 0,
+        top: 0, left: 60, right: 0, bottom: 0,
         overflow: 'hidden',
         backgroundColor: 'var(--cv-bg)',
         backgroundImage: 'radial-gradient(circle, var(--cv-dot) 1px, transparent 1px)',
