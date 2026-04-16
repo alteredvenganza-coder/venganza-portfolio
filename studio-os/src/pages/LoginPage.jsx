@@ -22,13 +22,22 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
+    <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
+      {/* Full-screen background image */}
+      <img
+        src="/login-bg.png"
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      {/* Dark overlay for readability */}
+      <div className="absolute inset-0 bg-black/50" />
+
+      <div className="relative z-10 w-full max-w-sm">
 
         {/* Logo */}
         <div className="mb-8 text-center">
-          <h1 className="font-display text-3xl text-ink">Venganza OS</h1>
-          <p className="label-meta mt-1">CRM interno · Altered Venganza</p>
+          <h1 className="font-display text-4xl text-white drop-shadow-lg">Venganza OS</h1>
+          <p className="label-meta mt-1 text-white/60">CRM interno · Altered Venganza</p>
         </div>
 
         <div className="glass-strong rounded-lg p-6">
