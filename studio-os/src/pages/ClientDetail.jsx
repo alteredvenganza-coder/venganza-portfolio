@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Edit2, Trash2, Plus, Mail, Phone, Globe, FileText, Check, Clock, Calendar } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Plus, Mail, Phone, Globe, FileText, Check, Clock, Calendar, Wallet } from 'lucide-react';
 import ProjectCard from '../components/ProjectCard';
 import Btn from '../components/Btn';
 import Panel from '../components/Panel';
@@ -10,7 +10,7 @@ import ClientForm from '../forms/ClientForm';
 import ProjectForm from '../forms/ProjectForm';
 import * as db from '../lib/db';
 import { useClients, useProjects, useCalendarTasks } from '../hooks/useStore';
-import { formatDate, initials } from '../lib/utils';
+import { formatDate, formatEur, initials } from '../lib/utils';
 
 const DOT_COLORS = {
   burgundy: '#c9888b', blue: '#7bb3ff', green: '#6dd49e',
@@ -21,7 +21,7 @@ export default function ClientDetail() {
   const { id }       = useParams();
   const navigate     = useNavigate();
   const { getClient, updateClient, deleteClient, clients } = useClients();
-  const { getProjectsByClient, addProject } = useProjects();
+  const { getProjectsByClient, addProject, updateProject } = useProjects();
   const { updateCalendarTask } = useCalendarTasks();
   const [clientTasks, setClientTasks] = useState([]);
 
@@ -53,6 +53,8 @@ export default function ClientDetail() {
 
   const active    = projects.filter(p => p.stage !== 'completed');
   const completed = projects.filter(p => p.stage === 'completed');
+  const retainerProjects = projects.filter(p => p.type === 'retainer' && !['completed', 'delivered', 'archived'].includes(p.stage));
+  const totalMrr = retainerProjects.reduce((sum, p) => sum + (p.retainerFee ?? 0), 0);
 
   return (
     <>
@@ -132,6 +134,50 @@ export default function ClientDetail() {
           </div>
         )}
       </motion.div>
+
+      {/* Retainer section */}
+      {retainerProjects.length > 0 && (
+        <div className="glass rounded-lg p-4 sm:p-5 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-base font-semibold text-ink flex items-center gap-2">
+              <Wallet size={16} className="text-purple-400" />
+              Retainer
+            </h2>
+            <div className="text-right">
+              <p className="text-lg font-display font-semibold text-ink">{formatEur(totalMrr)}<span className="text-xs font-mono font-normal text-muted">/mese</span></p>
+              <p className="text-[11px] font-mono text-subtle">MRR totale</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {retainerProjects.map(project => (
+              <div key={project.id} className="flex items-center gap-3 p-3 rounded-lg bg-white/4">
+                <Link to={`/projects/${project.id}`} className="flex-1 min-w-0">
+                  <span className="text-sm font-medium text-ink hover:text-burgundy-muted transition-colors truncate block">
+                    {project.title}
+                  </span>
+                </Link>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-[11px] font-mono text-subtle">€</span>
+                  <input
+                    type="number"
+                    className="input w-24 text-sm text-right py-1"
+                    value={project.retainerFee ?? ''}
+                    onChange={e => {
+                      const val = e.target.value;
+                      updateProject(project.id, { retainerFee: val ? Number(val) : null });
+                    }}
+                    placeholder="0"
+                    min="0"
+                    step="50"
+                  />
+                  <span className="text-[11px] font-mono text-subtle">/mese</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Projects */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-2 sm:gap-4">
