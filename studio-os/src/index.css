@@ -189,3 +189,6 @@
 .canvas-root ::-webkit-scrollbar { width: 4px; height: 4px; }
 .canvas-root ::-webkit-scrollbar-track { background: transparent; }
 .canvas-root ::-webkit-scrollbar-thumb { background: var(--cv-border); border-radius: 2px; }
+
+.canvas-root .cv-card:hover .cv-card-actions { display: flex !important; }
+.canvas-root .cv-card:hover .cv-card-plus    { display: flex !important; }
