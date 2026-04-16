@@ -69,16 +69,16 @@ export default function AdminInvitesPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-ink">Inviti</h1>
-          <p className="text-sm text-muted mt-1">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="font-display text-xl sm:text-2xl font-bold text-ink">Inviti</h1>
+          <p className="text-xs sm:text-sm text-muted mt-1">
             Invita fino a 5 amici a usare Venganza Transfer.
           </p>
         </div>
-        <Btn variant="primary" onClick={handleCreate} disabled={creating}>
+        <Btn variant="primary" onClick={handleCreate} disabled={creating} className="shrink-0 min-h-[44px]">
           {creating ? <Loader2 size={14} className="animate-spin" /> : <UserPlus size={14} />}
-          Genera invito
+          <span className="hidden sm:inline">Genera</span> invito
         </Btn>
       </div>
 
@@ -120,8 +120,8 @@ export default function AdminInvitesPage() {
 
       {/* Invite codes list */}
       <div className="glass rounded-lg overflow-hidden">
-        <div className="px-5 py-3 border-b border-white/10">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">
+        <div className="px-3 sm:px-5 py-3 border-b border-white/10">
+          <h2 className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-muted">
             Codici Invito
           </h2>
         </div>
@@ -139,11 +139,11 @@ export default function AdminInvitesPage() {
               const guest = isUsed ? guestMap[inv.used_by] : null;
 
               return (
-                <div key={inv.id} className="px-5 py-3.5 flex items-center gap-4">
+                <div key={inv.id} className="px-3 sm:px-5 py-3 sm:py-3.5 flex items-center gap-3 sm:gap-4">
                   {/* Code */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <code className="text-sm font-mono font-bold text-ink tracking-widest">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <code className="text-xs sm:text-sm font-mono font-bold text-ink tracking-widest">
                         {inv.code}
                       </code>
                       <span className={`text-[10px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded ${
@@ -155,12 +155,12 @@ export default function AdminInvitesPage() {
                       </span>
                     </div>
                     {isUsed && guest && (
-                      <p className="text-xs text-muted mt-0.5">
+                      <p className="text-[11px] sm:text-xs text-muted mt-0.5">
                         Usato da: {guest.display_name || 'Ospite'} &middot; Storage: {formatBytes(guest.storage_used_bytes || 0)} / {inv.max_storage_mb || 100} MB
                       </p>
                     )}
                     {isUsed && !guest && (
-                      <p className="text-xs text-muted mt-0.5">
+                      <p className="text-[11px] sm:text-xs text-muted mt-0.5">
                         Usato il {new Date(inv.used_at).toLocaleDateString('it-IT')}
                       </p>
                     )}
@@ -172,6 +172,7 @@ export default function AdminInvitesPage() {
                       size="sm"
                       variant="secondary"
                       onClick={() => copyInviteLink(inv.code, inv.id)}
+                      className="shrink-0 min-h-[44px] sm:min-h-0"
                     >
                       {copiedId === inv.id ? (
                         <Check size={12} className="text-green-400" />
@@ -193,14 +194,14 @@ export default function AdminInvitesPage() {
       {/* Guest profiles */}
       {guests.length > 0 && (
         <div className="glass rounded-lg overflow-hidden">
-          <div className="px-5 py-3 border-b border-white/10">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">
+          <div className="px-3 sm:px-5 py-3 border-b border-white/10">
+            <h2 className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-muted">
               Utenti Ospiti
             </h2>
           </div>
           <div className="divide-y divide-white/8">
             {guests.map(g => (
-              <div key={g.id} className="px-5 py-3.5 flex items-center gap-4">
+              <div key={g.id} className="px-3 sm:px-5 py-3 sm:py-3.5 flex items-center gap-3 sm:gap-4">
                 <div className="w-8 h-8 rounded-full bg-burgundy/20 flex items-center justify-center shrink-0">
                   <span className="text-xs font-bold text-burgundy-muted">
                     {(g.display_name || '?')[0].toUpperCase()}

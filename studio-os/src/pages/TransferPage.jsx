@@ -91,7 +91,7 @@ export default function TransferPage() {
       flexDirection: 'column',
       alignItems:    'center',
       justifyContent:'center',
-      padding:       '40px 20px',
+      padding:       '24px 12px',
       fontFamily:    'Georgia, serif',
     }}>
 
@@ -214,13 +214,14 @@ export default function TransferPage() {
 
           {/* Title */}
           <h1 style={{
-            fontSize:      28,
+            fontSize:      'clamp(20px, 5vw, 28px)',
             fontWeight:    700,
             color:         '#fff',
             textAlign:     'center',
             marginBottom:  8,
             letterSpacing: '0.02em',
             textShadow:    '0 2px 8px rgba(0,0,0,0.5)',
+            wordBreak:     'break-word',
           }}>
             {transfer.title}
           </h1>
@@ -273,15 +274,16 @@ export default function TransferPage() {
               {files.map((file, i) => (
                 <div key={i} style={{
                   display:      'flex',
+                  flexWrap:     'wrap',
                   alignItems:   'center',
-                  gap:          12,
+                  gap:          10,
                   padding:      '12px 14px',
                   background:   'rgba(255,255,255,0.06)',
                   border:       '1px solid rgba(255,255,255,0.1)',
                   borderRadius: 8,
                 }}>
                   <FileText size={16} color="rgba(255,255,255,0.5)" style={{ flexShrink: 0 }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ flex: '1 1 0', minWidth: 0 }}>
                     <p style={{
                       fontSize:     14,
                       fontWeight:   500,
@@ -311,8 +313,10 @@ export default function TransferPage() {
                     style={{
                       display:        'inline-flex',
                       alignItems:     'center',
+                      justifyContent: 'center',
                       gap:            6,
-                      padding:        '8px 16px',
+                      padding:        '10px 16px',
+                      minHeight:      44,
                       background:     downloading === file.name ? '#5a1519' : '#7b1f24',
                       color:          '#fff',
                       borderRadius:   6,
@@ -321,6 +325,7 @@ export default function TransferPage() {
                       border:         'none',
                       cursor:         downloading === file.name ? 'wait' : 'pointer',
                       flexShrink:     0,
+                      flexGrow:       1,
                       fontFamily:     'sans-serif',
                       transition:     'background 0.2s',
                     }}
@@ -378,7 +383,7 @@ const glassCard = {
   WebkitBackdropFilter: 'blur(24px)',
   border:               '1px solid rgba(255,255,255,0.12)',
   borderRadius:         14,
-  padding:              '28px 32px',
+  padding:              'clamp(16px, 4vw, 32px)',
   boxShadow:            '0 8px 32px rgba(0,0,0,0.4)',
   position:             'relative',
   zIndex:               1,

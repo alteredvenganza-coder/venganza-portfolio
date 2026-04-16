@@ -141,7 +141,7 @@ export default function EmailButton({ client, project }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 z-50 w-56 glass-strong rounded-lg border border-white/15 shadow-xl overflow-hidden"
+            className="absolute right-0 sm:right-0 top-full mt-2 z-50 w-[calc(100vw-2rem)] sm:w-56 max-w-[240px] glass-strong rounded-lg border border-white/15 shadow-xl overflow-hidden"
           >
             <div className="py-1">
               <p className="px-3 py-1.5 text-[10px] font-mono text-subtle uppercase tracking-wider">
@@ -151,7 +151,7 @@ export default function EmailButton({ client, project }) {
                 <button
                   key={id}
                   onClick={() => handleSelect(id)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-ink hover:bg-white/10 transition-colors text-left"
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 min-h-[44px] sm:min-h-0 text-sm text-ink hover:bg-white/10 transition-colors text-left"
                 >
                   <Icon size={14} className="text-muted shrink-0" />
                   {label}

@@ -373,8 +373,8 @@ export default function CalendarPage() {
         <h1 className="font-display text-lg font-semibold text-ink tracking-tight">
           Calendario
         </h1>
-        <Btn size="sm" variant="primary" onClick={openAddModal}>
-          <Plus size={14} /> Nuova task
+        <Btn size="sm" variant="primary" onClick={openAddModal} className="min-h-[44px] sm:min-h-0">
+          <Plus size={14} /> <span className="hidden sm:inline">Nuova</span> task
         </Btn>
       </div>
 
@@ -409,19 +409,19 @@ export default function CalendarPage() {
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={prevMonth}
-              className="p-2 rounded hover:bg-white/8 text-muted hover:text-ink transition-colors"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-white/8 text-muted hover:text-ink transition-colors"
             >
               <ChevronLeft size={18} />
             </button>
 
-            <div className="flex items-center gap-3">
-              <h2 className="font-display text-base font-semibold text-ink">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <h2 className="font-display text-sm sm:text-base font-semibold text-ink">
                 {MONTHS_IT[month]} {year}
               </h2>
               {!isCurrentMonth && (
                 <button
                   onClick={goToday}
-                  className="text-[11px] font-mono uppercase tracking-wider text-burgundy-muted hover:text-burgundy transition-colors px-2 py-0.5 rounded border border-burgundy/20 hover:border-burgundy/40"
+                  className="text-[11px] font-mono uppercase tracking-wider text-burgundy-muted hover:text-burgundy transition-colors px-2 py-1 min-h-[32px] rounded border border-burgundy/20 hover:border-burgundy/40"
                 >
                   Oggi
                 </button>
@@ -430,7 +430,7 @@ export default function CalendarPage() {
 
             <button
               onClick={nextMonth}
-              className="p-2 rounded hover:bg-white/8 text-muted hover:text-ink transition-colors"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-white/8 text-muted hover:text-ink transition-colors"
             >
               <ChevronRight size={18} />
             </button>
@@ -439,7 +439,7 @@ export default function CalendarPage() {
           {/* Weekday headers */}
           <div className="grid grid-cols-7 gap-px mb-1">
             {WEEKDAYS.map(d => (
-              <div key={d} className="text-center text-[11px] font-mono uppercase tracking-wider text-subtle py-1">
+              <div key={d} className="text-center text-[9px] sm:text-[11px] font-mono uppercase tracking-wider text-subtle py-1">
                 {d}
               </div>
             ))}
@@ -461,7 +461,7 @@ export default function CalendarPage() {
                   key={i}
                   onClick={() => setSelectedDay(cell.date)}
                   className={`
-                    relative min-h-[60px] sm:min-h-[72px] p-1.5 rounded-md text-left transition-colors
+                    relative min-h-[48px] sm:min-h-[72px] p-1 sm:p-1.5 rounded-md text-left transition-colors
                     ${cell.outside ? 'opacity-30' : ''}
                     ${isSelected ? 'bg-burgundy/15 ring-1 ring-burgundy/30' : 'hover:bg-white/6'}
                     ${isToday && !isSelected ? 'bg-white/8' : ''}
@@ -484,54 +484,86 @@ export default function CalendarPage() {
                     )}
                   </div>
 
-                  {/* Project pills */}
+                  {/* Project pills — dots on mobile, full pills on sm+ */}
                   {dayProjects.length > 0 && (
-                    <div className="mt-1 flex flex-col gap-0.5">
-                      {dayProjects.slice(0, 2).map(p => {
-                        const type = p.type ?? 'other';
-                        return (
-                          <div
-                            key={p.id}
-                            className="truncate text-[9px] sm:text-[10px] font-mono leading-tight rounded px-1 py-px"
-                            style={{
-                              backgroundColor: TYPE_BG[type] ?? TYPE_BG.other,
-                              color: TYPE_TEXT[type] ?? TYPE_TEXT.other,
-                            }}
-                            title={p.title}
-                          >
-                            {p.title}
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <>
+                      {/* Mobile: colored dots */}
+                      <div className="mt-1 flex gap-0.5 sm:hidden">
+                        {dayProjects.slice(0, 3).map(p => {
+                          const type = p.type ?? 'other';
+                          return (
+                            <span
+                              key={p.id}
+                              className="w-1.5 h-1.5 rounded-full shrink-0"
+                              style={{ backgroundColor: TYPE_TEXT[type] ?? TYPE_TEXT.other }}
+                            />
+                          );
+                        })}
+                      </div>
+                      {/* Desktop: full pills */}
+                      <div className="mt-1 hidden sm:flex flex-col gap-0.5">
+                        {dayProjects.slice(0, 2).map(p => {
+                          const type = p.type ?? 'other';
+                          return (
+                            <div
+                              key={p.id}
+                              className="truncate text-[10px] font-mono leading-tight rounded px-1 py-px"
+                              style={{
+                                backgroundColor: TYPE_BG[type] ?? TYPE_BG.other,
+                                color: TYPE_TEXT[type] ?? TYPE_TEXT.other,
+                              }}
+                              title={p.title}
+                            >
+                              {p.title}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
                   )}
 
-                  {/* Task pills */}
+                  {/* Task pills — dots on mobile, full pills on sm+ */}
                   {dayTasks.length > 0 && (
-                    <div className="mt-0.5 flex flex-col gap-0.5">
-                      {dayTasks.slice(0, dayProjects.length > 0 ? 1 : 2).map(t => {
-                        const c = TASK_COLORS[t.color] ?? TASK_COLORS.burgundy;
-                        return (
-                          <div
-                            key={t.id}
-                            className={`flex items-center gap-1 truncate text-[9px] sm:text-[10px] font-mono leading-tight rounded px-1 py-px ${t.isDone ? 'line-through opacity-50' : ''}`}
-                            style={{ backgroundColor: c.bg, color: c.text }}
-                            title={t.title + (taskBadgeLabel(t, getClient, projects) ? ` — ${taskBadgeLabel(t, getClient, projects)}` : '')}
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: c.dot }} />
-                            {t.title}
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <>
+                      {/* Mobile: colored dots */}
+                      <div className="mt-0.5 flex gap-0.5 sm:hidden">
+                        {dayTasks.slice(0, 3).map(t => {
+                          const c = TASK_COLORS[t.color] ?? TASK_COLORS.burgundy;
+                          return (
+                            <span
+                              key={t.id}
+                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${t.isDone ? 'opacity-50' : ''}`}
+                              style={{ backgroundColor: c.dot }}
+                            />
+                          );
+                        })}
+                      </div>
+                      {/* Desktop: full pills */}
+                      <div className="mt-0.5 hidden sm:flex flex-col gap-0.5">
+                        {dayTasks.slice(0, dayProjects.length > 0 ? 1 : 2).map(t => {
+                          const c = TASK_COLORS[t.color] ?? TASK_COLORS.burgundy;
+                          return (
+                            <div
+                              key={t.id}
+                              className={`flex items-center gap-1 truncate text-[10px] font-mono leading-tight rounded px-1 py-px ${t.isDone ? 'line-through opacity-50' : ''}`}
+                              style={{ backgroundColor: c.bg, color: c.text }}
+                              title={t.title + (taskBadgeLabel(t, getClient, projects) ? ` — ${taskBadgeLabel(t, getClient, projects)}` : '')}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: c.dot }} />
+                              {t.title}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
                   )}
 
-                  {/* Cashflow badges */}
+                  {/* Cashflow badges — hidden on mobile */}
                   {dayCashflow.length > 0 && !cell.outside && (() => {
                     const entrateSum = dayCashflow.filter(e => e.type === 'entrata').reduce((s, e) => s + e.amount, 0);
                     const usciteSum  = dayCashflow.filter(e => e.type === 'uscita').reduce((s, e) => s + e.amount, 0);
                     return (
-                      <div className="mt-0.5 flex flex-wrap gap-0.5">
+                      <div className="mt-0.5 hidden sm:flex flex-wrap gap-0.5">
                         {entrateSum > 0 && (
                           <span
                             className="text-[9px] font-mono rounded px-0.5 leading-tight"
@@ -649,10 +681,10 @@ export default function CalendarPage() {
                             )}
                           </div>
 
-                          {/* Edit icon */}
+                          {/* Edit icon — always visible on mobile, hover on desktop */}
                           <button
                             onClick={() => openEditModal(task)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-subtle hover:text-ink"
+                            className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1.5 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 sm:p-1 flex items-center justify-center text-subtle hover:text-ink"
                           >
                             <Edit2 size={12} />
                           </button>

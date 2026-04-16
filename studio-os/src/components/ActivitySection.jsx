@@ -98,7 +98,7 @@ export default function ActivitySection({ activity = [] }) {
                     const color = ICON_COLORS[entry.type] ?? '#b0acaa';
 
                     return (
-                      <div key={entry.id} className="relative pl-6 pb-4 last:pb-0">
+                      <div key={entry.id} className="relative pl-5 sm:pl-6 pb-4 last:pb-0 min-w-0">
                         {/* dot on timeline */}
                         <div
                           className="absolute -left-[7px] top-[3px] w-3.5 h-3.5 rounded-full flex items-center justify-center"
@@ -107,8 +107,8 @@ export default function ActivitySection({ activity = [] }) {
                           <Icon size={8} style={{ color }} />
                         </div>
 
-                        <p className="text-sm text-ink leading-snug">{entry.text}</p>
-                        <p className="text-[11px] text-subtle font-mono mt-0.5">
+                        <p className="text-xs sm:text-sm text-ink leading-snug break-words">{entry.text}</p>
+                        <p className="text-[10px] sm:text-[11px] text-subtle font-mono mt-0.5">
                           {relativeTime(entry.timestamp)}
                         </p>
                       </div>

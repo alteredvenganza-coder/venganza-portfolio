@@ -64,7 +64,7 @@ export default function GuestSignupPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
+    <div className="relative min-h-screen flex items-center justify-center px-3 sm:px-4 py-6 overflow-hidden">
       {/* Full-screen background image */}
       <img
         src="/login-bg.png"
@@ -77,19 +77,19 @@ export default function GuestSignupPage() {
       <div className="relative z-10 w-full max-w-sm">
 
         {/* Logo */}
-        <div className="mb-8 text-center">
-          <h1 className="font-display text-4xl text-white drop-shadow-lg">Venganza Transfer</h1>
+        <div className="mb-6 sm:mb-8 text-center">
+          <h1 className="font-display text-3xl sm:text-4xl text-white drop-shadow-lg">Venganza Transfer</h1>
           <p className="label-meta mt-1 text-white/60">Registrazione ospite</p>
         </div>
 
-        <div className="glass-strong rounded-lg p-6">
+        <div className="glass-strong rounded-lg p-4 sm:p-6">
           {success ? (
             <div className="text-center py-4">
               <p className="text-green-400 text-sm font-medium">Account creato con successo!</p>
               <p className="text-white/60 text-xs mt-1">Reindirizzamento...</p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-4">
               <div>
                 <label className="label-meta block mb-1.5">Nome</label>
                 <input
@@ -99,6 +99,7 @@ export default function GuestSignupPage() {
                   placeholder="Il tuo nome"
                   required
                   autoFocus
+                  className="w-full text-sm"
                 />
               </div>
               <div>
@@ -109,6 +110,7 @@ export default function GuestSignupPage() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="tu@email.com"
                   required
+                  className="w-full text-sm"
                 />
               </div>
               <div>
@@ -120,6 +122,7 @@ export default function GuestSignupPage() {
                   placeholder="Minimo 6 caratteri"
                   required
                   minLength={6}
+                  className="w-full text-sm"
                 />
               </div>
               <div>
@@ -130,18 +133,18 @@ export default function GuestSignupPage() {
                   onChange={e => setInviteCode(e.target.value.toUpperCase())}
                   placeholder="XXXXXXXX"
                   required
-                  className="font-mono tracking-widest uppercase"
+                  className="w-full font-mono tracking-widest uppercase text-sm"
                 />
               </div>
 
               {error && (
-                <p className="text-sm text-burgundy">{error}</p>
+                <p className="text-xs sm:text-sm text-burgundy">{error}</p>
               )}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-burgundy hover:bg-burgundy-light text-white py-2.5 rounded text-sm font-medium transition-colors disabled:opacity-50 mt-1"
+                className="w-full bg-burgundy hover:bg-burgundy-light text-white py-3 sm:py-2.5 rounded text-sm font-medium transition-colors disabled:opacity-50 mt-1 min-h-[44px]"
               >
                 {loading ? 'Creazione account...' : 'Registrati'}
               </button>

@@ -215,16 +215,16 @@ export default function BriefSection({ brief: rawBrief, projectId, projectType, 
             <div className="px-4 sm:px-5 pb-5 flex flex-col gap-5 border-t border-border pt-4">
 
               {/* ── AI analysis ── */}
-              <div className="rounded-lg border border-dashed border-border bg-paper p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
+              <div className="rounded-lg border border-dashed border-border bg-paper p-2.5 sm:p-3">
+                <div className="flex items-start sm:items-center justify-between gap-2 sm:gap-3 flex-col sm:flex-row">
+                  <div className="flex items-center gap-2 min-w-0">
                     <Sparkles size={14} className="text-burgundy shrink-0" />
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-xs font-medium text-ink">Analizza con AI</p>
-                      <p className="text-[11px] text-subtle">Carica screenshot di chat, email o documenti — l'AI genera note e step</p>
+                      <p className="text-[10px] sm:text-[11px] text-subtle">Carica screenshot di chat, email o documenti</p>
                     </div>
                   </div>
-                  <label>
+                  <label className="shrink-0">
                     <input
                       ref={aiFileRef}
                       type="file"
@@ -233,7 +233,7 @@ export default function BriefSection({ brief: rawBrief, projectId, projectType, 
                       className="hidden"
                       onChange={handleAiFiles}
                     />
-                    <Btn as="span" variant="secondary" size="sm" disabled={analyzing} onClick={() => aiFileRef.current?.click()}>
+                    <Btn as="span" variant="secondary" size="sm" disabled={analyzing} onClick={() => aiFileRef.current?.click()} className="min-h-[44px] sm:min-h-0">
                       <Sparkles size={12} />
                       {analyzing ? 'Analisi…' : 'Analizza'}
                     </Btn>
@@ -356,9 +356,9 @@ export default function BriefSection({ brief: rawBrief, projectId, projectType, 
                 <div className="flex items-center justify-between mb-3">
                   <p className="label-meta">Step del progetto</p>
                   {hasTemplate && fewSteps && (
-                    <Btn variant="secondary" size="sm" onClick={handleUseTemplate}>
+                    <Btn variant="secondary" size="sm" onClick={handleUseTemplate} className="min-h-[44px] sm:min-h-0">
                       <ListChecks size={13} />
-                      Usa template
+                      <span className="hidden sm:inline">Usa</span> template
                     </Btn>
                   )}
                 </div>
@@ -375,14 +375,14 @@ export default function BriefSection({ brief: rawBrief, projectId, projectType, 
                       <p className="text-xs text-ink mb-2">
                         Hai gia {brief.steps.length} step. Vuoi sostituirli o aggiungere il template?
                       </p>
-                      <div className="flex gap-2">
-                        <Btn variant="secondary" size="sm" onClick={() => applyTemplate(true)}>
+                      <div className="flex flex-wrap gap-2">
+                        <Btn variant="secondary" size="sm" onClick={() => applyTemplate(true)} className="min-h-[44px] sm:min-h-0">
                           Sostituisci
                         </Btn>
-                        <Btn variant="secondary" size="sm" onClick={() => applyTemplate(false)}>
+                        <Btn variant="secondary" size="sm" onClick={() => applyTemplate(false)} className="min-h-[44px] sm:min-h-0">
                           Aggiungi
                         </Btn>
-                        <Btn variant="ghost" size="sm" onClick={() => setTemplateConfirm(false)}>
+                        <Btn variant="ghost" size="sm" onClick={() => setTemplateConfirm(false)} className="min-h-[44px] sm:min-h-0">
                           <X size={12} /> Annulla
                         </Btn>
                       </div>
@@ -430,10 +430,10 @@ export default function BriefSection({ brief: rawBrief, projectId, projectType, 
                           {step.label}
                         </span>
 
-                        {/* Delete */}
+                        {/* Delete — always visible on mobile */}
                         <button
                           onClick={() => deleteStep(step.id)}
-                          className="opacity-0 group-hover:opacity-100 text-subtle hover:text-burgundy transition-all"
+                          className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-subtle hover:text-burgundy transition-all p-1.5 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 sm:p-0 flex items-center justify-center"
                         >
                           <Trash2 size={13} />
                         </button>

@@ -199,15 +199,15 @@ export default function SendFilePage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="font-display text-2xl font-bold text-ink">Invia File</h1>
-        <p className="text-sm text-muted mt-1">
+        <h1 className="font-display text-xl sm:text-2xl font-bold text-ink">Invia File</h1>
+        <p className="text-xs sm:text-sm text-muted mt-1">
           Carica file e genera un link di download da condividere con chiunque.
         </p>
       </div>
 
       {/* Guest storage bar */}
       {isGuest && profile && (
-        <div className="glass rounded-lg p-4 flex items-center gap-4">
+        <div className="glass rounded-lg p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
           <HardDrive size={16} className="text-burgundy-muted shrink-0" />
           <div className="flex-1">
             <div className="flex items-center justify-between mb-1">
@@ -230,7 +230,7 @@ export default function SendFilePage() {
 
         {/* ── Left column: Upload form ── */}
         <div className="lg:col-span-3 space-y-5">
-          <div className="glass rounded-lg p-6 space-y-5">
+          <div className="glass rounded-lg p-4 sm:p-6 space-y-4 sm:space-y-5">
 
             {/* Drop zone */}
             <div
@@ -239,7 +239,7 @@ export default function SendFilePage() {
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               onClick={() => !uploading && fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-lg py-10 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+              className={`border-2 border-dashed rounded-lg py-6 sm:py-10 flex flex-col items-center justify-center cursor-pointer transition-colors min-h-[120px] ${
                 dragging
                   ? 'border-burgundy bg-burgundy/10'
                   : 'border-white/20 hover:border-burgundy-muted hover:bg-white/5'
@@ -359,10 +359,10 @@ export default function SendFilePage() {
             ) : (
               <div className="space-y-3">
                 <div className="flex gap-2">
-                  <div className="flex-1 bg-white/5 border border-white/15 rounded px-3 py-2.5 text-sm font-mono truncate text-muted">
+                  <div className="flex-1 bg-white/5 border border-white/15 rounded px-3 py-2.5 text-xs sm:text-sm font-mono truncate text-muted min-w-0">
                     {sharedLink}
                   </div>
-                  <Btn variant="secondary" onClick={() => copyLink(sharedLink)} className="shrink-0">
+                  <Btn variant="secondary" onClick={() => copyLink(sharedLink)} className="shrink-0 min-h-[44px] min-w-[44px]">
                     {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
                   </Btn>
                 </div>
@@ -376,7 +376,7 @@ export default function SendFilePage() {
 
         {/* ── Right column: History ── */}
         <div className="lg:col-span-2">
-          <div className="glass rounded-lg p-5">
+          <div className="glass rounded-lg p-3 sm:p-5">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted mb-4">
               Trasferimenti recenti
             </h2>
@@ -437,10 +437,10 @@ export default function SendFilePage() {
                       </div>
 
                       {!expired && (
-                        <div className="flex gap-1.5">
+                        <div className="flex gap-1">
                           <button
                             onClick={() => copyLink(link, t.id)}
-                            className="flex items-center gap-1 text-[11px] text-muted hover:text-ink transition-colors"
+                            className="flex items-center gap-1 text-[11px] text-muted hover:text-ink transition-colors min-h-[44px] sm:min-h-0 px-1"
                           >
                             {copiedId === t.id ? (
                               <Check size={11} className="text-green-400" />
@@ -453,7 +453,7 @@ export default function SendFilePage() {
                             href={link}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex items-center gap-1 text-[11px] text-muted hover:text-ink transition-colors ml-2"
+                            className="flex items-center gap-1 text-[11px] text-muted hover:text-ink transition-colors ml-1 min-h-[44px] sm:min-h-0 px-1"
                           >
                             <ExternalLink size={11} />
                             Apri

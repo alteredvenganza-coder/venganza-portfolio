@@ -26,7 +26,7 @@ export default function GuestLayout({ children }) {
             </span>
             <button
               onClick={signOut}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded text-sm text-muted hover:text-ink hover:bg-white/8 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded text-sm text-muted hover:text-ink hover:bg-white/8 transition-colors min-h-[44px] min-w-[44px]"
               title="Esci"
             >
               <LogOut size={14} />
