@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   ChevronLeft, ChevronRight, AlertTriangle,
   Plus, Check, Clock, Trash2, Edit2, Bell, Calendar,
-  User, Briefcase,
+  User, Briefcase, ChevronDown,
 } from 'lucide-react';
 import Badge from '../components/Badge';
 import Modal from '../components/Modal';
@@ -118,7 +118,7 @@ function taskBadgeLabel(task, getClient, projects) {
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function CalendarPage() {
-  const { projects }       = useProjects();
+  const { projects, addTask, toggleTask } = useProjects();
   const { clients, getClient } = useClients();
   const { calendarTasks, addCalendarTask, updateCalendarTask, deleteCalendarTask } = useCalendarTasks();
 
@@ -133,6 +133,10 @@ export default function CalendarPage() {
   const [editingTask, setEditingTask] = useState(null); // null = add, object = edit
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+
+  // Project to-do state
+  const [expandedProjects, setExpandedProjects] = useState({});
+  const [newTaskText, setNewTaskText] = useState({});
 
   // ── Derived data ──────────────────────────────────────────────────────────
 
@@ -680,6 +684,113 @@ export default function CalendarPage() {
           )}
         </div>
       </div>
+
+      {/* ── Project To-Do List ── */}
+      {activeProjectsList.length > 0 && (
+        <div className="glass rounded-lg p-4 sm:p-5">
+          <h2 className="font-display text-base font-semibold text-ink mb-4 flex items-center gap-2">
+            <Briefcase size={16} className="text-muted" />
+            Progetti attivi
+            <span className="text-muted font-sans text-sm font-normal">({activeProjectsList.length})</span>
+          </h2>
+
+          <div className="space-y-1">
+            {activeProjectsList.map(project => {
+              const isExpanded = expandedProjects[project.id] ?? false;
+              const tasks = project.tasks ?? [];
+              const doneCount = tasks.filter(t => t.done).length;
+              const client = project.clientId ? getClient(project.clientId) : null;
+              const type = project.type ?? 'other';
+              const stage = project.stage ?? 'lead';
+
+              return (
+                <div key={project.id} className="rounded-lg overflow-hidden">
+                  {/* Project header — clickable to expand */}
+                  <button
+                    onClick={() => setExpandedProjects(prev => ({ ...prev, [project.id]: !prev[project.id] }))}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/6 transition-colors text-left"
+                  >
+                    <ChevronDown
+                      size={14}
+                      className={`text-subtle shrink-0 transition-transform ${isExpanded ? '' : '-rotate-90'}`}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-ink truncate">{project.title}</span>
+                        {client && (
+                          <span className="text-[11px] text-subtle truncate hidden sm:inline">— {client.name}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {tasks.length > 0 && (
+                        <span className="text-[11px] font-mono text-subtle">
+                          {doneCount}/{tasks.length}
+                        </span>
+                      )}
+                      <Badge
+                        label={STAGE_LABELS[stage] ?? stage}
+                        bg={STAGE_BG[stage] ?? STAGE_BG.lead}
+                        color={STAGE_TEXT[stage] ?? STAGE_TEXT.lead}
+                      />
+                    </div>
+                  </button>
+
+                  {/* Expanded: task list + add input */}
+                  {isExpanded && (
+                    <div className="pl-8 pr-3 pb-3">
+                      {tasks.length > 0 ? (
+                        <div className="space-y-1">
+                          {tasks.map(task => (
+                            <div key={task.id} className="flex items-center gap-2 group">
+                              <button
+                                onClick={() => toggleTask(project.id, task.id)}
+                                className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${
+                                  task.done ? 'bg-white/20 border-white/30' : 'border-white/20 hover:border-white/40'
+                                }`}
+                              >
+                                {task.done && <Check size={10} className="text-muted" />}
+                              </button>
+                              <span className={`text-sm ${task.done ? 'text-subtle line-through' : 'text-ink'}`}>
+                                {task.text}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-[11px] text-subtle mb-2">Nessuna task</p>
+                      )}
+
+                      {/* Add task inline */}
+                      <form
+                        className="flex items-center gap-2 mt-2"
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          const text = (newTaskText[project.id] ?? '').trim();
+                          if (!text) return;
+                          await addTask(project.id, text);
+                          setNewTaskText(prev => ({ ...prev, [project.id]: '' }));
+                        }}
+                      >
+                        <input
+                          type="text"
+                          className="input text-sm flex-1 py-1.5"
+                          placeholder="Aggiungi task..."
+                          value={newTaskText[project.id] ?? ''}
+                          onChange={e => setNewTaskText(prev => ({ ...prev, [project.id]: e.target.value }))}
+                        />
+                        <Btn type="submit" size="sm" variant="ghost" disabled={!(newTaskText[project.id] ?? '').trim()}>
+                          <Plus size={14} />
+                        </Btn>
+                      </form>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── Add / Edit Task Modal ── */}
       <Modal
