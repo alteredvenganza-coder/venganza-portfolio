@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCanvas } from '../hooks/useCanvas';
 import { useCanvases } from '../hooks/useStore';
 import CanvasEngine from '../canvas/CanvasEngine';
+import CanvasToolbar from '../canvas/CanvasToolbar';
 import { renderCard } from '../canvas/cards';
 
 export default function CanvasView() {
@@ -25,6 +26,19 @@ export default function CanvasView() {
   }, [canvasId, clientId, addCanvas, navigate, resolvedId]);
 
   const { canvas, cards, loading, updateCanvas, addCard, updateCard, deleteCard } = useCanvas(resolvedId);
+  const [tool, setTool] = useState('select');
+
+  useEffect(() => {
+    function onKey(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'v' || e.key === 'V') setTool('select');
+      if (e.key === 'h' || e.key === 'H') setTool('pan');
+      if (e.key === 'c' || e.key === 'C') setTool('connect');
+      if (e.key === 'Escape') setTool('select');
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   if (!resolvedId || loading) {
     return (
@@ -40,13 +54,14 @@ export default function CanvasView() {
         panX={canvas?.panX ?? 0}
         panY={canvas?.panY ?? 0}
         zoom={canvas?.zoom ?? 1}
+        tool={tool}
         onViewportChange={({ panX, panY, zoom }) => updateCanvas({ panX, panY, zoom })}
       >
         {cards.map(c => renderCard(c, {
           ctx: {
             zoom: canvas?.zoom ?? 1,
             selected: false,
-            tool: 'select',
+            tool,
             onSelect: () => {},
             onMove: (x, y) => updateCard(c.id, { x, y }),
             onMoveEnd: () => {},
@@ -63,6 +78,28 @@ export default function CanvasView() {
           onUpdate: (patch) => updateCard(c.id, patch),
         }))}
       </CanvasEngine>
+      <CanvasToolbar
+        tool={tool}
+        onToolChange={setTool}
+        zoom={canvas?.zoom ?? 1}
+        onZoomChange={(z) => updateCanvas({ zoom: z })}
+        onFit={() => {
+          if (!cards.length) return;
+          const minX = Math.min(...cards.map(c => c.x));
+          const minY = Math.min(...cards.map(c => c.y));
+          const maxX = Math.max(...cards.map(c => c.x + c.w));
+          const maxY = Math.max(...cards.map(c => c.y + 220));
+          const pad = 120;
+          const w = maxX - minX + pad * 2;
+          const h = maxY - minY + pad * 2;
+          const z = Math.min(window.innerWidth / w, window.innerHeight / h, 1);
+          updateCanvas({
+            zoom: z,
+            panX: (window.innerWidth  - w * z) / 2 - minX * z + pad * z,
+            panY: (window.innerHeight - h * z) / 2 - minY * z + pad * z,
+          });
+        }}
+      />
       {/* Top-left back button */}
       <button
         onClick={() => navigate(clientId ? `/clients/${clientId}` : '/')}
