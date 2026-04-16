@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Plus, RefreshCw, ChevronLeft, ChevronRight, Trash2, Wallet, TrendingUp, TrendingDown } from 'lucide-react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { Plus, RefreshCw, ChevronLeft, ChevronRight, Trash2, Wallet, TrendingUp, TrendingDown, Sparkles, Check, X as XIcon, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Btn from '../components/Btn';
 import Modal from '../components/Modal';
@@ -123,6 +123,14 @@ export default function CashflowPage() {
   const [syncLoading, setSyncLoading] = useState(false);
   const [syncMsg,     setSyncMsg]     = useState('');
 
+  // ── Receipt scanner state ─────────────────────────────────────────────────────
+  const scanInputRef = useRef(null);
+  const [scanning,       setScanning]       = useState(false);
+  const [scanPreview,    setScanPreview]    = useState([]); // extracted entries with _checked flag
+  const [scanModalOpen,  setScanModalOpen]  = useState(false);
+  const [scanInserting,  setScanInserting]  = useState(false);
+  const [scanSuccessMsg, setScanSuccessMsg] = useState('');
+
   const revolutToken = localStorage.getItem(REVOLUT_KEY) ?? '';
 
   // ── Load entries ──────────────────────────────────────────────────────────────
@@ -224,6 +232,88 @@ export default function CashflowPage() {
     }
   }
 
+  // ── Receipt scanner ───────────────────────────────────────────────────────────
+  async function handleScanFiles(e) {
+    const fileList = Array.from(e.target.files || []);
+    if (!fileList.length) return;
+    // Reset input so same file can be re-selected
+    e.target.value = '';
+
+    setScanning(true);
+    setScanSuccessMsg('');
+
+    try {
+      // Convert files to base64
+      const filesPayload = await Promise.all(
+        fileList.map(file => new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64 = reader.result.split(',')[1];
+            resolve({ fileData: base64, mimeType: file.type || 'image/png' });
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        }))
+      );
+
+      const resp = await fetch('/api/scan-receipt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ files: filesPayload }),
+      });
+
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || 'Errore scansione');
+
+      if (!data.entries?.length) {
+        alert('Nessuna transazione trovata nel documento.');
+        return;
+      }
+
+      // Add _checked and _id for local tracking
+      setScanPreview(data.entries.map((entry, i) => ({ ...entry, _checked: true, _id: i })));
+      setScanModalOpen(true);
+    } catch (err) {
+      alert('Errore: ' + err.message);
+    } finally {
+      setScanning(false);
+    }
+  }
+
+  function updateScanEntry(idx, field, value) {
+    setScanPreview(prev => prev.map((e, i) => i === idx ? { ...e, [field]: value } : e));
+  }
+
+  async function handleConfirmScan() {
+    const checked = scanPreview.filter(e => e._checked);
+    if (!checked.length) return;
+
+    setScanInserting(true);
+    try {
+      const inserted = [];
+      for (const entry of checked) {
+        const result = await cf.insertEntry(user.id, {
+          type:        entry.type,
+          amount:      entry.amount,
+          category:    entry.category,
+          description: entry.description,
+          date:        entry.date,
+        });
+        inserted.push(result);
+      }
+      setEntries(prev => [...inserted, ...prev]);
+      setScanModalOpen(false);
+      setScanPreview([]);
+      setScanSuccessMsg(`${inserted.length} ${inserted.length === 1 ? 'voce aggiunta' : 'voci aggiunte'} dalla scansione`);
+      // Auto-clear success message
+      setTimeout(() => setScanSuccessMsg(''), 5000);
+    } catch (err) {
+      alert('Errore inserimento: ' + err.message);
+    } finally {
+      setScanInserting(false);
+    }
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────────
   return (
     <div>
@@ -240,6 +330,18 @@ export default function CashflowPage() {
               {syncLoading ? 'Sync in corso…' : 'Sync Revolut'}
             </Btn>
           )}
+          <Btn variant="secondary" size="sm" onClick={() => scanInputRef.current?.click()} disabled={scanning}>
+            {scanning ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
+            {scanning ? 'Analisi in corso…' : 'Scansiona ricevuta'}
+          </Btn>
+          <input
+            ref={scanInputRef}
+            type="file"
+            accept="image/*,.pdf"
+            multiple
+            className="hidden"
+            onChange={handleScanFiles}
+          />
           <Btn variant="primary" size="sm" onClick={() => { setForm(EMPTY_FORM); setAddOpen(true); }}>
             <Plus size={14} /> Aggiungi
           </Btn>
@@ -253,6 +355,16 @@ export default function CashflowPage() {
           className={`text-xs mb-4 ${syncMsg.startsWith('✓') ? 'text-green-400' : 'text-yellow-400'}`}
         >
           {syncMsg}
+        </motion.p>
+      )}
+
+      {scanSuccessMsg && (
+        <motion.p
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-xs mb-4 text-green-400"
+        >
+          ✓ {scanSuccessMsg}
         </motion.p>
       )}
 
@@ -475,6 +587,117 @@ export default function CashflowPage() {
             </Btn>
           </div>
         </form>
+      </Modal>
+
+      {/* ── Scan preview modal ── */}
+      <Modal
+        open={scanModalOpen}
+        onClose={() => { setScanModalOpen(false); setScanPreview([]); }}
+        title="Voci estratte dalla scansione"
+        width="max-w-2xl"
+      >
+        <div className="flex flex-col gap-3">
+          <p className="text-xs text-subtle">
+            <Sparkles size={12} className="inline mr-1 text-burgundy-muted" />
+            {scanPreview.length} {scanPreview.length === 1 ? 'voce trovata' : 'voci trovate'} — modifica o deseleziona prima di confermare.
+          </p>
+
+          <div className="flex flex-col gap-2 max-h-[55vh] overflow-y-auto pr-1">
+            {scanPreview.map((entry, idx) => (
+              <div
+                key={entry._id}
+                className={`glass rounded-lg p-3 border transition-opacity ${
+                  entry._checked ? 'border-white/10' : 'border-white/5 opacity-50'
+                }`}
+              >
+                {/* Row 1: checkbox + type + amount */}
+                <div className="flex items-center gap-3 mb-2">
+                  <button
+                    type="button"
+                    onClick={() => updateScanEntry(idx, '_checked', !entry._checked)}
+                    className={`w-5 h-5 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
+                      entry._checked
+                        ? 'bg-burgundy border-burgundy text-white'
+                        : 'border-white/20 text-transparent hover:border-white/40'
+                    }`}
+                  >
+                    <Check size={12} />
+                  </button>
+
+                  <select
+                    value={entry.type}
+                    onChange={e => updateScanEntry(idx, 'type', e.target.value)}
+                    className="text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-ink w-24"
+                  >
+                    <option value="entrata">Entrata</option>
+                    <option value="uscita">Uscita</option>
+                  </select>
+
+                  <div className={`flex-shrink-0 font-mono text-sm font-semibold ${entry.type === 'entrata' ? 'text-green-400' : 'text-red-400'}`}>
+                    {entry.type === 'entrata' ? '+' : '-'}{fmt(entry.amount)}
+                  </div>
+
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={entry.amount}
+                    onChange={e => updateScanEntry(idx, 'amount', Math.abs(Number(e.target.value)) || 0)}
+                    className="w-24 text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-ink font-mono ml-auto"
+                  />
+                </div>
+
+                {/* Row 2: category + date */}
+                <div className="flex gap-2 mb-2 flex-wrap">
+                  <select
+                    value={entry.category}
+                    onChange={e => updateScanEntry(idx, 'category', e.target.value)}
+                    className="text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-ink flex-1 min-w-[140px]"
+                  >
+                    {(entry.type === 'entrata' ? cf.CATEGORIES_ENTRATA : cf.CATEGORIES_USCITA).map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+
+                  <input
+                    type="date"
+                    value={entry.date}
+                    onChange={e => updateScanEntry(idx, 'date', e.target.value)}
+                    className="text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-ink w-36"
+                  />
+                </div>
+
+                {/* Row 3: description */}
+                <input
+                  type="text"
+                  value={entry.description}
+                  onChange={e => updateScanEntry(idx, 'description', e.target.value)}
+                  placeholder="Descrizione…"
+                  className="w-full text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-ink"
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-2 pt-3 border-t border-border">
+            <Btn variant="ghost" size="sm" onClick={() => { setScanModalOpen(false); setScanPreview([]); }} className="w-full sm:w-auto">
+              Annulla
+            </Btn>
+            <Btn
+              variant="primary"
+              size="sm"
+              onClick={handleConfirmScan}
+              disabled={scanInserting || !scanPreview.some(e => e._checked)}
+              className="w-full sm:w-auto"
+            >
+              {scanInserting ? (
+                <><Loader2 size={13} className="animate-spin" /> Inserimento…</>
+              ) : (
+                <><Check size={13} /> Conferma e aggiungi ({scanPreview.filter(e => e._checked).length})</>
+              )}
+            </Btn>
+          </div>
+        </div>
       </Modal>
     </div>
   );
