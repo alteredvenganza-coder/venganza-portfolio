@@ -129,7 +129,7 @@ export default function CanvasEngine({
         cursor,
       }}
     >
-      <div style={{
+      <div data-canvas-world style={{
         position: 'absolute',
         top: 0, left: 0,
         width: WORLD_SIZE, height: WORLD_SIZE,

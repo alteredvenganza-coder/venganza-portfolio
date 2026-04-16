@@ -12,6 +12,7 @@ import AddPopup from '../canvas/AddPopup';
 import ContextMenu from '../canvas/ContextMenu';
 import CanvasMinimap from '../canvas/CanvasMinimap';
 import AiPanel from '../canvas/AiPanel';
+import { exportCanvasPng } from '../canvas/exportCanvas';
 
 export default function CanvasView() {
   const { canvasId, id: clientId } = useParams();
@@ -92,6 +93,7 @@ export default function CanvasView() {
         onHome={() => navigate(clientId ? `/clients/${clientId}` : '/')}
         onTemplates={() => setShowTemplates(true)}
         onAi={() => setShowAi(v => !v)}
+        onExport={() => exportCanvasPng(cards, canvas?.name)}
       />
       <CanvasEngine
         panX={canvas?.panX ?? 0}
