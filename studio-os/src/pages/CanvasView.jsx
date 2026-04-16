@@ -155,21 +155,28 @@ export default function CanvasView() {
         open={showTemplates}
         onClose={() => setShowTemplates(false)}
         onApply={(tmpl) => {
-          const z = canvas?.zoom ?? 1;
+          const z  = canvas?.zoom ?? 1;
           const px = canvas?.panX ?? 0;
           const py = canvas?.panY ?? 0;
           const centerWorldX = (window.innerWidth  / 2 - px) / z;
           const centerWorldY = (window.innerHeight / 2 - py) / z;
           const dx = centerWorldX - 3000;
           const dy = centerWorldY - 3000;
+
+          const SMART = ['budget', 'tasks', 'files', 'project-overview'];
+
           tmpl.cards.forEach((c) => {
             const { type, x, y, w, ...rest } = c;
+            const isSmart = SMART.includes(type);
+            const data    = isSmart ? (rest.data || {}) : rest;
+            const refId   = isSmart ? (rest.refId || null) : undefined;
             addCard({
               type,
               x: x + dx,
               y: y + dy,
               w: w || 230,
-              data: rest,
+              ...(refId !== undefined ? { refId } : {}),
+              data,
             });
           });
           setShowTemplates(false);
