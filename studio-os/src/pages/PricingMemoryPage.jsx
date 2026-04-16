@@ -92,11 +92,11 @@ function HistoryRow({ project, clientName }) {
         </div>
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        <Badge
+        <span className="hidden sm:inline"><Badge
           label={TYPE_LABELS[project.type]}
           bg={TYPE_BG[project.type]}
           color={TYPE_TEXT[project.type]}
-        />
+        /></span>
         <span className="text-sm font-mono font-bold text-ink min-w-[60px] text-right">
           {formatEur(project.price)}
         </span>

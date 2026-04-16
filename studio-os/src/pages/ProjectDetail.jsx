@@ -314,7 +314,7 @@ export default function ProjectDetail() {
                     </span>
                     <button
                       onClick={() => deleteTask(id, task.id)}
-                      className="opacity-0 group-hover:opacity-100 text-subtle hover:text-burgundy transition-all"
+                      className="sm:opacity-0 sm:group-hover:opacity-100 text-subtle hover:text-burgundy transition-all p-1 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                     >
                       <X size={14} />
                     </button>
@@ -522,6 +522,7 @@ export default function ProjectDetail() {
         <BriefSection
           brief={project.brief ?? {}}
           projectId={id}
+          projectType={project.type}
           onUpdate={(brief) => updateProject(id, { brief })}
           onProjectUpdate={(patch) => updateProject(id, patch)}
         />

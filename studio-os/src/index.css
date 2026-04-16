@@ -61,6 +61,15 @@
 }
 
 @layer utilities {
+  /* ── Hide scrollbar but keep scroll ────────────────────────────────────── */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   /* ── Glassmorphism card ─────────────────────────────────────────────────── */
   .glass {
     background: rgba(255,255,255,0.07);

@@ -5,7 +5,7 @@ export default function StageStepper({ current, onChange, disabled = false }) {
   const currentIdx = STAGES.indexOf(current);
 
   return (
-    <div className="flex items-center gap-0 overflow-x-auto pb-1">
+    <div className="flex items-center gap-0 overflow-x-auto pb-1 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
       {STAGES.map((stage, idx) => {
         const isActive  = stage === current;
         const isDone    = idx < currentIdx;
@@ -19,8 +19,8 @@ export default function StageStepper({ current, onChange, disabled = false }) {
               disabled={disabled}
               title={STAGE_LABELS[stage]}
               className={[
-                'relative px-2 sm:px-4 py-2 text-xs font-mono font-medium tracking-wide rounded transition-colors',
-                'focus:outline-none',
+                'relative px-2.5 sm:px-4 py-2.5 sm:py-2 text-xs font-mono font-medium tracking-wide rounded transition-colors whitespace-nowrap',
+                'focus:outline-none min-h-[44px] sm:min-h-0',
                 isActive
                   ? 'ring-1 ring-offset-1'
                   : isDone

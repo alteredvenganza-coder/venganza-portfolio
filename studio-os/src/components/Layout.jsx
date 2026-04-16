@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings } from 'lucide-react';
+import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings, FolderKanban } from 'lucide-react';
 import { useClients, useProjects, useGoals } from '../hooks/useStore';
 import SettingsModal from './SettingsModal';
 
@@ -20,6 +20,27 @@ export default function Layout({ children }) {
   const [query, setQuery]       = useState('');
   const [focused, setFocused]   = useState(false);
   const [settings, setSettings] = useState(false);
+  const searchRef = useRef(null);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setFocused(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close dropdown on Escape key
+  const handleSearchKeyDown = useCallback((e) => {
+    if (e.key === 'Escape') {
+      setFocused(false);
+      setQuery('');
+      e.target.blur();
+    }
+  }, []);
 
   const q = query.trim().toLowerCase();
 
@@ -78,14 +99,14 @@ export default function Layout({ children }) {
           </Link>
 
           {/* Nav */}
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-0.5 sm:gap-1">
             {NAV.map(({ to, label, icon: Icon, end }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={end}
                 className={({ isActive }) =>
-                  `flex items-center gap-1.5 px-3 py-1.5 rounded text-sm transition-colors ${
+                  `flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 rounded text-sm transition-colors min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 ${
                     isActive
                       ? 'bg-burgundy/20 text-burgundy-muted border border-burgundy/20 font-medium'
                       : 'text-muted hover:text-ink hover:bg-white/8'
@@ -98,17 +119,8 @@ export default function Layout({ children }) {
             ))}
           </nav>
 
-          {/* Settings icon */}
-          <button
-            onClick={() => setSettings(true)}
-            className="ml-auto shrink-0 p-1.5 rounded text-muted hover:text-ink hover:bg-white/8 transition-colors"
-            title="Impostazioni"
-          >
-            <Settings size={16} />
-          </button>
-
           {/* Search */}
-          <div className="flex-1 max-w-xs hidden sm:block relative">
+          <div ref={searchRef} className="ml-auto flex-1 max-w-xs hidden sm:block relative">
             <div className="relative">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-subtle pointer-events-none" />
               <input
@@ -117,12 +129,12 @@ export default function Layout({ children }) {
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onFocus={() => setFocused(true)}
-                onBlur={() => setTimeout(() => setFocused(false), 200)}
+                onKeyDown={handleSearchKeyDown}
                 className="w-full pl-9 pr-8 py-1.5 text-sm rounded-md"
               />
               {query && (
                 <button
-                  onClick={() => setQuery('')}
+                  onClick={() => { setQuery(''); setFocused(false); }}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-subtle hover:text-ink"
                 >
                   <X size={13} />
@@ -134,13 +146,13 @@ export default function Layout({ children }) {
             {focused && q && (
               <div className="absolute top-full mt-1 w-full glass-strong rounded-lg overflow-hidden z-50 max-h-72 overflow-y-auto">
                 {!hasResults && (
-                  <p className="px-4 py-3 text-xs text-subtle">Nessun risultato per "{q}"</p>
+                  <p className="px-4 py-3 text-xs text-subtle">Nessun risultato per &ldquo;{q}&rdquo;</p>
                 )}
 
                 {resultClients.length > 0 && (
                   <div>
                     <p className="label-meta px-4 pt-3 pb-1">Clienti</p>
-                    {resultClients.slice(0, 3).map(c => (
+                    {resultClients.slice(0, 5).map(c => (
                       <button
                         key={c.id}
                         onMouseDown={() => handleSelect(`/clients/${c.id}`)}
@@ -157,7 +169,7 @@ export default function Layout({ children }) {
                 {resultProjects.length > 0 && (
                   <div>
                     <p className="label-meta px-4 pt-3 pb-1">Progetti</p>
-                    {resultProjects.slice(0, 4).map(p => (
+                    {resultProjects.slice(0, 5).map(p => (
                       <button
                         key={p.id}
                         onMouseDown={() => handleSelect(`/projects/${p.id}`)}
@@ -172,11 +184,20 @@ export default function Layout({ children }) {
               </div>
             )}
           </div>
+
+          {/* Settings icon */}
+          <button
+            onClick={() => setSettings(true)}
+            className="shrink-0 p-2.5 sm:p-1.5 rounded text-muted hover:text-ink hover:bg-white/8 transition-colors min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+            title="Impostazioni"
+          >
+            <Settings size={16} />
+          </button>
         </div>
       </header>
 
       {/* ── Page content ── */}
-      <main className="max-w-6xl mx-auto px-6 py-8 relative" style={{ zIndex: 1 }}>
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 relative" style={{ zIndex: 1 }}>
         {children}
       </main>
 

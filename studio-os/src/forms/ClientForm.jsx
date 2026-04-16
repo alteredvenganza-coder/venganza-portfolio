@@ -225,7 +225,7 @@ export default function ClientForm({ open, onClose, onSave, initialValues }) {
                 <Field label="Descrizione">
                   <textarea rows={2} value={project.description} onChange={e => setProjField('description', e.target.value)} className="resize-none" />
                 </Field>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <Field label="Tipo">
                     <select value={project.type} onChange={e => setProjField('type', e.target.value)}>
                       {PROJECT_TYPES.map(t => <option key={t} value={t}>{TYPE_LABELS[t]}</option>)}

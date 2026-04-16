@@ -262,11 +262,11 @@ export default function CashflowPage() {
       {/* ── Year overview ── */}
       <div className="glass rounded-xl p-4 sm:p-5 mb-6">
         <div className="flex items-center gap-2 mb-3">
-          <button onClick={() => setYear(y => y - 1)} className="p-1 text-subtle hover:text-ink transition-colors rounded">
+          <button onClick={() => setYear(y => y - 1)} className="p-2 text-subtle hover:text-ink transition-colors rounded min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center">
             <ChevronLeft size={16} />
           </button>
           <span className="font-mono text-sm font-semibold text-ink w-12 text-center">{year}</span>
-          <button onClick={() => setYear(y => y + 1)} className="p-1 text-subtle hover:text-ink transition-colors rounded">
+          <button onClick={() => setYear(y => y + 1)} className="p-2 text-subtle hover:text-ink transition-colors rounded min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center">
             <ChevronRight size={16} />
           </button>
           <div className="flex items-center gap-3 ml-auto text-[11px] text-subtle">
@@ -278,18 +278,18 @@ export default function CashflowPage() {
       </div>
 
       {/* ── Month header + stats ── */}
-      <div className="flex items-center gap-3 mb-4 flex-wrap">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
         <div className="flex items-center gap-2">
-          <button onClick={() => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); }} className="p-1 text-subtle hover:text-ink transition-colors rounded">
+          <button onClick={() => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); }} className="p-2 text-subtle hover:text-ink transition-colors rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
             <ChevronLeft size={15} />
           </button>
-          <h2 className="font-display text-xl text-ink min-w-[180px]">{MONTHS_FULL[month]} {year}</h2>
-          <button onClick={() => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); }} className="p-1 text-subtle hover:text-ink transition-colors rounded">
+          <h2 className="font-display text-lg sm:text-xl text-ink min-w-[140px] sm:min-w-[180px] text-center">{MONTHS_FULL[month]} {year}</h2>
+          <button onClick={() => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); }} className="p-2 text-subtle hover:text-ink transition-colors rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
             <ChevronRight size={15} />
           </button>
         </div>
 
-        <div className="flex gap-2 ml-auto flex-wrap">
+        <div className="flex gap-2 sm:ml-auto overflow-x-auto scrollbar-hide">
           {[
             { label: 'Entrate', value: entrate, color: 'text-green-400', icon: TrendingUp },
             { label: 'Uscite',  value: uscite,  color: 'text-red-400',   icon: TrendingDown },
@@ -319,7 +319,7 @@ export default function CashflowPage() {
           <button
             key={t}
             onClick={() => setScopeTab(t)}
-            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+            className={`px-3 py-2 sm:py-1 rounded text-xs font-medium transition-colors min-h-[44px] sm:min-h-0 ${
               scopeTab === t ? 'bg-burgundy text-white' : 'text-muted hover:text-ink hover:bg-white/8'
             }`}
           >
@@ -382,7 +382,7 @@ export default function CashflowPage() {
                 {/* Delete */}
                 <button
                   onClick={() => handleDelete(entry.id)}
-                  className="p-1 text-subtle hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0"
+                  className="p-2 text-subtle hover:text-red-400 transition-colors sm:opacity-0 sm:group-hover:opacity-100 flex-shrink-0 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                 >
                   <Trash2 size={13} />
                 </button>
@@ -454,13 +454,14 @@ export default function CashflowPage() {
             />
           </Field>
 
-          <div className="flex gap-2 justify-end pt-1">
-            <Btn variant="ghost" size="sm" type="button" onClick={() => setAddOpen(false)}>Annulla</Btn>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2 border-t border-border">
+            <Btn variant="ghost" size="sm" type="button" onClick={() => setAddOpen(false)} className="w-full sm:w-auto">Annulla</Btn>
             <Btn
               variant="primary"
               size="sm"
               type="submit"
               disabled={saving || !form.amount || !form.date}
+              className="w-full sm:w-auto"
             >
               {saving ? 'Salvataggio…' : `Aggiungi ${form.type}`}
             </Btn>

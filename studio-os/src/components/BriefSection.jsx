@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Check, Upload, X, ChevronDown, ChevronUp, Image, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Check, Upload, X, ChevronDown, ChevronUp, Image, Sparkles, ListChecks } from 'lucide-react';
 import Btn from './Btn';
 import { genId } from '../lib/utils';
 import { uploadProjectFile, deleteProjectFile } from '../lib/db';
@@ -14,11 +14,19 @@ import { fireWebhook } from '../lib/webhook';
   }
 */
 
+const STEP_TEMPLATES = {
+  fashion:  ["Briefing cliente", "Raccolta materiali", "Moodboard", "Shooting", "Selezione foto", "Editing", "Lookbook/Layout", "Revisione cliente", "Consegna finale"],
+  branding: ["Briefing cliente", "Ricerca e analisi", "Moodboard", "Concept design", "Logo design", "Brand guidelines", "Mockup applicazioni", "Revisione cliente", "Consegna file finali"],
+  edilizia: ["Briefing cliente", "Sopralluogo", "Rilievi e misurazioni", "Concept progetto", "Rendering 3D", "Tavole tecniche", "Revisione cliente", "Progetto esecutivo", "Consegna"],
+  app:      ["Briefing cliente", "Wireframe UX", "Design UI", "Prototipo interattivo", "Sviluppo frontend", "Sviluppo backend", "Testing", "Revisione cliente", "Deploy e lancio"],
+  other:    ["Briefing cliente", "Ricerca", "Prima bozza", "Revisione", "Finalizzazione", "Consegna"],
+};
+
 function emptyBrief() {
   return { notes: '', images: [], steps: [] };
 }
 
-export default function BriefSection({ brief: rawBrief, projectId, onUpdate, onProjectUpdate }) {
+export default function BriefSection({ brief: rawBrief, projectId, projectType, onUpdate, onProjectUpdate }) {
   const brief   = { ...emptyBrief(), ...rawBrief };
   const [open,       setOpen]      = useState(false);
   const [uploading,  setUploading] = useState(false);
@@ -26,8 +34,29 @@ export default function BriefSection({ brief: rawBrief, projectId, onUpdate, onP
   const [analyzeErr, setAnalyzeErr]= useState('');
   const [newStep,    setNewStep]   = useState('');
   const [aiExtras,   setAiExtras]  = useState(null); // enriched AI extraction results
+  const [templateConfirm, setTemplateConfirm] = useState(false); // confirm before replacing existing steps
   const fileRef    = useRef(null);
   const aiFileRef  = useRef(null);
+
+  const templateSteps = STEP_TEMPLATES[projectType] ?? STEP_TEMPLATES.other;
+  const hasTemplate   = !!projectType;
+  const fewSteps      = brief.steps.length <= 2;
+
+  function applyTemplate(replace = true) {
+    const newSteps = replace
+      ? templateSteps.map(label => ({ id: genId(), label, done: false }))
+      : [...brief.steps, ...templateSteps.map(label => ({ id: genId(), label, done: false }))];
+    update({ steps: newSteps });
+    setTemplateConfirm(false);
+  }
+
+  function handleUseTemplate() {
+    if (brief.steps.length === 0) {
+      applyTemplate(true);
+    } else {
+      setTemplateConfirm(true);
+    }
+  }
 
   function update(patch) {
     onUpdate({ ...brief, ...patch });
@@ -324,7 +353,42 @@ export default function BriefSection({ brief: rawBrief, projectId, onUpdate, onP
 
               {/* ── Step creativi ── */}
               <div>
-                <p className="label-meta mb-3">Step del progetto</p>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="label-meta">Step del progetto</p>
+                  {hasTemplate && fewSteps && (
+                    <Btn variant="secondary" size="sm" onClick={handleUseTemplate}>
+                      <ListChecks size={13} />
+                      Usa template
+                    </Btn>
+                  )}
+                </div>
+
+                {/* Template confirm dialog */}
+                <AnimatePresence>
+                  {templateConfirm && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mb-3 rounded-lg border border-border bg-paper p-3"
+                    >
+                      <p className="text-xs text-ink mb-2">
+                        Hai gia {brief.steps.length} step. Vuoi sostituirli o aggiungere il template?
+                      </p>
+                      <div className="flex gap-2">
+                        <Btn variant="secondary" size="sm" onClick={() => applyTemplate(true)}>
+                          Sostituisci
+                        </Btn>
+                        <Btn variant="secondary" size="sm" onClick={() => applyTemplate(false)}>
+                          Aggiungi
+                        </Btn>
+                        <Btn variant="ghost" size="sm" onClick={() => setTemplateConfirm(false)}>
+                          <X size={12} /> Annulla
+                        </Btn>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Progress bar */}
                 {brief.steps.length > 0 && (

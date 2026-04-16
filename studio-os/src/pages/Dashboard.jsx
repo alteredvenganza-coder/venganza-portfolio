@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, AlertCircle, Clock, Zap } from 'lucide-react';
+import { Plus, AlertCircle, Clock, Zap, CalendarClock } from 'lucide-react';
 import {
   DndContext, PointerSensor, useSensor, useSensors,
   DragOverlay, useDraggable, useDroppable,
@@ -12,7 +12,7 @@ import Btn from '../components/Btn';
 import Badge from '../components/Badge';
 import { useClients, useProjects, useGoals } from '../hooks/useStore';
 import { STAGES, STAGE_LABELS, STAGE_BG, STAGE_TEXT, PROJECT_TYPES, TYPE_LABELS } from '../lib/constants';
-import { isOverdue, daysUntil, formatEur } from '../lib/utils';
+import { isOverdue, daysUntil, formatEur, formatDate } from '../lib/utils';
 
 import ProjectForm from '../forms/ProjectForm';
 import ClientForm from '../forms/ClientForm';
@@ -74,7 +74,7 @@ export default function Dashboard() {
   const incassato       = activeProjects.reduce((s, p) => s + (p.paidAmount ?? 0), 0);
   const fatturato       = activeProjects.reduce((s, p) => s + (p.price ?? 0), 0);
   const pipeline        = projects.filter(p => ['lead','onboarding'].includes(p.stage) && p.type !== 'retainer' && p.type !== 'premade').reduce((s, p) => s + (p.price ?? 0), 0);
-  const daIncassare     = activeProjects.reduce((s, p) => s + Math.max(0, (p.price ?? 0) - (p.paidAmount ?? 0)), 0);
+  const daIncassare     = activeProjects.filter(p => p.paymentStatus !== 'paid').reduce((s, p) => s + Math.max(0, (p.price ?? 0) - (p.paidAmount ?? 0)), 0);
   const mrr             = projects.filter(p => p.type === 'retainer' && p.stage !== 'completed').reduce((s, p) => s + (p.retainerFee ?? 0), 0);
   const premadeRev      = projects.filter(p => p.type === 'premade').reduce((s, p) => s + ((p.price ?? 0) * (p.salesCount ?? 0)), 0);
   const goalPct         = goals.monthly > 0 ? Math.min(100, Math.round(((incassato + mrr + premadeRev) / goals.monthly) * 100)) : 0;
@@ -95,6 +95,22 @@ export default function Dashboard() {
     return isOverdue(p.deadline) || (days !== null && days <= 3);
   });
 
+  // ── Deadline alerts ─────────────────────────────────────────────────────────
+  const deadlineAlerts = active
+    .filter(p => p.deadline)
+    .map(p => {
+      const days = daysUntil(p.deadline);
+      const overdue = isOverdue(p.deadline);
+      let severity = null;
+      if (overdue) severity = 'overdue';
+      else if (days !== null && days <= 3) severity = 'urgent';
+      else if (days !== null && days <= 7) severity = 'warning';
+      return severity ? { ...p, days, overdue, severity } : null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => (a.days ?? -Infinity) - (b.days ?? -Infinity));
+
+  const overdue         = active.filter(p => p.deadline && isOverdue(p.deadline) && !['completed','delivered','archived'].includes(p.stage));
   const waiting         = active.filter(p => p.stage === 'waiting');
   const withNextAction  = active.filter(p => p.nextAction?.trim() && !p.isPaused);
 
@@ -143,6 +159,67 @@ export default function Dashboard() {
           </Btn>
         </div>
       </div>
+
+      {/* ── Deadline alerts ── */}
+      {deadlineAlerts.length > 0 && (
+        <div className="glass rounded-lg shadow-card p-4 sm:p-5 mb-6 sm:mb-8 border border-burgundy/30">
+          <div className="flex items-center gap-2 mb-3">
+            <CalendarClock size={18} className="text-burgundy" />
+            <h2 className="font-display text-sm font-semibold text-ink">
+              Progetti in scadenza
+            </h2>
+            <Badge
+              label={`${deadlineAlerts.length}`}
+              bg="rgba(123,31,36,0.25)"
+              color="#f5a0a3"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            {deadlineAlerts.map(p => {
+              const severityConfig = {
+                overdue: {
+                  bg:    'rgba(180,50,50,0.18)',
+                  text:  '#f5a0a3',
+                  label: `Scaduto da ${Math.abs(p.days)} ${Math.abs(p.days) === 1 ? 'giorno' : 'giorni'}`,
+                },
+                urgent: {
+                  bg:    'rgba(180,50,50,0.18)',
+                  text:  '#f5a0a3',
+                  label: p.days === 0 ? 'Scade oggi' : `${p.days} ${p.days === 1 ? 'giorno' : 'giorni'} rimasti`,
+                },
+                warning: {
+                  bg:    'rgba(194,160,40,0.18)',
+                  text:  '#f5e0a0',
+                  label: `${p.days} giorni rimasti`,
+                },
+              };
+              const cfg = severityConfig[p.severity];
+
+              return (
+                <Link
+                  key={p.id}
+                  to={`/projects/${p.id}`}
+                  className="flex items-center gap-3 p-2.5 rounded-md border border-white/10 bg-white/5 hover:border-burgundy-muted transition-colors group"
+                >
+                  {p.severity === 'overdue' && (
+                    <AlertCircle size={16} className="shrink-0" style={{ color: cfg.text }} />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-ink truncate group-hover:text-burgundy-muted transition-colors">
+                      {p.title}
+                    </p>
+                    <p className="text-[11px] text-muted truncate">
+                      {clientName(p.clientId) || 'Nessun cliente'} &middot; {formatDate(p.deadline)}
+                    </p>
+                  </div>
+                  <Badge label={cfg.label} bg={cfg.bg} color={cfg.text} />
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── Finance widget ── */}
       <div className="glass rounded-lg shadow-card p-4 sm:p-5 mb-6 sm:mb-8">
@@ -201,10 +278,10 @@ export default function Dashboard() {
       </div>
 
       {/* ── Type filter ── */}
-      <div className="flex items-center gap-1 sm:gap-2 mb-5 sm:mb-6 overflow-x-auto pb-1">
+      <div className="flex items-center gap-1 sm:gap-2 mb-5 sm:mb-6 overflow-x-auto pb-1 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
         <button
           onClick={() => setTypeFilter('all')}
-          className={`px-2 sm:px-3 py-1.5 text-xs font-mono rounded border transition-colors whitespace-nowrap ${
+          className={`px-3 py-2 sm:py-1.5 text-xs font-mono rounded border transition-colors whitespace-nowrap min-h-[44px] sm:min-h-0 ${
             typeFilter === 'all'
               ? 'bg-burgundy text-white border-burgundy'
               : 'bg-white/8 text-muted border-white/15 hover:border-white/30 hover:text-ink'
@@ -216,7 +293,7 @@ export default function Dashboard() {
           <button
             key={t}
             onClick={() => setTypeFilter(t)}
-            className={`px-2 sm:px-3 py-1.5 text-xs font-mono rounded border transition-colors whitespace-nowrap ${
+            className={`px-3 py-2 sm:py-1.5 text-xs font-mono rounded border transition-colors whitespace-nowrap min-h-[44px] sm:min-h-0 ${
               typeFilter === t
                 ? 'bg-burgundy text-white border-burgundy'
                 : 'bg-white/8 text-muted border-white/15 hover:border-white/30 hover:text-ink'
@@ -227,14 +304,69 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* ── 3 Info panels ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+      {/* ── Quick stats row ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="glass rounded-lg p-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(180,50,50,0.18)' }}>
+            <AlertCircle size={18} className="text-burgundy" />
+          </div>
+          <div>
+            <p className="label-meta mb-0.5">Da incassare</p>
+            <p className={`text-lg font-display font-semibold ${daIncassare > 0 ? 'text-burgundy' : 'text-ink'}`}>
+              {formatEur(daIncassare)}
+            </p>
+          </div>
+        </div>
+
+        <div className="glass rounded-lg p-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(194,130,40,0.18)' }}>
+            <CalendarClock size={18} style={{ color: '#f5c563' }} />
+          </div>
+          <div>
+            <p className="label-meta mb-0.5">Progetti in ritardo</p>
+            <p className={`text-lg font-display font-semibold ${overdue.length > 0 ? 'text-[#f5c563]' : 'text-ink'}`}>
+              {overdue.length}
+            </p>
+          </div>
+        </div>
+
+        <div className="glass rounded-lg p-4 flex items-center gap-3 col-span-2 sm:col-span-1">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(56,120,220,0.18)' }}>
+            <Zap size={18} style={{ color: '#7bb3ff' }} />
+          </div>
+          <div>
+            <p className="label-meta mb-0.5">Azioni pendenti</p>
+            <p className="text-lg font-display font-semibold text-ink">{withNextAction.length}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Info panels ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
         <Panel title="Urgenti" count={urgent.length || undefined} action={<AlertCircle size={16} className="text-burgundy" />}>
           {urgent.length === 0 ? (
             <p className="text-xs text-subtle">Nessun progetto urgente.</p>
           ) : (
             <div className="flex flex-col gap-2">
               {urgent.map(p => <ProjectCard key={p.id} project={p} clientName={clientName(p.clientId)} compact />)}
+            </div>
+          )}
+        </Panel>
+
+        <Panel title="In ritardo" count={overdue.length || undefined} action={<CalendarClock size={16} style={{ color: '#f5c563' }} />}>
+          {overdue.length === 0 ? (
+            <p className="text-xs text-subtle">Nessun progetto in ritardo.</p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {overdue.map(p => (
+                <Link key={p.id} to={`/projects/${p.id}`} className="block p-2 rounded border border-white/10 bg-white/5 hover:border-burgundy-muted transition-colors">
+                  <p className="text-xs font-medium text-ink mb-0.5 line-clamp-1">{p.title}</p>
+                  <p className="text-[11px] text-muted">
+                    {clientName(p.clientId) && <span className="text-subtle">{clientName(p.clientId)} · </span>}
+                    Scadenza: {formatDate(p.deadline)}
+                  </p>
+                </Link>
+              ))}
             </div>
           )}
         </Panel>
@@ -254,10 +386,11 @@ export default function Dashboard() {
             <p className="text-xs text-subtle">Nessuna azione definita.</p>
           ) : (
             <div className="flex flex-col gap-2">
-              {withNextAction.slice(0, 4).map(p => (
+              {withNextAction.slice(0, 5).map(p => (
                 <Link key={p.id} to={`/projects/${p.id}`} className="block p-2 rounded border border-white/10 bg-white/5 hover:border-burgundy-muted transition-colors">
                   <p className="text-xs font-medium text-ink mb-0.5 line-clamp-1">{p.title}</p>
-                  <p className="text-xs text-muted line-clamp-2">→ {p.nextAction}</p>
+                  {clientName(p.clientId) && <p className="text-[11px] text-subtle mb-0.5">{clientName(p.clientId)}</p>}
+                  <p className="text-xs text-muted line-clamp-2">{p.nextAction}</p>
                 </Link>
               ))}
             </div>
@@ -283,7 +416,7 @@ export default function Dashboard() {
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
-            <div className="overflow-x-auto pb-2">
+            <div className="overflow-x-auto pb-2 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
               <div className="flex gap-3 sm:gap-4 min-w-max">
                 {STAGES.map(stage => {
                   const col = projectsForStage(stage);
