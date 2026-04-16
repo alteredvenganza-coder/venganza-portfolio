@@ -50,6 +50,7 @@ function projectFromDb(row) {
     brief:         row.brief        ?? {},
     coverImage:    row.cover_image  ?? null,
     completedAt:   row.completed_at ?? null,
+    activity:      row.activity     ?? [],
     createdAt:     row.created_at,
   };
 }
@@ -77,6 +78,7 @@ function projectToDb(p) {
   if ('brief'         in p) row.brief          = p.brief  ?? {};
   if ('coverImage'    in p) row.cover_image    = p.coverImage  ?? null;
   if ('completedAt'   in p) row.completed_at  = p.completedAt ?? null;
+  if ('activity'      in p) row.activity      = p.activity    ?? [];
   return row;
 }
 

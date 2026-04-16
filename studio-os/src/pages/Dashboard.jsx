@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, AlertCircle, Clock, Zap, CalendarClock } from 'lucide-react';
@@ -63,6 +63,11 @@ export default function Dashboard() {
   const { clients, addClient }              = useClients();
   const { projects, addProject, updateProject } = useProjects();
   const { goals }                           = useGoals();
+
+  /** Block mouse-wheel horizontal scroll on desktop */
+  const blockWheelScroll = useCallback((e) => {
+    if (window.matchMedia('(pointer: fine)').matches) e.preventDefault();
+  }, []);
 
   const [typeFilter, setTypeFilter]         = useState('all');
   const [showAddProject, setShowAddProject] = useState(false);
@@ -278,7 +283,7 @@ export default function Dashboard() {
       </div>
 
       {/* ── Type filter ── */}
-      <div className="flex items-center gap-1 sm:gap-2 mb-5 sm:mb-6 overflow-x-auto pb-1 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+      <div className="flex items-center gap-1 sm:gap-2 mb-5 sm:mb-6 overflow-x-auto pb-1 scrollbar-hide hscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }} onWheel={blockWheelScroll}>
         <button
           onClick={() => setTypeFilter('all')}
           className={`px-3 py-2 sm:py-1.5 text-xs font-mono rounded border transition-colors whitespace-nowrap min-h-[44px] sm:min-h-0 ${
@@ -416,7 +421,7 @@ export default function Dashboard() {
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
-            <div className="overflow-x-auto pb-2 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="overflow-x-auto pb-2 scrollbar-hide hscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }} onWheel={blockWheelScroll}>
               <div className="flex gap-3 sm:gap-4 min-w-max">
                 {STAGES.map(stage => {
                   const col = projectsForStage(stage);

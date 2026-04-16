@@ -12,6 +12,7 @@ import Field from '../components/Field';
 import Modal from '../components/Modal';
 import BriefSection from '../components/BriefSection';
 import DeliverySection from '../components/DeliverySection';
+import ActivitySection from '../components/ActivitySection';
 import ProjectForm from '../forms/ProjectForm';
 import { uploadProjectFile } from '../lib/db';
 import CompletionSection from '../components/CompletionSection';
@@ -526,6 +527,11 @@ export default function ProjectDetail() {
           onUpdate={(brief) => updateProject(id, { brief })}
           onProjectUpdate={(patch) => updateProject(id, patch)}
         />
+      </div>
+
+      {/* ── Attivita ── */}
+      <div className="mt-3">
+        <ActivitySection activity={project.activity ?? []} />
       </div>
 
       {/* ── Consegna ── */}

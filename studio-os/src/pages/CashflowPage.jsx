@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Plus, RefreshCw, ChevronLeft, ChevronRight, Trash2, Wallet, TrendingUp, TrendingDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Btn from '../components/Btn';
@@ -105,6 +105,11 @@ function CategoryBadge({ cat }) {
 export default function CashflowPage() {
   const { user } = useStore();
   const today    = new Date();
+
+  /** Block mouse-wheel horizontal scroll on desktop */
+  const blockWheelScroll = useCallback((e) => {
+    if (window.matchMedia('(pointer: fine)').matches) e.preventDefault();
+  }, []);
 
   const [entries,     setEntries]     = useState([]);
   const [loading,     setLoading]     = useState(true);
@@ -289,7 +294,7 @@ export default function CashflowPage() {
           </button>
         </div>
 
-        <div className="flex gap-2 sm:ml-auto overflow-x-auto scrollbar-hide">
+        <div className="flex gap-2 sm:ml-auto overflow-x-auto scrollbar-hide hscroll-contain" onWheel={blockWheelScroll}>
           {[
             { label: 'Entrate', value: entrate, color: 'text-green-400', icon: TrendingUp },
             { label: 'Uscite',  value: uscite,  color: 'text-red-400',   icon: TrendingDown },

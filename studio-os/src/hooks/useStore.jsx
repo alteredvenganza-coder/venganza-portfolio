@@ -3,6 +3,42 @@ import { genId } from '../lib/utils';
 import * as db from '../lib/db';
 import { useAuth } from './useAuth';
 import { fireWebhook } from '../lib/webhook';
+import { STAGE_LABELS, PAYMENT_LABELS } from '../lib/constants';
+
+// ── Activity log helpers ─────────────────────────────────────────────────────
+
+function logEntry(type, text) {
+  return { id: genId(), type, text, timestamp: new Date().toISOString() };
+}
+
+/** Compare current project with incoming patch and return activity entries */
+function detectActivities(current, patch) {
+  const entries = [];
+
+  // Stage change
+  if (patch.stage && patch.stage !== current.stage) {
+    const from = STAGE_LABELS[current.stage] ?? current.stage;
+    const to   = STAGE_LABELS[patch.stage]   ?? patch.stage;
+    entries.push(logEntry('stage_change', `Stage cambiato da ${from} a ${to}`));
+  }
+
+  // Payment status change
+  if (patch.paymentStatus && patch.paymentStatus !== current.paymentStatus) {
+    const label = PAYMENT_LABELS[patch.paymentStatus] ?? patch.paymentStatus;
+    entries.push(logEntry('payment_change', `Pagamento aggiornato: ${label}`));
+  }
+
+  // Paused / resumed
+  if ('isPaused' in patch) {
+    if (patch.isPaused && !current.isPaused) {
+      entries.push(logEntry('paused', 'Progetto messo in pausa'));
+    } else if (!patch.isPaused && current.isPaused) {
+      entries.push(logEntry('resumed', 'Progetto ripreso'));
+    }
+  }
+
+  return entries;
+}
 
 const GOALS_KEY      = 'venganza-goals';
 const GOALS_DEFAULTS = { monthly: 10000, yearly: 120000, byType: {}, appBackground: null };
@@ -111,6 +147,12 @@ export function useProjects() {
     if (patch.stage && closedStages.includes(patch.stage) && !current?.completedAt) {
       patch = { ...patch, completedAt: new Date().toISOString() };
     }
+    // Auto-log activity
+    const newEntries = detectActivities(current, patch);
+    if (newEntries.length > 0) {
+      const prev = current.activity ?? [];
+      patch = { ...patch, activity: [...prev, ...newEntries] };
+    }
     const merged  = { ...current, ...patch };
     setProjects(prev => prev.map(p => p.id === id ? merged : p)); // optimistic
     try {
@@ -137,16 +179,25 @@ export function useProjects() {
   }
 
   async function addTask(projectId, text) {
-    const project = projects.find(p => p.id === projectId);
-    const tasks   = [...(project.tasks ?? []), { id: genId(), text, done: false }];
-    await updateProject(projectId, { tasks });
+    const project  = projects.find(p => p.id === projectId);
+    const tasks    = [...(project.tasks ?? []), { id: genId(), text, done: false }];
+    const entry    = logEntry('task_added', `Task aggiunto: ${text}`);
+    const activity = [...(project.activity ?? []), entry];
+    await updateProject(projectId, { tasks, activity });
     fireWebhook({ event: 'task_added', project: project.title, task: text });
   }
 
   async function toggleTask(projectId, taskId) {
     const project = projects.find(p => p.id === projectId);
+    const task    = project.tasks.find(t => t.id === taskId);
     const tasks   = project.tasks.map(t => t.id === taskId ? { ...t, done: !t.done } : t);
-    await updateProject(projectId, { tasks });
+    // Log only when marking as completed (not when un-completing)
+    const extras  = {};
+    if (task && !task.done) {
+      const entry = logEntry('task_completed', `Task completato: ${task.text}`);
+      extras.activity = [...(project.activity ?? []), entry];
+    }
+    await updateProject(projectId, { tasks, ...extras });
   }
 
   async function deleteTask(projectId, taskId) {

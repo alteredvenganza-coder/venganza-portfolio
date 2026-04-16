@@ -3,6 +3,7 @@ import { Component } from 'react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { StoreProvider, useStore } from './hooks/useStore';
 import { supabaseConfigured } from './lib/supabase';
+import { I18nProvider } from './lib/i18n';
 
 // ── Error boundary ─────────────────────────────────────────────────────────────
 class ErrorBoundary extends Component {
@@ -33,6 +34,7 @@ import LoginPage from './pages/LoginPage';
 import DeliveryPage from './pages/DeliveryPage';
 import TransferPage from './pages/TransferPage';
 import SendFilePage from './pages/SendFilePage';
+import CalendarPage from './pages/CalendarPage';
 
 // ── Loading screen ─────────────────────────────────────────────────────────────
 function Spinner() {
@@ -57,6 +59,7 @@ function AppContent() {
         <Route path="/projects/:id"  element={<ProjectDetail />} />
         <Route path="/pricing"       element={<PricingMemoryPage />} />
         <Route path="/cashflow"      element={<CashflowPage />} />
+        <Route path="/calendario"    element={<CalendarPage />} />
         <Route path="/send"          element={<SendFilePage />} />
         <Route path="*"              element={<Navigate to="/" replace />} />
       </Routes>
@@ -95,6 +98,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
+    <I18nProvider>
     <AuthProvider>
       <BrowserRouter>
         <Routes>
@@ -105,6 +109,7 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </I18nProvider>
     </ErrorBoundary>
   );
 }

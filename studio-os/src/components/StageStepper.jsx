@@ -1,11 +1,27 @@
+import { useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { STAGES, STAGE_LABELS, STAGE_BG, STAGE_TEXT } from '../lib/constants';
 
+/** Block mouse-wheel horizontal scroll on desktop (pointer:fine) */
+function useBlockWheelScroll() {
+  return useCallback((e) => {
+    // Only block on devices with a fine pointer (mouse/trackpad)
+    if (window.matchMedia('(pointer: fine)').matches) {
+      e.preventDefault();
+    }
+  }, []);
+}
+
 export default function StageStepper({ current, onChange, disabled = false }) {
   const currentIdx = STAGES.indexOf(current);
+  const onWheel = useBlockWheelScroll();
 
   return (
-    <div className="flex items-center gap-0 overflow-x-auto pb-1 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+    <div
+      className="flex items-center gap-0 overflow-x-auto pb-1 scrollbar-hide hscroll-contain snap-x-mandatory"
+      style={{ WebkitOverflowScrolling: 'touch' }}
+      onWheel={onWheel}
+    >
       {STAGES.map((stage, idx) => {
         const isActive  = stage === current;
         const isDone    = idx < currentIdx;

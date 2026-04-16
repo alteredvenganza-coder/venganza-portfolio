@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bell, BellOff, Webhook, Check, X, ExternalLink, Target, ImagePlus, Trash2, CreditCard } from 'lucide-react';
+import { Bell, BellOff, Webhook, Check, X, ExternalLink, Target, ImagePlus, Trash2, CreditCard, Globe } from 'lucide-react';
 
 const REVOLUT_KEY = 'revolut-api-token';
 import Modal from './Modal';
@@ -9,6 +9,7 @@ import GoalsSection from './GoalsSection';
 import { usePush } from '../hooks/usePush';
 import { useGoals } from '../hooks/useStore';
 import { getWebhookUrl, saveWebhookUrl } from '../lib/webhook';
+import { useI18n } from '../lib/i18n';
 
 const TABS = [
   { id: 'settings', label: 'Impostazioni' },
@@ -16,6 +17,7 @@ const TABS = [
 ];
 
 export default function SettingsModal({ open, onClose }) {
+  const { t, lang, setLang } = useI18n();
   const { status, subscribe, unsubscribe, supported } = usePush();
   const { goals, updateGoals } = useGoals();
   const [webhookUrl,      setWebhookUrl]      = useState('');
@@ -91,6 +93,38 @@ export default function SettingsModal({ open, onClose }) {
       {/* ── Tab: Impostazioni ── */}
       {activeTab === 'settings' && (
         <div className="flex flex-col gap-6">
+
+          {/* Language toggle */}
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Globe size={14} className="text-burgundy" />
+              <p className="text-sm font-semibold text-ink">{t('label.language')}</p>
+            </div>
+            <div className="flex items-center gap-1 mt-2 p-1 bg-white/5 rounded-lg border border-white/10 w-fit">
+              <button
+                onClick={() => setLang('IT')}
+                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                  lang === 'IT'
+                    ? 'bg-burgundy text-white'
+                    : 'text-muted hover:text-ink hover:bg-white/8'
+                }`}
+              >
+                IT
+              </button>
+              <button
+                onClick={() => setLang('EN')}
+                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                  lang === 'EN'
+                    ? 'bg-burgundy text-white'
+                    : 'text-muted hover:text-ink hover:bg-white/8'
+                }`}
+              >
+                EN
+              </button>
+            </div>
+          </div>
+
+          <hr className="border-white/10" />
 
           {/* Push Notifications */}
           <div>

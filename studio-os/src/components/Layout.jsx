@@ -1,21 +1,24 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings, FolderKanban, Send } from 'lucide-react';
+import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings, FolderKanban, Send, CalendarDays } from 'lucide-react';
 import { useClients, useProjects, useGoals } from '../hooks/useStore';
+import { useI18n } from '../lib/i18n';
 import SettingsModal from './SettingsModal';
 
 const NAV = [
-  { to: '/',          label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/clients',   label: 'Clienti',   icon: Users },
-  { to: '/pricing',   label: 'Prezzi',    icon: TrendingUp },
-  { to: '/cashflow',  label: 'Finanze',   icon: Wallet },
-  { to: '/send',      label: 'Invia File', icon: Send },
+  { to: '/',           i18nKey: 'nav.dashboard',  icon: LayoutDashboard, end: true },
+  { to: '/clients',    i18nKey: 'nav.clients',    icon: Users },
+  { to: '/pricing',    i18nKey: 'nav.pricing',    icon: TrendingUp },
+  { to: '/cashflow',   i18nKey: 'nav.cashflow',   icon: Wallet },
+  { to: '/calendario', i18nKey: 'nav.calendar',   icon: CalendarDays },
+  { to: '/send',       i18nKey: 'nav.sendFile',   icon: Send },
 ];
 
 export default function Layout({ children }) {
   const { clients }  = useClients();
   const { projects } = useProjects();
   const { goals }    = useGoals();
+  const { t }        = useI18n();
   const navigate     = useNavigate();
 
   const [query, setQuery]       = useState('');
@@ -101,7 +104,7 @@ export default function Layout({ children }) {
 
           {/* Nav */}
           <nav className="flex items-center gap-0.5 sm:gap-1">
-            {NAV.map(({ to, label, icon: Icon, end }) => (
+            {NAV.map(({ to, i18nKey, icon: Icon, end }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -115,7 +118,7 @@ export default function Layout({ children }) {
                 }
               >
                 <Icon size={14} />
-                <span className="hidden sm:inline">{label}</span>
+                <span className="hidden sm:inline">{t(i18nKey)}</span>
               </NavLink>
             ))}
           </nav>
@@ -126,7 +129,7 @@ export default function Layout({ children }) {
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-subtle pointer-events-none" />
               <input
                 type="text"
-                placeholder="Cerca clienti, progetti…"
+                placeholder={t('search.placeholder')}
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onFocus={() => setFocused(true)}
@@ -147,12 +150,12 @@ export default function Layout({ children }) {
             {focused && q && (
               <div className="absolute top-full mt-1 w-full glass-strong rounded-lg overflow-hidden z-50 max-h-72 overflow-y-auto">
                 {!hasResults && (
-                  <p className="px-4 py-3 text-xs text-subtle">Nessun risultato per &ldquo;{q}&rdquo;</p>
+                  <p className="px-4 py-3 text-xs text-subtle">{t('empty.noResults')} &ldquo;{q}&rdquo;</p>
                 )}
 
                 {resultClients.length > 0 && (
                   <div>
-                    <p className="label-meta px-4 pt-3 pb-1">Clienti</p>
+                    <p className="label-meta px-4 pt-3 pb-1">{t('search.clients')}</p>
                     {resultClients.slice(0, 5).map(c => (
                       <button
                         key={c.id}
@@ -169,7 +172,7 @@ export default function Layout({ children }) {
 
                 {resultProjects.length > 0 && (
                   <div>
-                    <p className="label-meta px-4 pt-3 pb-1">Progetti</p>
+                    <p className="label-meta px-4 pt-3 pb-1">{t('search.projects')}</p>
                     {resultProjects.slice(0, 5).map(p => (
                       <button
                         key={p.id}
@@ -190,7 +193,7 @@ export default function Layout({ children }) {
           <button
             onClick={() => setSettings(true)}
             className="shrink-0 p-2.5 sm:p-1.5 rounded text-muted hover:text-ink hover:bg-white/8 transition-colors min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
-            title="Impostazioni"
+            title={t('label.settings')}
           >
             <Settings size={16} />
           </button>

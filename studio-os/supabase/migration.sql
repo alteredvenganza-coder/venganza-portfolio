@@ -139,6 +139,10 @@ alter table public.deliveries
 alter table public.projects
   add column if not exists completed_at timestamptz;
 
+-- ── Activity log per progetto ────────────────────────────────
+alter table public.projects
+  add column if not exists activity jsonb default '[]';
+
 -- ── Cashflow: entrate e uscite (business + personali) ─────────
 create table if not exists public.cashflow_entries (
   id           uuid primary key default gen_random_uuid(),

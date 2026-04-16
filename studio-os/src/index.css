@@ -70,6 +70,29 @@
     display: none;
   }
 
+  /* ── Horizontal scroll containment ─────────────────────────────────────
+     Prevents mouse-wheel horizontal scroll from hijacking the page on
+     desktop while preserving touch-swipe on mobile.
+     ──────────────────────────────────────────────────────────────────── */
+  .hscroll-contain {
+    overscroll-behavior-x: contain;
+  }
+  @media (pointer: fine) {
+    /* Desktop (mouse / trackpad) — block wheel-initiated horizontal scroll */
+    .hscroll-contain {
+      overflow-x: auto;
+      /* Let JS onWheel handler do the blocking; CSS just contains overscroll */
+    }
+  }
+
+  /* ── Scroll-snap for step-style rows ─────────────────────────────────── */
+  .snap-x-mandatory {
+    scroll-snap-type: x mandatory;
+  }
+  .snap-x-mandatory > * {
+    scroll-snap-align: start;
+  }
+
   /* ── Glassmorphism card ─────────────────────────────────────────────────── */
   .glass {
     background: rgba(255,255,255,0.07);
