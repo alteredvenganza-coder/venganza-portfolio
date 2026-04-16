@@ -195,3 +195,66 @@ create policy "Owner calendar tasks"
 alter table public.calendar_tasks
   add column if not exists client_id  uuid references public.clients(id)  on delete set null,
   add column if not exists project_id uuid references public.projects(id) on delete set null;
+
+-- ── Canvas tables ─────────────────────────────────────────────
+
+create table if not exists public.canvases (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users not null,
+  client_id uuid references public.clients(id) on delete cascade,
+  name text not null default 'Untitled Canvas',
+  template text,
+  thumbnail text,
+  pan_x int default 0,
+  pan_y int default 0,
+  zoom numeric default 1,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists public.canvas_cards (
+  id uuid primary key default gen_random_uuid(),
+  canvas_id uuid references public.canvases(id) on delete cascade not null,
+  type text not null,
+  x int not null,
+  y int not null,
+  w int default 230,
+  h int,
+  data jsonb default '{}'::jsonb,
+  ref_id uuid,
+  z_index int default 0,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.canvas_connections (
+  id uuid primary key default gen_random_uuid(),
+  canvas_id uuid references public.canvases(id) on delete cascade not null,
+  from_card uuid references public.canvas_cards(id) on delete cascade not null,
+  to_card uuid references public.canvas_cards(id) on delete cascade not null
+);
+
+create index if not exists canvases_user_idx        on public.canvases(user_id);
+create index if not exists canvases_client_idx      on public.canvases(client_id);
+create index if not exists canvas_cards_canvas_idx  on public.canvas_cards(canvas_id);
+create index if not exists canvas_connections_canvas_idx on public.canvas_connections(canvas_id);
+
+alter table public.canvases            enable row level security;
+alter table public.canvas_cards        enable row level security;
+alter table public.canvas_connections  enable row level security;
+
+create policy "canvases_owner" on public.canvases
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+create policy "canvas_cards_via_canvas" on public.canvas_cards
+  for all using (
+    exists (select 1 from public.canvases c where c.id = canvas_id and c.user_id = auth.uid())
+  ) with check (
+    exists (select 1 from public.canvases c where c.id = canvas_id and c.user_id = auth.uid())
+  );
+
+create policy "canvas_connections_via_canvas" on public.canvas_connections
+  for all using (
+    exists (select 1 from public.canvases c where c.id = canvas_id and c.user_id = auth.uid())
+  ) with check (
+    exists (select 1 from public.canvases c where c.id = canvas_id and c.user_id = auth.uid())
+  );
