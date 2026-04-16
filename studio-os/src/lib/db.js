@@ -166,6 +166,8 @@ function calTaskFromDb(row) {
     color:           row.color,
     isDone:          row.is_done,
     reminderMinutes: row.reminder_minutes,
+    clientId:        row.client_id ?? null,
+    projectId:       row.project_id ?? null,
     createdAt:       row.created_at,
   };
 }
@@ -180,6 +182,8 @@ function calTaskToDb(t) {
   if ('color'           in t) row.color            = t.color;
   if ('isDone'          in t) row.is_done          = t.isDone;
   if ('reminderMinutes' in t) row.reminder_minutes = t.reminderMinutes ?? null;
+  if ('clientId'        in t) row.client_id        = t.clientId || null;
+  if ('projectId'       in t) row.project_id       = t.projectId || null;
   return row;
 }
 
@@ -214,6 +218,16 @@ export async function patchCalendarTask(id, patch) {
 export async function removeCalendarTask(id) {
   const { error } = await supabase.from('calendar_tasks').delete().eq('id', id);
   if (error) throw error;
+}
+
+export async function fetchCalendarTasksByClient(clientId) {
+  const { data, error } = await supabase
+    .from('calendar_tasks')
+    .select('*')
+    .eq('client_id', clientId)
+    .order('date', { ascending: false });
+  if (error) throw error;
+  return data.map(calTaskFromDb);
 }
 
 // ── Storage — project files ───────────────────────────────────────────────────
