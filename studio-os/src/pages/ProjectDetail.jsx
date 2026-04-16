@@ -17,7 +17,7 @@ import ProjectForm from '../forms/ProjectForm';
 import { uploadProjectFile } from '../lib/db';
 import CompletionSection from '../components/CompletionSection';
 import EmailButton from '../components/EmailButton';
-import { useClients, useProjects } from '../hooks/useStore';
+import { useClients, useProjects, useCanvases } from '../hooks/useStore';
 import {
   STAGE_LABELS, STAGE_BG, STAGE_TEXT,
   TYPE_LABELS, TYPE_BG, TYPE_TEXT,
@@ -33,6 +33,17 @@ export default function ProjectDetail() {
 
   const { getClient, clients }                                           = useClients();
   const { getProject, updateProject, deleteProject, addTask, toggleTask, deleteTask } = useProjects();
+  const { getCanvasesByClient, addCanvas } = useCanvases();
+
+  async function openCanvas() {
+    if (!project?.clientId) return alert('Progetto senza cliente — assegnane uno per usare il canvas.');
+    const existing = getCanvasesByClient(project.clientId);
+    let target = existing[0];
+    if (!target) {
+      target = await addCanvas({ name: project.title + ' — Canvas', clientId: project.clientId });
+    }
+    navigate(`/clients/${project.clientId}/canvas/${target.id}`);
+  }
 
   const project = getProject(id);
   const client  = project ? getClient(project.clientId) : null;
@@ -239,6 +250,10 @@ export default function ProjectDetail() {
                 {client?.email && (
                   <EmailButton client={client} project={project} />
                 )}
+                <button onClick={openCanvas}
+                  className="text-xs px-3 py-1.5 rounded-md border border-ink/15 hover:bg-ink/5">
+                  Apri Canvas
+                </button>
                 <Btn variant="secondary" size="sm" onClick={() => setEditOpen(true)}>
                   <Edit2 size={13} /> <span className="hidden sm:inline">Modifica</span>
                 </Btn>
