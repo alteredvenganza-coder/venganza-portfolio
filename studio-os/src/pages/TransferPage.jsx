@@ -32,6 +32,27 @@ export default function TransferPage() {
   const [error, setError]       = useState(null);
   const [loading, setLoading]   = useState(true);
   const [bgIdx, setBgIdx]       = useState(0);
+  const [downloading, setDownloading] = useState(null);
+
+  async function handleDownload(file) {
+    setDownloading(file.name);
+    try {
+      const res  = await fetch(file.url);
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      window.open(file.url, '_blank');
+    } finally {
+      setDownloading(null);
+    }
+  }
 
   useEffect(() => {
     if (!token) { setError('Link non valido.'); setLoading(false); return; }
@@ -284,32 +305,31 @@ export default function TransferPage() {
                       </p>
                     )}
                   </div>
-                  <a
-                    href={file.url}
-                    download={file.name}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    onClick={() => handleDownload(file)}
+                    disabled={downloading === file.name}
                     style={{
                       display:        'inline-flex',
                       alignItems:     'center',
                       gap:            6,
                       padding:        '8px 16px',
-                      background:     '#7b1f24',
+                      background:     downloading === file.name ? '#5a1519' : '#7b1f24',
                       color:          '#fff',
                       borderRadius:   6,
                       fontSize:       13,
                       fontWeight:     600,
-                      textDecoration: 'none',
+                      border:         'none',
+                      cursor:         downloading === file.name ? 'wait' : 'pointer',
                       flexShrink:     0,
                       fontFamily:     'sans-serif',
                       transition:     'background 0.2s',
                     }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#942529'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#7b1f24'}
+                    onMouseEnter={e => { if (!downloading) e.currentTarget.style.background = '#942529'; }}
+                    onMouseLeave={e => { if (!downloading) e.currentTarget.style.background = '#7b1f24'; }}
                   >
                     <Download size={13} />
-                    Scarica
-                  </a>
+                    {downloading === file.name ? 'Scaricando…' : 'Scarica'}
+                  </button>
                 </div>
               ))}
             </div>
