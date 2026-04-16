@@ -10,7 +10,7 @@ import SideNav from './SideNav';
 const NAV = [
   { to: '/',           i18nKey: 'nav.dashboard',  icon: LayoutDashboard, end: true },
   { to: '/clients',    i18nKey: 'nav.clients',    icon: Users },
-  { to: '/canvas/new', label: 'Canvas',           icon: LayoutGrid },
+  { to: '/canvas-home', label: 'Canvas',          icon: LayoutGrid },
   { to: '/pricing',    i18nKey: 'nav.pricing',    icon: TrendingUp },
   { to: '/cashflow',   i18nKey: 'nav.cashflow',   icon: Wallet },
   { to: '/calendario', i18nKey: 'nav.calendar',   icon: CalendarDays },
