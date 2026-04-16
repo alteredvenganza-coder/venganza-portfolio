@@ -28,7 +28,7 @@ import Layout from './components/Layout';
 import GuestLayout from './components/GuestLayout';
 import Dashboard from './pages/Dashboard';
 import ClientsPage from './pages/ClientsPage';
-import ClientDetail from './pages/ClientDetail';
+import ClientCanvasHub from './pages/ClientCanvasHub';
 import ProjectDetail from './pages/ProjectDetail';
 import PricingMemoryPage from './pages/PricingMemoryPage';
 import CashflowPage from './pages/CashflowPage';
@@ -79,7 +79,7 @@ function AdminContent() {
           <Routes>
             <Route path="/"              element={<Dashboard />} />
             <Route path="/clients"       element={<ClientsPage />} />
-            <Route path="/clients/:id"   element={<ClientDetail />} />
+            <Route path="/clients/:id"   element={<ClientCanvasHub />} />
             <Route path="/projects/:id"  element={<ProjectDetail />} />
             <Route path="/pricing"       element={<PricingMemoryPage />} />
             <Route path="/cashflow"      element={<CashflowPage />} />
