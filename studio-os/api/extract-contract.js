@@ -68,7 +68,7 @@ Se un campo non è presente nel documento, usa stringa vuota per stringhe o null
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-20250414',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
         messages: [{ role: 'user', content }],
       }),
