@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as db from '../lib/db';
+import { generateThumbnail } from '../lib/canvas-thumbnail';
 
 /**
  * Single-canvas hook. Loads canvas metadata + cards + connections by id,
@@ -16,6 +17,8 @@ export function useCanvas(canvasId) {
   const pendingCardPatches    = useRef(new Map());
   const pendingCanvasPatch    = useRef(null);
   const flushTimer            = useRef(null);
+  const thumbTimer            = useRef(null);
+  const cardsRef              = useRef([]);
 
   // ─── Load on mount / id change ─────────────────────────────────────────────
   useEffect(() => {
@@ -61,8 +64,25 @@ export function useCanvas(canvasId) {
     }, 300);
   }, [canvasId]);
 
+  // Keep a ref to current cards so the thumb timer reads fresh state.
+  useEffect(() => { cardsRef.current = cards; }, [cards]);
+
+  // ─── Thumbnail (debounced 2s) ─────────────────────────────────────────────
+  const scheduleThumb = useCallback(() => {
+    if (thumbTimer.current) clearTimeout(thumbTimer.current);
+    thumbTimer.current = setTimeout(() => {
+      thumbTimer.current = null;
+      const thumb = generateThumbnail(cardsRef.current);
+      if (!thumb) return;
+      setCanvas(prev => prev ? { ...prev, thumbnail: thumb } : prev);
+      pendingCanvasPatch.current = { ...(pendingCanvasPatch.current || {}), thumbnail: thumb };
+      scheduleFlush();
+    }, 2000);
+  }, [scheduleFlush]);
+
   // Flush on unmount
   useEffect(() => () => {
+    if (thumbTimer.current) { clearTimeout(thumbTimer.current); thumbTimer.current = null; }
     if (flushTimer.current) {
       clearTimeout(flushTimer.current);
       // Fire-and-forget final flush
@@ -80,6 +100,7 @@ export function useCanvas(canvasId) {
   async function addCard(partial) {
     const created = await db.insertCanvasCard(canvasId, partial);
     setCards(prev => [...prev, created]);
+    scheduleThumb();
     return created;
   }
 
@@ -88,6 +109,7 @@ export function useCanvas(canvasId) {
     const merged = { ...(pendingCardPatches.current.get(id) || {}), ...patch };
     pendingCardPatches.current.set(id, merged);
     scheduleFlush();
+    if ('x' in patch || 'y' in patch || 'w' in patch || 'h' in patch) scheduleThumb();
   }
 
   async function deleteCard(id) {
@@ -96,6 +118,7 @@ export function useCanvas(canvasId) {
     pendingCardPatches.current.delete(id);
     try { await db.removeCanvasCard(id); }
     catch (e) { console.error('[useCanvas] deleteCard failed', e); }
+    scheduleThumb();
   }
 
   // ─── Connection mutations ──────────────────────────────────────────────────
