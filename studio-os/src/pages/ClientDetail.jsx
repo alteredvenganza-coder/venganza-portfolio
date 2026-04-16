@@ -12,6 +12,11 @@ import * as db from '../lib/db';
 import { useClients, useProjects, useCalendarTasks } from '../hooks/useStore';
 import { formatDate, initials } from '../lib/utils';
 
+const DOT_COLORS = {
+  burgundy: '#c9888b', blue: '#7bb3ff', green: '#6dd49e',
+  yellow: '#f5e0a0', purple: '#c4a5ff',
+};
+
 export default function ClientDetail() {
   const { id }       = useParams();
   const navigate     = useNavigate();
@@ -185,11 +190,7 @@ export default function ClientDetail() {
         ) : (
           <div className="glass rounded-lg divide-y divide-border">
             {clientTasks.map(task => {
-              const TASK_COLORS = {
-                burgundy: '#c9888b', blue: '#7bb3ff', green: '#6dd49e',
-                yellow: '#f5e0a0', purple: '#c4a5ff',
-              };
-              const dotColor = TASK_COLORS[task.color] ?? TASK_COLORS.burgundy;
+              const dotColor = DOT_COLORS[task.color] ?? DOT_COLORS.burgundy;
               return (
                 <div key={task.id} className="flex items-center gap-3 px-4 py-3">
                   {/* Checkbox */}
@@ -226,7 +227,7 @@ export default function ClientDetail() {
 
                   {/* Date */}
                   <span className="text-[11px] font-mono text-subtle shrink-0">
-                    {task.date}
+                    {formatDate(task.date)}
                   </span>
                 </div>
               );

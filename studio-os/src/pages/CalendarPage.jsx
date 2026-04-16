@@ -485,7 +485,7 @@ export default function CalendarPage() {
                             key={t.id}
                             className={`flex items-center gap-1 truncate text-[9px] sm:text-[10px] font-mono leading-tight rounded px-1 py-px ${t.isDone ? 'line-through opacity-50' : ''}`}
                             style={{ backgroundColor: c.bg, color: c.text }}
-                            title={`${t.title}${(() => { const b = taskBadgeLabel(t, getClient, projects); return b ? ` — ${b}` : ''; })()}`}
+                            title={t.title + (taskBadgeLabel(t, getClient, projects) ? ` — ${taskBadgeLabel(t, getClient, projects)}` : '')}
                           >
                             <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: c.dot }} />
                             {t.title}
@@ -581,15 +581,12 @@ export default function CalendarPage() {
                                 </span>
                               )}
                             </div>
-                            {(() => {
-                              const badge = taskBadgeLabel(task, getClient, projects);
-                              return badge ? (
-                                <span className="text-[11px] text-zinc-500 truncate block mt-0.5">
-                                  <User size={10} className="inline mr-1 -mt-px" />
-                                  {badge}
-                                </span>
-                              ) : null;
-                            })()}
+                            {taskBadgeLabel(task, getClient, projects) && (
+                              <span className="text-[11px] text-zinc-500 truncate block mt-0.5">
+                                {task.clientId ? <User size={10} className="inline mr-1 -mt-px" /> : <Briefcase size={10} className="inline mr-1 -mt-px" />}
+                                {taskBadgeLabel(task, getClient, projects)}
+                              </span>
+                            )}
                             {task.description && (
                               <p className="text-[11px] text-subtle mt-1 line-clamp-2">{task.description}</p>
                             )}
