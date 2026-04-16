@@ -33,6 +33,7 @@ export default function CanvasView() {
 
   const { canvas, cards, connections, loading, updateCanvas, addCard, updateCard, deleteCard, addConnection } = useCanvas(resolvedId);
   const [tool, setTool] = useState('select');
+  const [selectedId, setSelectedId] = useState(null);
   const [connectFrom, setConnectFrom] = useState(null);
   const [showTemplates, setShowTemplates] = useState(false);
   const [addPopup, setAddPopup] = useState(null); // { x, y, refCard? }
@@ -46,11 +47,15 @@ export default function CanvasView() {
       if (e.key === 'v' || e.key === 'V') setTool('select');
       if (e.key === 'h' || e.key === 'H') setTool('pan');
       if (e.key === 'c' || e.key === 'C') setTool('connect');
-      if (e.key === 'Escape') setTool('select');
+      if (e.key === 'Escape') { setTool('select'); setSelectedId(null); setAddPopup(null); setCtxMenu(null); }
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
+        deleteCard(selectedId);
+        setSelectedId(null);
+      }
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [selectedId, deleteCard]);
 
   if (!resolvedId || loading) {
     return (
@@ -85,13 +90,14 @@ export default function CanvasView() {
         }}
         svgChildren={<Connections connections={connections} cards={cards} refresh={cards} />}
         onContextMenu={(cx, cy, wx, wy) => setCtxMenu({ x: cx, y: cy, worldX: wx, worldY: wy })}
+        onBackgroundClick={() => setSelectedId(null)}
       >
         {cards.map(c => renderCard(c, {
           ctx: {
             zoom: canvas?.zoom ?? 1,
-            selected: false,
+            selected: selectedId === c.id,
             tool,
-            onSelect: () => {},
+            onSelect: () => setSelectedId(c.id),
             onMove: (x, y) => updateCard(c.id, { x, y }),
             onMoveEnd: () => {},
             onResize: (w) => updateCard(c.id, { w }),
