@@ -5,6 +5,10 @@ const ITEMS = [
   { type: 'todo',    label: 'To-Do', icon: '✓' },
   { type: 'heading', label: 'Title', icon: 'T' },
   { type: 'link',    label: 'Link',  icon: '🔗' },
+  { type: 'budget',           label: 'Budget',  icon: '💰' },
+  { type: 'tasks',            label: 'Tasks',   icon: '✓' },
+  { type: 'files',            label: 'Files',   icon: '📎' },
+  { type: 'project-overview', label: 'Project', icon: '📋' },
 ];
 
 export default function AddPopup({ x, y, onPick, onClose }) {

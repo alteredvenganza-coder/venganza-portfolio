@@ -85,6 +85,10 @@ export default function CanvasView() {
             todo:    { data: { title: 'To-do', items: [] } },
             board:   { data: { title: 'Board', subCards: [] } },
             heading: { data: { title: 'NEW HEADING' } },
+            budget:             { data: {} },
+            tasks:              { data: { filter: 'open' } },
+            files:              { data: {} },
+            'project-overview': { data: {} },
           };
           addCard({ type, x: x - 110, y: y - 30, w: 230, ...(defaults[type] || {}) });
         }}
@@ -186,6 +190,10 @@ export default function CanvasView() {
             todo:    { data: { title: 'To-do', items: [] } },
             board:   { data: { title: 'Board', subCards: [] } },
             heading: { data: { title: 'NEW HEADING' } },
+            budget:             { data: {} },
+            tasks:              { data: { filter: 'open' } },
+            files:              { data: {} },
+            'project-overview': { data: {} },
           };
           addCard({ type, x, y, w: 230, ...(defaults[type] || {}) });
           setAddPopup(null);

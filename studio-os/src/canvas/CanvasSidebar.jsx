@@ -7,6 +7,13 @@ const ITEMS = [
   { type: 'heading', label: 'Title', icon: 'T' },
 ];
 
+const SMART_ITEMS = [
+  { type: 'budget',           label: 'Budget',  icon: '💰' },
+  { type: 'tasks',            label: 'Tasks',   icon: '✓' },
+  { type: 'files',            label: 'Files',   icon: '📎' },
+  { type: 'project-overview', label: 'Project', icon: '📋' },
+];
+
 export default function CanvasSidebar({ onHome, onTemplates }) {
   return (
     <div style={{
@@ -16,6 +23,10 @@ export default function CanvasSidebar({ onHome, onTemplates }) {
       padding: '10px 0', gap: 2, zIndex: 40,
     }}>
       {ITEMS.map(it => (
+        <SideBtn key={it.type} icon={it.icon} label={it.label} draggable type={it.type} />
+      ))}
+      <div style={{ width: 32, height: 1, background: 'var(--cv-border2)', margin: '6px 0' }} />
+      {SMART_ITEMS.map(it => (
         <SideBtn key={it.type} icon={it.icon} label={it.label} draggable type={it.type} />
       ))}
       <div style={{ width: 32, height: 1, background: 'var(--cv-border2)', margin: '6px 0' }} />
