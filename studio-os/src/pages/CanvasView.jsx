@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCanvas } from '../hooks/useCanvas';
 import { useCanvases } from '../hooks/useStore';
 import CanvasEngine from '../canvas/CanvasEngine';
+import { renderCard } from '../canvas/cards';
 
 export default function CanvasView() {
   const { canvasId, id: clientId } = useParams();
@@ -23,7 +24,7 @@ export default function CanvasView() {
       });
   }, [canvasId, clientId, addCanvas, navigate, resolvedId]);
 
-  const { canvas, cards, loading, updateCanvas } = useCanvas(resolvedId);
+  const { canvas, cards, loading, updateCanvas, addCard, updateCard, deleteCard } = useCanvas(resolvedId);
 
   if (!resolvedId || loading) {
     return (
@@ -41,19 +42,26 @@ export default function CanvasView() {
         zoom={canvas?.zoom ?? 1}
         onViewportChange={({ panX, panY, zoom }) => updateCanvas({ panX, panY, zoom })}
       >
-        {cards.map(c => (
-          <div key={c.id} style={{
-            position: 'absolute',
-            left: c.x, top: c.y, width: c.w,
-            background: 'var(--cv-white)',
-            border: '1px solid var(--cv-border)',
-            borderRadius: 8,
-            padding: 12,
-            fontSize: 12,
-          }}>
-            [{c.type}] {c.data?.title || c.id.slice(0,6)}
-          </div>
-        ))}
+        {cards.map(c => renderCard(c, {
+          ctx: {
+            zoom: canvas?.zoom ?? 1,
+            selected: false,
+            tool: 'select',
+            onSelect: () => {},
+            onMove: (x, y) => updateCard(c.id, { x, y }),
+            onMoveEnd: () => {},
+            onResize: (w) => updateCard(c.id, { w }),
+            onResizeEnd: () => {},
+            onDelete: () => deleteCard(c.id),
+            onDuplicate: () => addCard({
+              type: c.type, x: c.x + 20, y: c.y + 20, w: c.w, data: c.data,
+            }),
+            onConnectStart: () => {},
+            onConnectFinish: () => {},
+            onPlusClick: () => {},
+          },
+          onUpdate: (patch) => updateCard(c.id, patch),
+        }))}
       </CanvasEngine>
       {/* Top-left back button */}
       <button
@@ -65,6 +73,15 @@ export default function CanvasView() {
           fontSize:11, fontFamily:'DM Sans', cursor:'pointer',
         }}
       >← Indietro</button>
+      <button
+        onClick={() => addCard({ type: 'note', x: 3000, y: 3000, w: 230, data: { title: 'Note', text: '' } })}
+        style={{
+          position:'absolute', top:14, left:120, zIndex:50,
+          padding:'6px 12px', border:'1px solid var(--cv-border)',
+          borderRadius:6, background:'var(--cv-white)', color:'var(--cv-text)',
+          fontSize:11, fontFamily:'DM Sans', cursor:'pointer',
+        }}
+      >+ Note</button>
     </div>
   );
 }
