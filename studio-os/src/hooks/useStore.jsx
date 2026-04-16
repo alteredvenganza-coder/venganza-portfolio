@@ -52,6 +52,7 @@ export function StoreProvider({ children }) {
   const [clients,  setClients]  = useState([]);
   const [projects, setProjects] = useState([]);
   const [calendarTasks, setCalendarTasks] = useState([]);
+  const [canvases, setCanvases] = useState([]);
   const [loading,  setLoading]  = useState(true);
 
   const [goals, setGoals] = useState(() => {
@@ -86,12 +87,14 @@ export function StoreProvider({ children }) {
       db.fetchClients(user.id),
       db.fetchProjects(user.id),
       db.fetchCalendarTasks(user.id),
+      db.fetchCanvases(user.id),
       db.fetchAppBackground(user.id),
     ])
-      .then(([c, p, ct, bg]) => {
+      .then(([c, p, ct, cv, bg]) => {
         setClients(c);
         setProjects(p);
         setCalendarTasks(ct);
+        setCanvases(cv);
         // Override local appBackground with Supabase value (cross-device sync)
         if (bg !== undefined) {
           setGoals(prev => {
@@ -105,7 +108,7 @@ export function StoreProvider({ children }) {
   }, [user]);
 
   return (
-    <StoreContext.Provider value={{ clients, setClients, projects, setProjects, calendarTasks, setCalendarTasks, loading, user, goals, updateGoals }}>
+    <StoreContext.Provider value={{ clients, setClients, projects, setProjects, calendarTasks, setCalendarTasks, canvases, setCanvases, loading, user, goals, updateGoals }}>
       {children}
     </StoreContext.Provider>
   );
@@ -268,4 +271,46 @@ export function useCalendarTasks() {
   }
 
   return { calendarTasks, addCalendarTask, updateCalendarTask, deleteCalendarTask };
+}
+
+// ── Canvases ──────────────────────────────────────────────────────────────────
+
+export function useCanvases() {
+  const { canvases, setCanvases, user } = useStore();
+
+  async function addCanvas(data) {
+    const canvas = await db.insertCanvas(user.id, data);
+    setCanvases(prev => [canvas, ...prev]);
+    return canvas;
+  }
+
+  async function updateCanvasMeta(id, patch) {
+    const current = canvases.find(c => c.id === id);
+    const merged  = { ...current, ...patch };
+    setCanvases(prev => prev.map(c => c.id === id ? merged : c));
+    await db.patchCanvas(id, patch);
+  }
+
+  async function deleteCanvas(id) {
+    setCanvases(prev => prev.filter(c => c.id !== id));
+    await db.removeCanvas(id);
+  }
+
+  function getCanvas(id) {
+    return canvases.find(c => c.id === id) ?? null;
+  }
+
+  function getCanvasesByClient(clientId) {
+    return canvases.filter(c => c.clientId === clientId);
+  }
+
+  function getStudioCanvases() {
+    return canvases.filter(c => !c.clientId);
+  }
+
+  return {
+    canvases,
+    addCanvas, updateCanvasMeta, deleteCanvas,
+    getCanvas, getCanvasesByClient, getStudioCanvases,
+  };
 }
