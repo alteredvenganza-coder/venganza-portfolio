@@ -409,3 +409,172 @@ export async function updateStorageUsed(userId, bytesAdded) {
     .eq('id', userId);
   if (error) throw error;
 }
+
+// ── Canvases ──────────────────────────────────────────────────────────────────
+
+function canvasFromDb(row) {
+  return {
+    id:        row.id,
+    clientId:  row.client_id,
+    name:      row.name,
+    template:  row.template,
+    thumbnail: row.thumbnail,
+    panX:      row.pan_x ?? 0,
+    panY:      row.pan_y ?? 0,
+    zoom:      row.zoom != null ? Number(row.zoom) : 1,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+function canvasToDb(c) {
+  const row = {};
+  if ('clientId'  in c) row.client_id = c.clientId || null;
+  if ('name'      in c) row.name      = c.name;
+  if ('template'  in c) row.template  = c.template;
+  if ('thumbnail' in c) row.thumbnail = c.thumbnail;
+  if ('panX'      in c) row.pan_x     = Math.round(Number(c.panX) || 0);
+  if ('panY'      in c) row.pan_y     = Math.round(Number(c.panY) || 0);
+  if ('zoom'      in c) row.zoom      = Number(c.zoom) || 1;
+  return row;
+}
+
+export async function fetchCanvases(userId) {
+  const { data, error } = await supabase
+    .from('canvases')
+    .select('*')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false });
+  if (error) throw error;
+  return data.map(canvasFromDb);
+}
+
+export async function fetchCanvasById(id) {
+  const { data, error } = await supabase
+    .from('canvases')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (error) throw error;
+  return canvasFromDb(data);
+}
+
+export async function insertCanvas(userId, data) {
+  const { data: row, error } = await supabase
+    .from('canvases')
+    .insert({ user_id: userId, ...canvasToDb(data) })
+    .select()
+    .single();
+  if (error) throw error;
+  return canvasFromDb(row);
+}
+
+export async function patchCanvas(id, patch) {
+  const row = { ...canvasToDb(patch), updated_at: new Date().toISOString() };
+  const { error } = await supabase.from('canvases').update(row).eq('id', id);
+  if (error) throw error;
+}
+
+export async function removeCanvas(id) {
+  const { error } = await supabase.from('canvases').delete().eq('id', id);
+  if (error) throw error;
+}
+
+// ── Canvas cards ──────────────────────────────────────────────────────────────
+
+function cardFromDb(row) {
+  return {
+    id:       row.id,
+    canvasId: row.canvas_id,
+    type:     row.type,
+    x:        row.x,
+    y:        row.y,
+    w:        row.w ?? 230,
+    h:        row.h,
+    data:     row.data ?? {},
+    refId:    row.ref_id,
+    zIndex:   row.z_index ?? 0,
+  };
+}
+
+function cardToDb(c) {
+  const row = {};
+  if ('canvasId' in c) row.canvas_id = c.canvasId;
+  if ('type'     in c) row.type      = c.type;
+  if ('x'        in c) row.x         = Math.round(c.x);
+  if ('y'        in c) row.y         = Math.round(c.y);
+  if ('w'        in c) row.w         = Math.round(c.w);
+  if ('h'        in c) row.h         = c.h != null ? Math.round(c.h) : null;
+  if ('data'     in c) row.data      = c.data ?? {};
+  if ('refId'    in c) row.ref_id    = c.refId || null;
+  if ('zIndex'   in c) row.z_index   = c.zIndex ?? 0;
+  return row;
+}
+
+export async function fetchCanvasCards(canvasId) {
+  const { data, error } = await supabase
+    .from('canvas_cards')
+    .select('*')
+    .eq('canvas_id', canvasId)
+    .order('z_index', { ascending: true });
+  if (error) throw error;
+  return data.map(cardFromDb);
+}
+
+export async function insertCanvasCard(canvasId, data) {
+  const { data: row, error } = await supabase
+    .from('canvas_cards')
+    .insert({ canvas_id: canvasId, ...cardToDb({ ...data, canvasId }) })
+    .select()
+    .single();
+  if (error) throw error;
+  return cardFromDb(row);
+}
+
+export async function patchCanvasCard(id, patch) {
+  const { error } = await supabase
+    .from('canvas_cards')
+    .update(cardToDb(patch))
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function removeCanvasCard(id) {
+  const { error } = await supabase.from('canvas_cards').delete().eq('id', id);
+  if (error) throw error;
+}
+
+// ── Canvas connections ────────────────────────────────────────────────────────
+
+function connFromDb(row) {
+  return {
+    id:       row.id,
+    canvasId: row.canvas_id,
+    fromCard: row.from_card,
+    toCard:   row.to_card,
+  };
+}
+
+export async function fetchCanvasConnections(canvasId) {
+  const { data, error } = await supabase
+    .from('canvas_connections')
+    .select('*')
+    .eq('canvas_id', canvasId);
+  if (error) throw error;
+  return data.map(connFromDb);
+}
+
+export async function insertCanvasConnection(canvasId, fromCard, toCard) {
+  const { data: row, error } = await supabase
+    .from('canvas_connections')
+    .insert({ canvas_id: canvasId, from_card: fromCard, to_card: toCard })
+    .select()
+    .single();
+  if (error) throw error;
+  return connFromDb(row);
+}
+
+export async function removeCanvasConnection(id) {
+  const { error } = await supabase.from('canvas_connections').delete().eq('id', id);
+  if (error) throw error;
+}
