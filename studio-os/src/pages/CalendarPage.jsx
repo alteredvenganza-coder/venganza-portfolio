@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   ChevronLeft, ChevronRight, AlertTriangle,
   Plus, Check, Clock, Trash2, Edit2, Bell, Calendar,
+  User, Briefcase,
 } from 'lucide-react';
 import Badge from '../components/Badge';
 import Modal from '../components/Modal';
@@ -50,6 +51,8 @@ const EMPTY_FORM = {
   timeEnd: '',
   color: 'burgundy',
   reminderMinutes: '',
+  clientId: '',
+  projectId: '',
 };
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -99,11 +102,24 @@ function formatTimeRange(start, end) {
   return end ? `${start} - ${end}` : start;
 }
 
+function taskBadgeLabel(task, getClient, projects) {
+  const parts = [];
+  if (task.clientId) {
+    const client = getClient(task.clientId);
+    if (client) parts.push(client.name);
+  }
+  if (task.projectId) {
+    const proj = projects.find(p => p.id === task.projectId);
+    if (proj) parts.push(proj.title);
+  }
+  return parts.join(' · ');
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function CalendarPage() {
-  const { projects }  = useProjects();
-  const { getClient } = useClients();
+  const { projects }       = useProjects();
+  const { clients, getClient } = useClients();
   const { calendarTasks, addCalendarTask, updateCalendarTask, deleteCalendarTask } = useCalendarTasks();
 
   const today = useMemo(() => startOfDay(new Date()), []);
@@ -124,6 +140,16 @@ export default function CalendarPage() {
     () => projects.filter(p => p.deadline && p.stage !== 'archived'),
     [projects],
   );
+
+  const activeProjectsList = useMemo(
+    () => projects.filter(p => !['archived', 'completed', 'delivered'].includes(p.stage)),
+    [projects],
+  );
+
+  const filteredProjects = useMemo(() => {
+    if (!form.clientId) return activeProjectsList;
+    return activeProjectsList.filter(p => p.clientId === form.clientId);
+  }, [activeProjectsList, form.clientId]);
 
   // Map: "YYYY-MM-DD" -> [project, ...]
   const projectsByDate = useMemo(() => {
@@ -221,6 +247,8 @@ export default function CalendarPage() {
       timeEnd: task.timeEnd ?? '',
       color: task.color ?? 'burgundy',
       reminderMinutes: task.reminderMinutes != null ? String(task.reminderMinutes) : '',
+      clientId: task.clientId ?? '',
+      projectId: task.projectId ?? '',
     });
     setModalOpen(true);
   }
@@ -235,6 +263,32 @@ export default function CalendarPage() {
     setForm(prev => ({ ...prev, [key]: val }));
   }
 
+  function handleClientChange(clientId) {
+    setForm(prev => {
+      const next = { ...prev, clientId: clientId || '' };
+      if (clientId && prev.projectId) {
+        const proj = activeProjectsList.find(p => p.id === prev.projectId);
+        if (proj && proj.clientId && proj.clientId !== clientId) {
+          next.projectId = '';
+        }
+      }
+      return next;
+    });
+  }
+
+  function handleProjectChange(projectId) {
+    setForm(prev => {
+      const next = { ...prev, projectId: projectId || '' };
+      if (projectId) {
+        const proj = activeProjectsList.find(p => p.id === projectId);
+        if (proj?.clientId) {
+          next.clientId = proj.clientId;
+        }
+      }
+      return next;
+    });
+  }
+
   async function handleSave() {
     if (!form.title.trim() || !form.date) return;
     setSaving(true);
@@ -247,6 +301,8 @@ export default function CalendarPage() {
         timeEnd: form.timeEnd || null,
         color: form.color,
         reminderMinutes: form.reminderMinutes ? Number(form.reminderMinutes) : null,
+        clientId: form.clientId || null,
+        projectId: form.projectId || null,
       };
       if (editingTask) {
         await updateCalendarTask(editingTask.id, payload);
@@ -429,7 +485,7 @@ export default function CalendarPage() {
                             key={t.id}
                             className={`flex items-center gap-1 truncate text-[9px] sm:text-[10px] font-mono leading-tight rounded px-1 py-px ${t.isDone ? 'line-through opacity-50' : ''}`}
                             style={{ backgroundColor: c.bg, color: c.text }}
-                            title={t.title}
+                            title={`${t.title}${(() => { const b = taskBadgeLabel(t, getClient, projects); return b ? ` — ${b}` : ''; })()}`}
                           >
                             <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: c.dot }} />
                             {t.title}
@@ -525,6 +581,15 @@ export default function CalendarPage() {
                                 </span>
                               )}
                             </div>
+                            {(() => {
+                              const badge = taskBadgeLabel(task, getClient, projects);
+                              return badge ? (
+                                <span className="text-[11px] text-zinc-500 truncate block mt-0.5">
+                                  <User size={10} className="inline mr-1 -mt-px" />
+                                  {badge}
+                                </span>
+                              ) : null;
+                            })()}
                             {task.description && (
                               <p className="text-[11px] text-subtle mt-1 line-clamp-2">{task.description}</p>
                             )}
@@ -697,6 +762,34 @@ export default function CalendarPage() {
                 />
               ))}
             </div>
+          </Field>
+
+          {/* Client select */}
+          <Field label="Cliente">
+            <select
+              className="input"
+              value={form.clientId}
+              onChange={e => handleClientChange(e.target.value)}
+            >
+              <option value="">Nessuno</option>
+              {clients.map(c => (
+                <option key={c.id} value={c.id}>{c.name}{c.brand ? ` (${c.brand})` : ''}</option>
+              ))}
+            </select>
+          </Field>
+
+          {/* Project select */}
+          <Field label="Progetto">
+            <select
+              className="input"
+              value={form.projectId}
+              onChange={e => handleProjectChange(e.target.value)}
+            >
+              <option value="">Nessuno</option>
+              {filteredProjects.map(p => (
+                <option key={p.id} value={p.id}>{p.title}</option>
+              ))}
+            </select>
           </Field>
 
           {/* Reminder */}
