@@ -16,6 +16,7 @@ import ActivitySection from '../components/ActivitySection';
 import ProjectForm from '../forms/ProjectForm';
 import { uploadProjectFile } from '../lib/db';
 import CompletionSection from '../components/CompletionSection';
+import EmailButton from '../components/EmailButton';
 import { useClients, useProjects } from '../hooks/useStore';
 import {
   STAGE_LABELS, STAGE_BG, STAGE_TEXT,
@@ -235,6 +236,9 @@ export default function ProjectDetail() {
               </div>
 
               <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                {client?.email && (
+                  <EmailButton client={client} project={project} />
+                )}
                 <Btn variant="secondary" size="sm" onClick={() => setEditOpen(true)}>
                   <Edit2 size={13} /> <span className="hidden sm:inline">Modifica</span>
                 </Btn>
