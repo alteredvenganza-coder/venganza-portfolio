@@ -28,6 +28,7 @@ import Layout from './components/Layout';
 import GuestLayout from './components/GuestLayout';
 import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
+import CommandPalette from './components/CommandPalette';
 import ClientsPage from './pages/ClientsPage';
 import ClientCanvasHub from './pages/ClientCanvasHub';
 import ProjectDetail from './pages/ProjectDetail';
@@ -69,6 +70,8 @@ function AdminContent() {
   if (loading) return <Spinner />;
 
   return (
+    <>
+    <CommandPalette />
     <Routes>
       {/* Full-screen canvas routes — NO Layout wrapper */}
       <Route path="/canvas/:canvasId"                 element={<CanvasView />} />
@@ -93,6 +96,7 @@ function AdminContent() {
         </Layout>
       } />
     </Routes>
+    </>
   );
 }
 
