@@ -26,7 +26,7 @@ class ErrorBoundary extends Component {
 }
 import Layout from './components/Layout';
 import GuestLayout from './components/GuestLayout';
-import Dashboard from './pages/Dashboard';
+import HomePage from './pages/HomePage';
 import ClientsPage from './pages/ClientsPage';
 import ClientCanvasHub from './pages/ClientCanvasHub';
 import ProjectDetail from './pages/ProjectDetail';
@@ -77,7 +77,7 @@ function AdminContent() {
       <Route path="/*" element={
         <Layout>
           <Routes>
-            <Route path="/"              element={<Dashboard />} />
+            <Route path="/"              element={<HomePage />} />
             <Route path="/clients"       element={<ClientsPage />} />
             <Route path="/clients/:id"   element={<ClientCanvasHub />} />
             <Route path="/projects/:id"  element={<ProjectDetail />} />
