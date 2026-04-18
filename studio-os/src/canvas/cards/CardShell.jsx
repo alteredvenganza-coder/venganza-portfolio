@@ -42,6 +42,7 @@ export default function CardShell({
   onPlusClick,
   title, onTitleChange,
   showStrip = true,
+  groupIds, groupBasePositions, onGroupMoveStart, onGroupMove, onGroupMoveEnd,
   children,
 }) {
   const ref = useRef(null);
@@ -56,13 +57,24 @@ export default function CardShell({
       return;
     }
     onSelect && onSelect(e);
-    onMoveStart && onMoveStart({ x: card.x, y: card.y });
-    dragRef.current = {
-      startClientX: e.clientX,
-      startClientY: e.clientY,
-      startX: card.x,
-      startY: card.y,
-    };
+    if (groupIds && groupIds.length > 1) {
+      onGroupMoveStart && onGroupMoveStart(groupBasePositions);
+      dragRef.current = {
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+        startX: card.x,
+        startY: card.y,
+        group: groupBasePositions,
+      };
+    } else {
+      onMoveStart && onMoveStart({ x: card.x, y: card.y });
+      dragRef.current = {
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+        startX: card.x,
+        startY: card.y,
+      };
+    }
     e.stopPropagation();
     e.preventDefault();
   }
@@ -76,27 +88,44 @@ export default function CardShell({
 
   useEffect(() => {
     const GRID = 20;
-    let lastX = null, lastY = null;
+    let lastX = null, lastY = null, lastDX = 0, lastDY = 0;
     function move(e) {
       if (!dragRef.current) return;
       const dx = (e.clientX - dragRef.current.startClientX) / zoom;
       const dy = (e.clientY - dragRef.current.startClientY) / zoom;
-      let nx = dragRef.current.startX + dx;
-      let ny = dragRef.current.startY + dy;
-      // Snap to 20px grid unless Alt held
-      if (!e.altKey) {
-        nx = Math.round(nx / GRID) * GRID;
-        ny = Math.round(ny / GRID) * GRID;
+      if (dragRef.current.group) {
+        let snappedDX = dx, snappedDY = dy;
+        if (!e.altKey) {
+          // snap delta against the lead card's start position
+          const leadX = dragRef.current.startX + dx;
+          const leadY = dragRef.current.startY + dy;
+          snappedDX = Math.round(leadX / GRID) * GRID - dragRef.current.startX;
+          snappedDY = Math.round(leadY / GRID) * GRID - dragRef.current.startY;
+        }
+        lastDX = snappedDX; lastDY = snappedDY;
+        onGroupMove && onGroupMove(snappedDX, snappedDY, dragRef.current.group);
+      } else {
+        let nx = dragRef.current.startX + dx;
+        let ny = dragRef.current.startY + dy;
+        if (!e.altKey) {
+          nx = Math.round(nx / GRID) * GRID;
+          ny = Math.round(ny / GRID) * GRID;
+        }
+        lastX = nx; lastY = ny;
+        onMove && onMove(nx, ny);
       }
-      lastX = nx; lastY = ny;
-      onMove && onMove(nx, ny);
     }
     function up() {
-      if (dragRef.current) {
-        dragRef.current = null;
+      if (!dragRef.current) return;
+      const wasGroup = !!dragRef.current.group;
+      const groupBase = dragRef.current.group;
+      dragRef.current = null;
+      if (wasGroup) {
+        onGroupMoveEnd && onGroupMoveEnd(groupBase, lastDX, lastDY);
+      } else {
         onMoveEnd && onMoveEnd(lastX != null ? { x: lastX, y: lastY } : null);
-        lastX = lastY = null;
       }
+      lastX = lastY = null; lastDX = lastDY = 0;
     }
     window.addEventListener('mousemove', move);
     window.addEventListener('mouseup', up);
@@ -104,7 +133,7 @@ export default function CardShell({
       window.removeEventListener('mousemove', move);
       window.removeEventListener('mouseup', up);
     };
-  }, [zoom, onMove, onMoveEnd]);
+  }, [zoom, onMove, onMoveEnd, onGroupMove, onGroupMoveEnd]);
 
   function onResizeMouseDown(e) {
     onResizeStart && onResizeStart({ w: card.w });

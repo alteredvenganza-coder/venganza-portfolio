@@ -124,6 +124,20 @@ export function useCanvas(canvasId) {
     if ('x' in patch || 'y' in patch || 'w' in patch || 'h' in patch) scheduleThumb();
   }
 
+  function moveCards(updates) {
+    // updates: Array<{ id, x, y }>
+    setCards(prev => {
+      const map = new Map(updates.map(u => [u.id, u]));
+      return prev.map(c => map.has(c.id) ? { ...c, x: map.get(c.id).x, y: map.get(c.id).y } : c);
+    });
+    for (const u of updates) {
+      const merged = { ...(pendingCardPatches.current.get(u.id) || {}), x: u.x, y: u.y };
+      pendingCardPatches.current.set(u.id, merged);
+    }
+    scheduleFlush();
+    scheduleThumb();
+  }
+
   async function deleteCard(id) {
     setCards(prev => prev.filter(c => c.id !== id));
     setConnections(prev => prev.filter(cn => cn.fromCard !== id && cn.toCard !== id));
@@ -153,6 +167,28 @@ export function useCanvas(canvasId) {
     undoStack.current.push({
       undo: () => apply(prevPatch),
       redo: () => apply(nextPatch),
+    });
+    if (undoStack.current.length > 50) undoStack.current.shift();
+    redoStack.current = [];
+  }
+
+  function commitGroupMove(prevPositions, nextPositions) {
+    // prev/nextPositions: Array<{ id, x, y }>
+    const apply = (positions) => {
+      setCards(prev => {
+        const map = new Map(positions.map(p => [p.id, p]));
+        return prev.map(c => map.has(c.id) ? { ...c, x: map.get(c.id).x, y: map.get(c.id).y } : c);
+      });
+      for (const p of positions) {
+        const merged = { ...(pendingCardPatches.current.get(p.id) || {}), x: p.x, y: p.y };
+        pendingCardPatches.current.set(p.id, merged);
+      }
+      scheduleFlush();
+      scheduleThumb();
+    };
+    undoStack.current.push({
+      undo: () => apply(prevPositions),
+      redo: () => apply(nextPositions),
     });
     if (undoStack.current.length > 50) undoStack.current.shift();
     redoStack.current = [];
@@ -202,5 +238,6 @@ export function useCanvas(canvasId) {
     addConnection, deleteConnection,
     updateCanvas,
     commitCardPatch, undo, redo,
+    moveCards, commitGroupMove,
   };
 }

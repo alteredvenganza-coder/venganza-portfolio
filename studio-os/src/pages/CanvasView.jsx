@@ -33,7 +33,7 @@ export default function CanvasView() {
       });
   }, [canvasId, clientId, addCanvas, navigate, resolvedId]);
 
-  const { canvas, cards, connections, loading, saveState, updateCanvas, addCard, updateCard, deleteCard, addConnection, deleteConnection, commitCardPatch, undo, redo } = useCanvas(resolvedId);
+  const { canvas, cards, connections, loading, saveState, updateCanvas, addCard, updateCard, deleteCard, addConnection, deleteConnection, commitCardPatch, undo, redo, moveCards, commitGroupMove } = useCanvas(resolvedId);
   const dragBeforeRef = useRef(null); // { id, patch }
   const [tool, setTool] = useState('select');
   const [selectedIds, setSelectedIds] = useState(() => new Set());
@@ -164,6 +164,23 @@ export default function CanvasView() {
               const b = dragBeforeRef.current;
               dragBeforeRef.current = null;
               if (b && final && b.id === c.id) commitCardPatch(c.id, b.patch, final);
+            },
+            groupIds: selectedIds.has(c.id) && selectedIds.size > 1 ? [...selectedIds] : null,
+            groupBasePositions: selectedIds.has(c.id) && selectedIds.size > 1
+              ? [...selectedIds].map(id => {
+                  const cc = cards.find(cd => cd.id === id);
+                  return cc ? { id: cc.id, x: cc.x, y: cc.y } : null;
+                }).filter(Boolean)
+              : null,
+            onGroupMoveStart: (positions) => { dragBeforeRef.current = { groupPositions: positions }; },
+            onGroupMove: (deltaX, deltaY, basePositions) => {
+              moveCards(basePositions.map(p => ({ id: p.id, x: p.x + deltaX, y: p.y + deltaY })));
+            },
+            onGroupMoveEnd: (basePositions, deltaX, deltaY) => {
+              const before = dragBeforeRef.current?.groupPositions || basePositions;
+              dragBeforeRef.current = null;
+              const after = basePositions.map(p => ({ id: p.id, x: p.x + deltaX, y: p.y + deltaY }));
+              commitGroupMove(before, after);
             },
             onResizeStart: (before) => { dragBeforeRef.current = { id: c.id, patch: before }; },
             onResize: (w) => updateCard(c.id, { w }),
