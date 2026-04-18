@@ -6,3 +6,6 @@ package-lock.json
 .env.*.local
 .vercel
 .env*.local
+playwright-report/
+test-results/
+/e2e/.auth/
