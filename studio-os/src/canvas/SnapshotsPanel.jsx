@@ -7,6 +7,7 @@ export default function SnapshotsPanel({ open, onClose, canvasId, cards, connect
   const [list, setList]       = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving]   = useState(false);
+  const [restoring, setRestoring] = useState(false);
 
   useEffect(() => {
     if (!open || !canvasId) return;
@@ -31,8 +32,18 @@ export default function SnapshotsPanel({ open, onClose, canvasId, cards, connect
   }
 
   async function handleRestore(snap) {
-    if (!confirm(`Ripristinare lo snapshot "${snap.label || snap.createdAt}"? Le modifiche correnti vanno perse.`)) return;
-    await onRestore(snap);
+    if (restoring) return;
+    if (!confirm(`Ripristinare lo snapshot "${snap.label || snap.createdAt}"? Le modifiche correnti e la cronologia annulla/ripristina vanno perse.`)) return;
+    setRestoring(true);
+    try {
+      const result = await onRestore(snap);
+      if (result && !result.ok) {
+        const fails = (result.deleteFails || 0) + (result.insertFails || 0) + (result.connectionFails || 0);
+        alert(`Ripristino completato con ${fails} errori. Controlla la console per i dettagli.`);
+      }
+    } finally {
+      setRestoring(false);
+    }
     onClose();
   }
 
@@ -94,8 +105,8 @@ export default function SnapshotsPanel({ open, onClose, canvasId, cards, connect
                 {s.kind === 'auto' ? 'Auto' : 'Manuale'} · {(s.cards || []).length} card
               </p>
             </div>
-            <button onClick={() => handleRestore(s)} title="Ripristina"
-              style={{ border:'none', background:'transparent', cursor:'pointer', fontSize:13, color:'var(--cv-gold2)' }}>↺</button>
+            <button onClick={() => handleRestore(s)} title="Ripristina" disabled={restoring}
+              style={{ border:'none', background:'transparent', cursor: restoring ? 'wait' : 'pointer', fontSize:13, color:'var(--cv-gold2)', opacity: restoring ? 0.5 : 1 }}>↺</button>
             <button onClick={() => handleDelete(s)} title="Elimina"
               style={{ border:'none', background:'transparent', cursor:'pointer', fontSize:13, color:'var(--cv-red)' }}>×</button>
           </div>

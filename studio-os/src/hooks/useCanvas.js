@@ -223,10 +223,17 @@ export function useCanvas(canvasId) {
   async function restoreSnapshot(snapshot) {
     // Replace current cards/connections with snapshot data.
     // Strategy: delete existing rows, insert snapshot rows fresh.
-    if (!canvasId) return;
+    // Returns { ok, deleteFails, insertFails, connectionFails } so callers can warn on partial failure.
+    if (!canvasId) return { ok: false, deleteFails: 0, insertFails: 0, connectionFails: 0 };
+    // Drop pending debounced patches — they're about to be obsolete and would
+    // otherwise race against the restore (patching ids that no longer exist).
+    if (flushTimer.current) { clearTimeout(flushTimer.current); flushTimer.current = null; }
+    pendingCardPatches.current.clear();
+    let deleteFails = 0, insertFails = 0, connectionFails = 0;
     const existingCards = cardsRef.current;
     for (const c of existingCards) {
-      try { await db.removeCanvasCard(c.id); } catch (e) { console.error(e); }
+      try { await db.removeCanvasCard(c.id); }
+      catch (e) { deleteFails++; console.error('[restoreSnapshot] delete failed', e); }
     }
     const newCards = [];
     for (const c of snapshot.cards) {
@@ -235,7 +242,7 @@ export function useCanvas(canvasId) {
           type: c.type, x: c.x, y: c.y, w: c.w, h: c.h, data: c.data, refId: c.refId,
         });
         newCards.push({ ...created, _oldId: c.id });
-      } catch (e) { console.error(e); }
+      } catch (e) { insertFails++; console.error('[restoreSnapshot] insert failed', e); }
     }
     setCards(newCards);
     const idMap = new Map(newCards.map(c => [c._oldId, c.id]));
@@ -243,16 +250,17 @@ export function useCanvas(canvasId) {
     for (const cn of snapshot.connections) {
       const from = idMap.get(cn.fromCard);
       const to   = idMap.get(cn.toCard);
-      if (!from || !to) continue;
+      if (!from || !to) { connectionFails++; continue; }
       try {
         const created = await db.insertCanvasConnection(canvasId, from, to);
         newConns.push(created);
-      } catch (e) { console.error(e); }
+      } catch (e) { connectionFails++; console.error('[restoreSnapshot] connection failed', e); }
     }
     setConnections(newConns);
     undoStack.current = [];
     redoStack.current = [];
     scheduleThumb();
+    return { ok: deleteFails === 0 && insertFails === 0 && connectionFails === 0, deleteFails, insertFails, connectionFails };
   }
 
   return {
