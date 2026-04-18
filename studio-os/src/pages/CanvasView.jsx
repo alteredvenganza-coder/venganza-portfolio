@@ -177,8 +177,9 @@ export default function CanvasView() {
               moveCards(basePositions.map(p => ({ id: p.id, x: p.x + deltaX, y: p.y + deltaY })));
             },
             onGroupMoveEnd: (basePositions, deltaX, deltaY) => {
-              const before = dragBeforeRef.current?.groupPositions || basePositions;
+              const before = dragBeforeRef.current?.groupPositions;
               dragBeforeRef.current = null;
+              if (!before) return; // interrupted drag — no-op rather than commit a no-op undo entry
               const after = basePositions.map(p => ({ id: p.id, x: p.x + deltaX, y: p.y + deltaY }));
               commitGroupMove(before, after);
             },

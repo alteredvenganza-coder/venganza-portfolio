@@ -174,21 +174,9 @@ export function useCanvas(canvasId) {
 
   function commitGroupMove(prevPositions, nextPositions) {
     // prev/nextPositions: Array<{ id, x, y }>
-    const apply = (positions) => {
-      setCards(prev => {
-        const map = new Map(positions.map(p => [p.id, p]));
-        return prev.map(c => map.has(c.id) ? { ...c, x: map.get(c.id).x, y: map.get(c.id).y } : c);
-      });
-      for (const p of positions) {
-        const merged = { ...(pendingCardPatches.current.get(p.id) || {}), x: p.x, y: p.y };
-        pendingCardPatches.current.set(p.id, merged);
-      }
-      scheduleFlush();
-      scheduleThumb();
-    };
     undoStack.current.push({
-      undo: () => apply(prevPositions),
-      redo: () => apply(nextPositions),
+      undo: () => moveCards(prevPositions),
+      redo: () => moveCards(nextPositions),
     });
     if (undoStack.current.length > 50) undoStack.current.shift();
     redoStack.current = [];
