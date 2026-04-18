@@ -21,11 +21,14 @@ export default function CanvasEngine({
   panX, panY, zoom, onViewportChange,
   tool = 'select',
   onBackgroundClick, onContextMenu, onDrop,
+  onMarqueeEnd,
   children, svgChildren,
 }) {
   const wrapRef = useRef(null);
   const [isPanning, setIsPanning]   = useState(false);
   const panStart = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
+  const [marquee, setMarquee] = useState(null); // { x0, y0, x1, y1 } in container px
+  const marqueeStart = useRef(null);
 
   // ─── Wheel: zoom (with ctrl/meta) or pan ──────────────────────────────────
   const onWheel = useCallback((e) => {
@@ -56,7 +59,22 @@ export default function CanvasEngine({
     if (e.button !== 0) return;
     const target = e.target;
     const isBackground = target === wrapRef.current || target.dataset.canvasBg === '1';
-    if (tool === 'pan' || isBackground) {
+    if (tool === 'pan') {
+      setIsPanning(true);
+      panStart.current = { x: e.clientX, y: e.clientY, panX, panY };
+      e.preventDefault();
+      return;
+    }
+    if (isBackground && tool === 'select') {
+      const rect = wrapRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      marqueeStart.current = { x, y };
+      setMarquee({ x0: x, y0: y, x1: x, y1: y });
+      e.preventDefault();
+      return;
+    }
+    if (isBackground) {
       setIsPanning(true);
       panStart.current = { x: e.clientX, y: e.clientY, panX, panY };
       e.preventDefault();
@@ -80,6 +98,43 @@ export default function CanvasEngine({
       window.removeEventListener('mouseup', up);
     };
   }, [isPanning, zoom, onViewportChange]);
+
+  useEffect(() => {
+    if (!marquee) return;
+    function move(e) {
+      if (!marqueeStart.current) return;
+      const rect = wrapRef.current.getBoundingClientRect();
+      setMarquee({
+        x0: marqueeStart.current.x,
+        y0: marqueeStart.current.y,
+        x1: e.clientX - rect.left,
+        y1: e.clientY - rect.top,
+      });
+    }
+    function up() {
+      if (!marqueeStart.current) return;
+      const m = marquee;
+      marqueeStart.current = null;
+      setMarquee(null);
+      if (!onMarqueeEnd) return;
+      const minX = Math.min(m.x0, m.x1);
+      const minY = Math.min(m.y0, m.y1);
+      const maxX = Math.max(m.x0, m.x1);
+      const maxY = Math.max(m.y0, m.y1);
+      if (maxX - minX < 4 && maxY - minY < 4) return; // treat as click
+      const wMinX = (minX - panX) / zoom;
+      const wMinY = (minY - panY) / zoom;
+      const wMaxX = (maxX - panX) / zoom;
+      const wMaxY = (maxY - panY) / zoom;
+      onMarqueeEnd({ minX: wMinX, minY: wMinY, maxX: wMaxX, maxY: wMaxY });
+    }
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+    return () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+  }, [marquee, panX, panY, zoom, onMarqueeEnd]);
 
   function onClick(e) {
     if (e.target !== wrapRef.current && e.target.dataset.canvasBg !== '1') return;
@@ -143,6 +198,19 @@ export default function CanvasEngine({
         </svg>
         {children}
       </div>
+      {marquee && (
+        <div style={{
+          position: 'absolute',
+          left: Math.min(marquee.x0, marquee.x1),
+          top:  Math.min(marquee.y0, marquee.y1),
+          width:  Math.abs(marquee.x1 - marquee.x0),
+          height: Math.abs(marquee.y1 - marquee.y0),
+          border: '1px dashed var(--cv-gold2)',
+          background: 'rgba(212,176,107,0.08)',
+          pointerEvents: 'none',
+          zIndex: 100,
+        }} />
+      )}
     </div>
   );
 }

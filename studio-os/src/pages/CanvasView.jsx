@@ -140,6 +140,14 @@ export default function CanvasView() {
                                    onSelectConnection={(id) => { setSelectedConnId(id); setSelectedId(null); }} />}
         onContextMenu={(cx, cy, wx, wy) => setCtxMenu({ x: cx, y: cy, worldX: wx, worldY: wy })}
         onBackgroundClick={() => { setSelectedId(null); setSelectedConnId(null); }}
+        onMarqueeEnd={(box) => {
+          const hits = cards.filter(c => {
+            const cx0 = c.x, cy0 = c.y;
+            const cx1 = c.x + c.w, cy1 = c.y + (c.h ?? 220);
+            return cx0 < box.maxX && cx1 > box.minX && cy0 < box.maxY && cy1 > box.minY;
+          });
+          setSelectedIds(new Set(hits.map(h => h.id)));
+        }}
       >
         {cards.map(c => renderCard(c, {
           ctx: {
