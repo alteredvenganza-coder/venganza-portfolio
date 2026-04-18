@@ -36,7 +36,20 @@ export default function CanvasView() {
   const { canvas, cards, connections, loading, saveState, updateCanvas, addCard, updateCard, deleteCard, addConnection, deleteConnection, commitCardPatch, undo, redo } = useCanvas(resolvedId);
   const dragBeforeRef = useRef(null); // { id, patch }
   const [tool, setTool] = useState('select');
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
+
+  // Backwards-compat helpers used by callers below
+  const selectedId = selectedIds.size === 1 ? [...selectedIds][0] : null;
+  function setSelectedId(id) {
+    setSelectedIds(id ? new Set([id]) : new Set());
+  }
+  function toggleSelected(id) {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
   const [selectedConnId, setSelectedConnId] = useState(null);
   const [connectFrom, setConnectFrom] = useState(null);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -59,10 +72,13 @@ export default function CanvasView() {
         redo();
         return;
       }
-      if (isCtrl && (e.key === 'd' || e.key === 'D') && selectedId) {
+      if (isCtrl && (e.key === 'd' || e.key === 'D') && selectedIds.size) {
         e.preventDefault();
-        const c = cards.find(cd => cd.id === selectedId);
-        if (c) addCard({ type: c.type, x: c.x + 20, y: c.y + 20, w: c.w, data: c.data });
+        const ids = [...selectedIds];
+        ids.forEach(id => {
+          const c = cards.find(cd => cd.id === id);
+          if (c) addCard({ type: c.type, x: c.x + 20, y: c.y + 20, w: c.w, data: c.data });
+        });
         return;
       }
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -71,13 +87,16 @@ export default function CanvasView() {
       if (e.key === 'c' || e.key === 'C') setTool('connect');
       if (e.key === 'Escape') { setTool('select'); setSelectedId(null); setSelectedConnId(null); setAddPopup(null); setCtxMenu(null); }
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (selectedConnId) { deleteConnection(selectedConnId); setSelectedConnId(null); }
-        else if (selectedId) { deleteCard(selectedId); setSelectedId(null); }
+        if (selectedConnId) { deleteConnection(selectedConnId); setSelectedConnId(null); return; }
+        if (selectedIds.size === 0) return;
+        const ids = [...selectedIds];
+        ids.forEach(id => deleteCard(id));
+        setSelectedIds(new Set());
       }
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [selectedId, selectedConnId, cards, addCard, deleteCard, deleteConnection, undo, redo]);
+  }, [selectedIds, selectedConnId, cards, addCard, deleteCard, deleteConnection, undo, redo]);
 
   if (!resolvedId || loading) {
     return (
@@ -125,9 +144,12 @@ export default function CanvasView() {
         {cards.map(c => renderCard(c, {
           ctx: {
             zoom: canvas?.zoom ?? 1,
-            selected: selectedId === c.id,
+            selected: selectedIds.has(c.id),
             tool,
-            onSelect: () => setSelectedId(c.id),
+            onSelect: (e) => {
+              if (e && (e.shiftKey || e.metaKey || e.ctrlKey)) toggleSelected(c.id);
+              else setSelectedId(c.id);
+            },
             onMoveStart: (before) => { dragBeforeRef.current = { id: c.id, patch: before }; },
             onMove: (x, y) => updateCard(c.id, { x, y }),
             onMoveEnd: (final) => {

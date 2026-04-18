@@ -55,7 +55,7 @@ export default function CardShell({
       e.stopPropagation();
       return;
     }
-    onSelect && onSelect();
+    onSelect && onSelect(e);
     onMoveStart && onMoveStart({ x: card.x, y: card.y });
     dragRef.current = {
       startClientX: e.clientX,
