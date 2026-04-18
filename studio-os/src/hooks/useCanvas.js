@@ -26,6 +26,9 @@ export function useCanvas(canvasId) {
   const undoStack             = useRef([]);
   const redoStack             = useRef([]);
 
+  const mutationCount         = useRef(0);
+  const AUTO_SNAPSHOT_EVERY   = 50;
+
   // ─── Load on mount / id change ─────────────────────────────────────────────
   useEffect(() => {
     if (!canvasId) { setLoading(false); return; }
@@ -76,6 +79,24 @@ export function useCanvas(canvasId) {
   // Keep a ref to current cards so the thumb timer reads fresh state.
   useEffect(() => { cardsRef.current = cards; }, [cards]);
 
+  // ─── Auto-snapshot every N mutations ─────────────────────────────────────
+  async function maybeAutoSnapshot() {
+    mutationCount.current += 1;
+    if (mutationCount.current < AUTO_SNAPSHOT_EVERY) return;
+    mutationCount.current = 0;
+    try {
+      const { data: { user } } = await import('../lib/supabase').then(m => m.supabase.auth.getUser());
+      if (!user || !canvasId) return;
+      await db.insertCanvasSnapshot(canvasId, user.id, {
+        label: 'Auto ' + new Date().toLocaleString('it-IT'),
+        cards: cardsRef.current,
+        connections: [],
+        thumbnail: null,
+        kind: 'auto',
+      });
+    } catch (e) { console.error('[useCanvas] auto-snapshot failed', e); }
+  }
+
   // ─── Thumbnail (debounced 2s) ─────────────────────────────────────────────
   const scheduleThumb = useCallback(() => {
     if (thumbTimer.current) clearTimeout(thumbTimer.current);
@@ -112,6 +133,7 @@ export function useCanvas(canvasId) {
     // Add invalidates undo history (re-inserting a deleted card is out of scope A).
     undoStack.current = [];
     redoStack.current = [];
+    maybeAutoSnapshot();
     scheduleThumb();
     return created;
   }
@@ -147,6 +169,7 @@ export function useCanvas(canvasId) {
     // Delete invalidates undo history (same reasoning as addCard).
     undoStack.current = [];
     redoStack.current = [];
+    maybeAutoSnapshot();
     scheduleThumb();
   }
 
@@ -157,6 +180,7 @@ export function useCanvas(canvasId) {
   function commitCardPatch(id, prevPatch, nextPatch) {
     const eq = (a, b) => Object.keys({ ...a, ...b }).every(k => a[k] === b[k]);
     if (eq(prevPatch, nextPatch)) return;
+    maybeAutoSnapshot();
     const apply = (patch) => {
       setCards(prev => prev.map(c => c.id === id ? { ...c, ...patch } : c));
       const merged = { ...(pendingCardPatches.current.get(id) || {}), ...patch };
