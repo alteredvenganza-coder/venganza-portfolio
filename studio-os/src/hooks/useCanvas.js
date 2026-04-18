@@ -219,6 +219,42 @@ export function useCanvas(canvasId) {
     scheduleFlush();
   }
 
+  // ─── Snapshot restore ──────────────────────────────────────────────────────
+  async function restoreSnapshot(snapshot) {
+    // Replace current cards/connections with snapshot data.
+    // Strategy: delete existing rows, insert snapshot rows fresh.
+    if (!canvasId) return;
+    const existingCards = cardsRef.current;
+    for (const c of existingCards) {
+      try { await db.removeCanvasCard(c.id); } catch (e) { console.error(e); }
+    }
+    const newCards = [];
+    for (const c of snapshot.cards) {
+      try {
+        const created = await db.insertCanvasCard(canvasId, {
+          type: c.type, x: c.x, y: c.y, w: c.w, h: c.h, data: c.data, refId: c.refId,
+        });
+        newCards.push({ ...created, _oldId: c.id });
+      } catch (e) { console.error(e); }
+    }
+    setCards(newCards);
+    const idMap = new Map(newCards.map(c => [c._oldId, c.id]));
+    const newConns = [];
+    for (const cn of snapshot.connections) {
+      const from = idMap.get(cn.fromCard);
+      const to   = idMap.get(cn.toCard);
+      if (!from || !to) continue;
+      try {
+        const created = await db.insertCanvasConnection(canvasId, from, to);
+        newConns.push(created);
+      } catch (e) { console.error(e); }
+    }
+    setConnections(newConns);
+    undoStack.current = [];
+    redoStack.current = [];
+    scheduleThumb();
+  }
+
   return {
     canvas, cards, connections,
     loading, error, saveState,
@@ -227,5 +263,6 @@ export function useCanvas(canvasId) {
     updateCanvas,
     commitCardPatch, undo, redo,
     moveCards, commitGroupMove,
+    restoreSnapshot,
   };
 }

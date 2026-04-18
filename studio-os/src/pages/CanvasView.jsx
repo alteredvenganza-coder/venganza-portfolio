@@ -12,6 +12,7 @@ import AddPopup from '../canvas/AddPopup';
 import ContextMenu from '../canvas/ContextMenu';
 import CanvasMinimap from '../canvas/CanvasMinimap';
 import AiPanel from '../canvas/AiPanel';
+import SnapshotsPanel from '../canvas/SnapshotsPanel';
 import { exportCanvasPng } from '../canvas/exportCanvas';
 
 export default function CanvasView() {
@@ -33,7 +34,7 @@ export default function CanvasView() {
       });
   }, [canvasId, clientId, addCanvas, navigate, resolvedId]);
 
-  const { canvas, cards, connections, loading, saveState, updateCanvas, addCard, updateCard, deleteCard, addConnection, deleteConnection, commitCardPatch, undo, redo, moveCards, commitGroupMove } = useCanvas(resolvedId);
+  const { canvas, cards, connections, loading, saveState, updateCanvas, addCard, updateCard, deleteCard, addConnection, deleteConnection, commitCardPatch, undo, redo, moveCards, commitGroupMove, restoreSnapshot } = useCanvas(resolvedId);
   const dragBeforeRef = useRef(null); // { id, patch }
   const [tool, setTool] = useState('select');
   const [selectedIds, setSelectedIds] = useState(() => new Set());
@@ -54,6 +55,7 @@ export default function CanvasView() {
   const [connectFrom, setConnectFrom] = useState(null);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showAi, setShowAi] = useState(false);
+  const [showSnapshots, setShowSnapshots] = useState(false);
   const [addPopup, setAddPopup] = useState(null); // { x, y, refCard? }
   const [ctxMenu,  setCtxMenu]  = useState(null); // { x, y, worldX, worldY }
 
@@ -113,6 +115,7 @@ export default function CanvasView() {
         onTemplates={() => setShowTemplates(true)}
         onAi={() => setShowAi(v => !v)}
         onExport={() => exportCanvasPng(cards, canvas?.name)}
+        onSnapshots={() => setShowSnapshots(v => !v)}
       />
       <CanvasEngine
         panX={canvas?.panX ?? 0}
@@ -323,6 +326,16 @@ export default function CanvasView() {
             data: payload.data || { title: '✨ MAT AI', text: '' },
           });
         }}
+      />
+
+      <SnapshotsPanel
+        open={showSnapshots}
+        onClose={() => setShowSnapshots(false)}
+        canvasId={resolvedId}
+        cards={cards}
+        connections={connections}
+        thumbnail={canvas?.thumbnail}
+        onRestore={restoreSnapshot}
       />
 
       <ContextMenu
