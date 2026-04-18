@@ -18,7 +18,7 @@ const STRIP_COLORS = {
  * - card: { id, type, x, y, w, ... }
  * - zoom: current canvas zoom (used for delta math)
  * - selected: boolean
- * - onSelect()
+ * - onSelect(e)            — receives click event so parent can read shift/meta/ctrl for multi-select
  * - onMove(x, y)         — fires while dragging (positions are world coords)
  * - onMoveEnd()          — fires on mouseup (good time for save)
  * - onResize(w)          — fires while resizing
