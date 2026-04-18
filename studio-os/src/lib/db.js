@@ -578,3 +578,52 @@ export async function removeCanvasConnection(id) {
   const { error } = await supabase.from('canvas_connections').delete().eq('id', id);
   if (error) throw error;
 }
+
+// ── Canvas snapshots ──────────────────────────────────────────────────────────
+
+function snapshotFromDb(row) {
+  return {
+    id:              row.id,
+    canvasId:        row.canvas_id,
+    label:           row.label,
+    cards:           row.cards_data,
+    connections:     row.connections_data,
+    thumbnail:       row.thumbnail,
+    kind:            row.kind,
+    createdAt:       row.created_at,
+  };
+}
+
+export async function fetchCanvasSnapshots(canvasId) {
+  const { data, error } = await supabase
+    .from('canvas_snapshots')
+    .select('*')
+    .eq('canvas_id', canvasId)
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if (error) throw error;
+  return data.map(snapshotFromDb);
+}
+
+export async function insertCanvasSnapshot(canvasId, userId, { label, cards, connections, thumbnail, kind = 'manual' }) {
+  const { data, error } = await supabase
+    .from('canvas_snapshots')
+    .insert({
+      canvas_id:        canvasId,
+      user_id:          userId,
+      label:            label || null,
+      cards_data:       cards,
+      connections_data: connections,
+      thumbnail:        thumbnail || null,
+      kind,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return snapshotFromDb(data);
+}
+
+export async function removeCanvasSnapshot(id) {
+  const { error } = await supabase.from('canvas_snapshots').delete().eq('id', id);
+  if (error) throw error;
+}

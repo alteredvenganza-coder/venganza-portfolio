@@ -258,3 +258,25 @@ create policy "canvas_connections_via_canvas" on public.canvas_connections
   ) with check (
     exists (select 1 from public.canvases c where c.id = canvas_id and c.user_id = auth.uid())
   );
+
+-- ── Canvas snapshots (Phase 4 versioning) ─────────────────────
+
+create table if not exists public.canvas_snapshots (
+  id uuid primary key default gen_random_uuid(),
+  canvas_id uuid references public.canvases(id) on delete cascade not null,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  label text,
+  cards_data jsonb not null,
+  connections_data jsonb not null,
+  thumbnail text,
+  kind text not null default 'manual', -- 'manual' | 'auto'
+  created_at timestamptz default now()
+);
+
+create index if not exists canvas_snapshots_canvas_idx
+  on public.canvas_snapshots(canvas_id, created_at desc);
+
+alter table public.canvas_snapshots enable row level security;
+
+create policy "canvas_snapshots_owner" on public.canvas_snapshots
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
