@@ -29,6 +29,7 @@ export default function CanvasEngine({
   const panStart = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
   const [marquee, setMarquee] = useState(null); // { x0, y0, x1, y1 } in container px
   const marqueeStart = useRef(null);
+  const touchState = useRef(null); // { mode, startPanX, startPanY, startZoom, startCenterX, startCenterY, startDist, startClientX, startClientY }
 
   // ─── Wheel: zoom (with ctrl/meta) or pan ──────────────────────────────────
   const onWheel = useCallback((e) => {
@@ -53,6 +54,83 @@ export default function CanvasEngine({
     wrap.addEventListener('wheel', onWheel, { passive: false });
     return () => wrap.removeEventListener('wheel', onWheel);
   }, [onWheel]);
+
+  // ─── Touch: pinch-zoom + one-finger pan ───────────────────────────────────
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap) return;
+
+    function onTouchStart(e) {
+      if (e.touches.length === 1) {
+        const t = e.touches[0];
+        const target = t.target;
+        const isBackground = target === wrap || target.dataset?.canvasBg === '1';
+        if (!isBackground) return;
+        touchState.current = {
+          mode: 'pan',
+          startClientX: t.clientX,
+          startClientY: t.clientY,
+          startPanX: panX,
+          startPanY: panY,
+        };
+      } else if (e.touches.length === 2) {
+        const [a, b] = e.touches;
+        const rect = wrap.getBoundingClientRect();
+        const cx = (a.clientX + b.clientX) / 2 - rect.left;
+        const cy = (a.clientY + b.clientY) / 2 - rect.top;
+        const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+        touchState.current = {
+          mode: 'pinch',
+          startCenterX: cx,
+          startCenterY: cy,
+          startDist: dist,
+          startZoom: zoom,
+          startPanX: panX,
+          startPanY: panY,
+        };
+      }
+    }
+
+    function onTouchMove(e) {
+      const s = touchState.current;
+      if (!s) return;
+      e.preventDefault();
+      if (s.mode === 'pan' && e.touches.length === 1) {
+        const t = e.touches[0];
+        onViewportChange({
+          panX: s.startPanX + (t.clientX - s.startClientX),
+          panY: s.startPanY + (t.clientY - s.startClientY),
+          zoom,
+        });
+      } else if (s.mode === 'pinch' && e.touches.length === 2) {
+        const [a, b] = e.touches;
+        const rect = wrap.getBoundingClientRect();
+        const cx = (a.clientX + b.clientX) / 2 - rect.left;
+        const cy = (a.clientY + b.clientY) / 2 - rect.top;
+        const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+        const ratio = dist / s.startDist;
+        const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, s.startZoom * ratio));
+        const newPanX = cx - (s.startCenterX - s.startPanX) * (newZoom / s.startZoom);
+        const newPanY = cy - (s.startCenterY - s.startPanY) * (newZoom / s.startZoom);
+        onViewportChange({ panX: newPanX, panY: newPanY, zoom: newZoom });
+      }
+    }
+
+    function onTouchEnd() {
+      touchState.current = null;
+    }
+
+    wrap.addEventListener('touchstart', onTouchStart, { passive: false });
+    wrap.addEventListener('touchmove',  onTouchMove,  { passive: false });
+    wrap.addEventListener('touchend',   onTouchEnd);
+    wrap.addEventListener('touchcancel', onTouchEnd);
+    return () => {
+      wrap.removeEventListener('touchstart', onTouchStart);
+      wrap.removeEventListener('touchmove',  onTouchMove);
+      wrap.removeEventListener('touchend',   onTouchEnd);
+      wrap.removeEventListener('touchcancel', onTouchEnd);
+    };
+  }, [panX, panY, zoom, onViewportChange]);
 
   // ─── Mouse: pan on background or pan tool ─────────────────────────────────
   function onMouseDown(e) {

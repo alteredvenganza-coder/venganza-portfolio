@@ -86,6 +86,27 @@ export default function CardShell({
     }
   }
 
+  function onHeaderTouchStart(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.touches.length !== 1) return;
+    const t = e.touches[0];
+    if (tool === 'connect') {
+      onConnectStart && onConnectStart();
+      e.stopPropagation();
+      return;
+    }
+    onSelect && onSelect(t);
+    onMoveStart && onMoveStart({ x: card.x, y: card.y });
+    dragRef.current = {
+      startClientX: t.clientX,
+      startClientY: t.clientY,
+      startX: card.x,
+      startY: card.y,
+      touch: true,
+    };
+    e.stopPropagation();
+  }
+
   useEffect(() => {
     const GRID = 20;
     let lastX = null, lastY = null, lastDX = 0, lastDY = 0;
@@ -134,6 +155,41 @@ export default function CardShell({
       window.removeEventListener('mouseup', up);
     };
   }, [zoom, onMove, onMoveEnd, onGroupMove, onGroupMoveEnd]);
+
+  // ─── Touch drag (single-finger tap-drag on card header) ─────────────────
+  useEffect(() => {
+    const GRID = 20;
+    let lastX = null, lastY = null;
+    function move(e) {
+      if (!dragRef.current?.touch) return;
+      if (e.touches.length !== 1) return;
+      e.preventDefault();
+      const t = e.touches[0];
+      const dx = (t.clientX - dragRef.current.startClientX) / zoom;
+      const dy = (t.clientY - dragRef.current.startClientY) / zoom;
+      let nx = dragRef.current.startX + dx;
+      let ny = dragRef.current.startY + dy;
+      nx = Math.round(nx / GRID) * GRID;
+      ny = Math.round(ny / GRID) * GRID;
+      lastX = nx; lastY = ny;
+      onMove && onMove(nx, ny);
+    }
+    function end() {
+      if (dragRef.current?.touch) {
+        dragRef.current = null;
+        onMoveEnd && onMoveEnd(lastX != null ? { x: lastX, y: lastY } : null);
+        lastX = lastY = null;
+      }
+    }
+    window.addEventListener('touchmove', move, { passive: false });
+    window.addEventListener('touchend',   end);
+    window.addEventListener('touchcancel', end);
+    return () => {
+      window.removeEventListener('touchmove', move);
+      window.removeEventListener('touchend',   end);
+      window.removeEventListener('touchcancel', end);
+    };
+  }, [zoom, onMove, onMoveEnd]);
 
   function onResizeMouseDown(e) {
     onResizeStart && onResizeStart({ w: card.w });
@@ -209,10 +265,12 @@ export default function CardShell({
 
       {/* Header / title */}
       <div onMouseDown={onHeaderMouseDown}
+        onTouchStart={onHeaderTouchStart}
         style={{
           padding: isHeading ? '0' : '9px 11px 5px',
           cursor: 'grab',
           userSelect: 'none',
+          touchAction: 'none',
         }}>
         {title !== undefined && (
           <input
