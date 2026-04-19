@@ -42,9 +42,11 @@ Drag dall'header per spostare. Drag dall'angolo basso-destra per ridimensionare.
 | `Wheel` | Pan |
 | `Ctrl/Cmd + Z` | Undo (move/resize) |
 | `Ctrl/Cmd + Shift + Z` / `Ctrl+Y` | Redo |
-| `Ctrl/Cmd + D` | Duplica card selezionata |
+| `Ctrl/Cmd + D` | Duplica card selezionata (funziona anche su selezione multipla) |
 | `Ctrl/Cmd + K` | Apre Command Palette |
 | `Alt + drag` | Muovi card fuori dalla griglia (disattiva snap) |
+| `Shift + Click card` | Aggiungi/togli dalla selezione multipla |
+| `Drag su sfondo` | Marquee selection (rubber-band) |
 | Click su connessione → `Backspace` | Elimina connessione |
 | Right-click | Menu contestuale (add elements, fit, clear) |
 
@@ -73,11 +75,17 @@ Modifiche live (digitazione, drag, resize) → debounced (300ms) sync su Supabas
 - **Phase 2** — Smart cards (Budget, Tasks, Files, Project Overview) collegate ai dati CRM esistenti, ClientCanvasHub sostituisce ClientDetail — ✅
 - **Phase 3** — HomePage rinnovata + MAT AI panel + undo/redo (move/resize) + thumbnail — ✅
 - **Phase 3.5 (polish)** — bundle splitting, command palette Ctrl+K, delete connessioni, Ctrl+D duplicate, export PNG, snap-to-grid, save indicator, AI panel su endpoint Claude reale — ✅
+- **Phase 4 (polish)** — multi-select + marquee + group drag, snapshot versioning (manuale + auto ogni 50 mutazioni), touch (pinch-zoom / pan / tap-drag), Playwright E2E smoke — ✅
+
+## Fatto (Phase 4)
+
+- **Multi-select** — `Shift + Click` + marquee (drag su sfondo). Group drag, delete e duplicate su selezione multipla con undo singolo.
+- **Versioning** — pannello `Vers` in sidebar: salva snapshot manuale, lista ultime 50, ripristina con ↺. Snapshot automatici ogni 50 mutazioni (`kind: 'auto'`).
+- **Touch** — pinch-zoom a due dita, pan a un dito su sfondo, tap-drag sulle card. Testato su iPad / Chrome touch emulator.
+- **E2E** — `npm run test:e2e`. Richiede `E2E_EMAIL` / `E2E_PASSWORD` in `.env.local` (utente Supabase dedicato). Senza env vars il test si salta.
 
 ## In Arrivo
 
-- Multi-select + group drag
-- Collaborazione real-time (Supabase Realtime o Yjs)
-- Versioning/history dei canvas
-- Canvas mobile (touch pinch-zoom)
-- Test E2E
+- Collaborazione real-time (Supabase Realtime o Yjs) — rinviata
+- Canvas mobile UI dedicata (toolbar/sidebar adattive)
+- Snapshot diff viewer
