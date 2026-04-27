@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { INSTAGRAM_DM_URL, INSTAGRAM_HANDLE, PREMADE_PRICE_PREMIUM, PREMADE_PRICE_BASIC } from './config';
 import { useTheme } from './hooks/useTheme';
+import { useSiteSettings } from './hooks/useSiteSettings';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -421,6 +422,7 @@ const Home = () => {
   const containerRef = useRef();
   const { slides, loading: slidesLoading } = useHeroSlides(6);
   const theme = useTheme();
+  const { settings: site } = useSiteSettings();
   const [servicesOpen, setServicesOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
@@ -446,6 +448,7 @@ const Home = () => {
       gsap.from('.hero-line', { y: 36, opacity: 0, stagger: 0.12, duration: 1.4, ease: 'power3.out', delay: 0.2 });
       gsap.from('.hero-sub', { y: 18, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.7 });
       gsap.from('.hero-cta', { y: 18, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.9 });
+      gsap.from('.hero-image', { x: 40, opacity: 0, duration: 1.4, ease: 'power3.out', delay: 0.4 });
       gsap.utils.toArray('.reveal').forEach((el) => {
         gsap.from(el, { y: 32, opacity: 0, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
       });
@@ -517,7 +520,7 @@ const Home = () => {
               )}
             </div>
             <a href="#work" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Work</a>
-            <a href="#premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Premades</a>
+            <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Premades</Link>
             <a href="#apps" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Apps</a>
             <Link to="/about" className="nav-item font-mono text-[11px] text-[color:var(--primary)] hover:text-black uppercase tracking-[0.2em] transition-colors">Studio</Link>
             <Link to="/contact" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Contact</Link>
@@ -530,25 +533,52 @@ const Home = () => {
 
       {/* ============ HERO ============ */}
       <section className="relative min-h-screen flex items-center px-6 md:px-12 lg:px-20 pt-32 pb-24">
-        <div className="max-w-6xl w-full">
-          <p className="hero-eyebrow font-mono text-[10px] md:text-[11px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-8">
-            Italian Creative Studio · Trieste
-          </p>
-          <h1 className="serif-heading text-black leading-[1.02] text-[2.6rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[6.5rem] xl:text-[7.2rem] font-medium">
-            <span className="hero-line block">We build brands</span>
-            <span className="hero-line block italic text-black/80">worth defending.</span>
-          </h1>
-          <p className="hero-sub mt-10 max-w-xl text-black/65 text-base md:text-lg leading-relaxed font-light">
-            Altered Venganza is a small studio shaping identity systems, apparel and tools for emerging brands. Strategic, editorial, made to outlast a single drop.
-          </p>
-          <div className="hero-cta mt-12 flex flex-col sm:flex-row gap-4">
-            <Link to="/contact" className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[11px] uppercase tracking-[0.25em] rounded-full hover:bg-black hover:text-white transition-colors">
-              Schedule a Consultation
-              <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-            </Link>
-            <a href="#services" className="inline-flex items-center justify-center gap-3 px-8 py-4 border border-black/15 text-black/80 hover:text-black hover:border-black/40 font-mono text-[11px] uppercase tracking-[0.25em] rounded-full transition-colors">
-              See What We Do
-            </a>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12 w-full max-w-7xl mx-auto items-center">
+
+          {/* Left — Content */}
+          <div className="md:col-span-7">
+            <p className="hero-eyebrow font-mono text-[10px] md:text-[11px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-8">
+              Italian Creative Studio · Trieste
+            </p>
+
+            <h1 className="hero-line heading-font text-black leading-[0.85] text-[4rem] sm:text-[5.5rem] md:text-[6.5rem] lg:text-[8.5rem] xl:text-[10rem] tracking-[0.01em] mb-6">
+              <span className="block">Altered</span>
+              <span className="block">Venganza</span>
+            </h1>
+
+            <p className="hero-line serif-heading italic text-black/75 text-[1.3rem] md:text-[1.7rem] lg:text-[2rem] leading-tight mb-10 max-w-xl">
+              We build brands worth defending.
+            </p>
+
+            <p className="hero-sub max-w-xl text-black/65 text-base md:text-lg leading-relaxed font-light mb-12">
+              A small Italian studio shaping identity systems, apparel and tools for emerging brands. Strategic, editorial, made to outlast a single drop.
+            </p>
+
+            <div className="hero-cta flex flex-col sm:flex-row gap-4">
+              <Link to="/contact" className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[11px] uppercase tracking-[0.25em] rounded-full hover:bg-black hover:text-white transition-colors">
+                Schedule a Consultation
+                <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+              </Link>
+              <a href="#services" className="inline-flex items-center justify-center gap-3 px-8 py-4 border border-black/15 text-black/80 hover:text-black hover:border-black/40 font-mono text-[11px] uppercase tracking-[0.25em] rounded-full transition-colors">
+                See What We Do
+              </a>
+            </div>
+          </div>
+
+          {/* Right — Image */}
+          <div className="md:col-span-5 hero-image">
+            <div className="relative aspect-[3/4] rounded-sm overflow-hidden border border-black/10 bg-gradient-to-br from-black/[0.05] to-black/[0.01]">
+              {site?.hero_image ? (
+                <img src={site.hero_image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              ) : theme.images?.heroRight ? (
+                <img src={theme.images.heroRight} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              ) : null}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between text-white">
+                <span className="font-mono text-[9px] uppercase tracking-[0.3em]">Studio · 2026</span>
+                <span className="font-mono text-[9px] uppercase tracking-[0.3em]">Trieste · IT</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -613,7 +643,9 @@ const Home = () => {
               </div>
             </div>
             <div className="md:col-span-7 order-1 md:order-2 aspect-[4/5] bg-gradient-to-br from-black/[0.04] to-black/[0.01] border border-black/10 rounded-sm overflow-hidden relative">
-              {!slidesLoading && slides[0]?.imageUrl ? (
+              {site?.case_study_maali_image ? (
+                <img src={site.case_study_maali_image} alt="MAALI" className="absolute inset-0 w-full h-full object-cover" />
+              ) : !slidesLoading && slides[0]?.imageUrl ? (
                 <img src={slides[0].imageUrl} alt="MAALI" className="absolute inset-0 w-full h-full object-cover" />
               ) : theme.images?.matRender1 ? (
                 <img src={theme.images.matRender1} alt="MAALI" className="absolute inset-0 w-full h-full object-cover" />
@@ -629,9 +661,11 @@ const Home = () => {
           {/* [04]-STUDIOS — secondary */}
           <div className="reveal grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
             <div className="md:col-span-5 order-1 aspect-square bg-gradient-to-br from-black/[0.04] to-black/[0.01] border border-black/10 rounded-sm overflow-hidden relative flex items-center justify-center">
-              {theme.images?.matRender3 && (
+              {site?.case_study_04_image ? (
+                <img src={site.case_study_04_image} alt="04 Studios" className="absolute inset-0 w-full h-full object-cover opacity-70" />
+              ) : theme.images?.matRender3 ? (
                 <img src={theme.images.matRender3} alt="04 Studios" className="absolute inset-0 w-full h-full object-cover opacity-40" />
-              )}
+              ) : null}
               <div className="absolute inset-0 bg-black/55" />
               <div className="relative z-10 text-center">
                 <span className="serif-heading text-white text-6xl md:text-7xl italic">[04]</span>
@@ -657,7 +691,10 @@ const Home = () => {
         <div className="max-w-6xl mx-auto">
           <div className="reveal mb-16 max-w-3xl">
             <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">03 — Quick Services</p>
-            <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">Premades & deliverables</h2>
+            <Link to="/premades" className="group inline-flex items-baseline gap-4">
+              <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight group-hover:text-[color:var(--primary)] transition-colors">Premades & deliverables</h2>
+              <ArrowRight size={28} className="text-black/30 group-hover:text-[color:var(--primary)] group-hover:translate-x-2 transition-all" />
+            </Link>
             <p className="text-black/60 text-base md:text-lg mt-6 font-light leading-relaxed">
               For founders who need speed — files, renders and packs that move from inbox to factory in days, not weeks.
             </p>
@@ -677,6 +714,13 @@ const Home = () => {
                 </div>
               </Link>
             ))}
+          </div>
+
+          <div className="reveal mt-12 flex justify-center">
+            <Link to="/premades" className="group inline-flex items-center gap-3 px-8 py-4 border border-black/15 text-black/80 hover:text-black hover:border-black/40 font-mono text-[11px] uppercase tracking-[0.25em] rounded-full transition-colors">
+              Browse all premades
+              <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+            </Link>
           </div>
         </div>
       </section>
@@ -2298,74 +2342,6 @@ const PremadesPage = () => {
   );
 };
 
-// ==========================================
-// ADMIN IMPORTS
-// ==========================================
-import { AuthProvider, useAuth } from './admin/lib/auth';
-import { EditorProvider } from './admin/lib/editor-context';
-import { ToastProvider } from './admin/lib/toast';
-import AdminLayout from './admin/components/AdminLayout';
-import EditorToolbar from './admin/components/EditorToolbar';
-import Dashboard from './admin/pages/Dashboard';
-import PremadesList from './admin/pages/PremadesList';
-import PremadeEdit from './admin/pages/PremadeEdit';
-import MediaLibrary from './admin/pages/MediaLibrary';
-import AdminSettings from './admin/pages/AdminSettings';
-import ThemeEditor from './admin/pages/ThemeEditor';
-
-const AdminGuard = () => {
-  const { user, loading, login } = useAuth();
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <p className="font-mono text-xs text-white/30 uppercase tracking-widest animate-pulse">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!user) {
-    const handleLogin = (e) => {
-      e.preventDefault();
-      const ok = login(password);
-      if (!ok) {
-        setError('Wrong password');
-        setPassword('');
-      }
-    };
-
-    return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="heading-font text-4xl tracking-widest text-white mb-4">Admin</h1>
-          <Link to="/" className="font-mono text-xs text-white/40 uppercase tracking-widest mb-8 block hover:text-white/60 transition-colors">Altered Venganza</Link>
-          <form onSubmit={handleLogin} className="flex flex-col gap-3 items-center">
-            <input
-              type="password"
-              value={password}
-              onChange={e => { setPassword(e.target.value); setError(''); }}
-              placeholder="Password"
-              className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 font-mono text-sm text-white text-center placeholder:text-white/20 outline-none focus:border-white/20 transition-colors w-64"
-              autoFocus
-            />
-            {error && <p className="font-mono text-[10px] text-red-400 uppercase tracking-widest">{error}</p>}
-            <button
-              type="submit"
-              className="bg-white text-black px-8 py-3 rounded-lg font-mono text-xs uppercase tracking-widest hover:bg-white/90 transition-colors"
-            >
-              Login
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
-  return <AdminLayout />;
-};
-
 // Global cart button — visible when cart has items, on any page
 const GlobalCartButton = () => {
   const { cart, setCartOpen, cartOpen } = useCart();
@@ -2392,43 +2368,24 @@ export default function App() {
   return (
     <BrowserRouter>
       <CartProvider>
-        <AuthProvider>
-          <EditorProvider>
-            <ToastProvider>
-              <ThemeController />
-              <AnimatedBackground />
-              <GlobalCartButton />
-              <GlobalCartSidebar />
-              <EditorToolbar />
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/materializing-ideas" element={<MaterializingIdeasPage />} />
-              <Route path="/vag" element={<GalleryPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/archive" element={<ArchivePage />} />
-              <Route path="/premades" element={<PremadesPage />} />
-              <Route path="/mat-renders" element={<MatRendersPage />} />
-              <Route path="/service/:id" element={<ServiceDetail />} />
-              <Route path="/service/:id/order" element={<ServiceOrderPage />} />
-              <Route path="/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
-              <Route path="/designs" element={<ServicePage title="Clothing Design Service" services={designsData} />} />
-
-              {/* Admin routes */}
-              <Route path="/admin" element={<AdminGuard />}>
-                <Route index element={<Dashboard />} />
-                <Route path="theme" element={<ThemeEditor />} />
-                <Route path="premades" element={<PremadesList />} />
-                <Route path="premades/new" element={<PremadeEdit />} />
-                <Route path="premades/edit/:filename" element={<PremadeEdit />} />
-                <Route path="media" element={<MediaLibrary />} />
-                <Route path="settings" element={<AdminSettings />} />
-              </Route>
-            </Routes>
-            </ToastProvider>
-          </EditorProvider>
-        </AuthProvider>
+        <ThemeController />
+        <AnimatedBackground />
+        <GlobalCartButton />
+        <GlobalCartSidebar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/materializing-ideas" element={<MaterializingIdeasPage />} />
+          <Route path="/vag" element={<GalleryPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/archive" element={<ArchivePage />} />
+          <Route path="/premades" element={<PremadesPage />} />
+          <Route path="/mat-renders" element={<MatRendersPage />} />
+          <Route path="/service/:id" element={<ServiceDetail />} />
+          <Route path="/service/:id/order" element={<ServiceOrderPage />} />
+          <Route path="/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
+          <Route path="/designs" element={<ServicePage title="Clothing Design Service" services={designsData} />} />
+        </Routes>
       </CartProvider>
     </BrowserRouter>
   );

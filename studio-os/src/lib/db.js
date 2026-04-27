@@ -409,3 +409,75 @@ export async function updateStorageUsed(userId, bytesAdded) {
     .eq('id', userId);
   if (error) throw error;
 }
+
+// ── Site (Altered Venganza website) ─────────────────────────────────────────
+
+export async function fetchSiteSettings() {
+  const { data, error } = await supabase
+    .from('site_settings')
+    .select('*')
+    .eq('id', 1)
+    .maybeSingle();
+  if (error) throw error;
+  return data || { id: 1, hero_image: null, case_study_maali_image: null, case_study_04_image: null, data: {} };
+}
+
+export async function updateSiteSettings(patch) {
+  const { error } = await supabase
+    .from('site_settings')
+    .upsert({ id: 1, ...patch, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+  if (error) throw error;
+}
+
+export async function fetchSitePremades() {
+  const { data, error } = await supabase
+    .from('site_premades')
+    .select('*')
+    .order('position', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createSitePremade(premade) {
+  const { data, error } = await supabase
+    .from('site_premades')
+    .insert(premade)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateSitePremade(id, patch) {
+  const { error } = await supabase
+    .from('site_premades')
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function deleteSitePremade(id) {
+  const { error } = await supabase
+    .from('site_premades')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function uploadSiteAsset(file, prefix = 'misc') {
+  const ext = file.name.split('.').pop() || 'bin';
+  const path = `${prefix}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabase.storage.from('site-assets').upload(path, file, {
+    cacheControl: '31536000',
+    upsert: false,
+  });
+  if (error) throw error;
+  const { data } = supabase.storage.from('site-assets').getPublicUrl(path);
+  return { path, url: data.publicUrl };
+}
+
+export async function deleteSiteAsset(path) {
+  if (!path) return;
+  const { error } = await supabase.storage.from('site-assets').remove([path]);
+  if (error) throw error;
+}

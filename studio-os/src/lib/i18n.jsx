@@ -10,6 +10,7 @@ const translations = {
     'nav.cashflow':     'Finanze',
     'nav.sendFile':     'Invia File',
     'nav.calendar':     'Calendario',
+    'nav.site':         'Sito',
 
     // Common labels
     'label.checklist':       'Checklist',
@@ -92,6 +93,7 @@ const translations = {
     'nav.cashflow':     'Finances',
     'nav.sendFile':     'Send File',
     'nav.calendar':     'Calendar',
+    'nav.site':         'Site',
 
     // Common labels
     'label.checklist':       'Checklist',

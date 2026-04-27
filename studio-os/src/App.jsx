@@ -39,6 +39,7 @@ import TransferPage from './pages/TransferPage';
 import SendFilePage from './pages/SendFilePage';
 import CalendarPage from './pages/CalendarPage';
 import AdminInvitesPage from './pages/AdminInvitesPage';
+import SitePage from './pages/SitePage';
 
 // ── Loading screen ─────────────────────────────────────────────────────────────
 function Spinner() {
@@ -76,6 +77,7 @@ function AdminContent() {
         <Route path="/pricing"       element={<PricingMemoryPage />} />
         <Route path="/cashflow"      element={<CashflowPage />} />
         <Route path="/calendario"    element={<CalendarPage />} />
+        <Route path="/site"          element={<SitePage />} />
         <Route path="/send"          element={<SendFilePage />} />
         <Route path="/inviti"        element={<AdminInvitesPage />} />
         <Route path="*"              element={<Navigate to="/" replace />} />

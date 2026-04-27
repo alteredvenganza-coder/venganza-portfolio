@@ -85,6 +85,83 @@ create policy "Auth delete project-files"
   on storage.objects for delete to authenticated
   using (bucket_id = 'project-files');
 
+-- ============================================================
+-- ── Site (Altered Venganza website) ─────────────────────────
+-- Public-readable theme + premades managed from Venganza OS
+-- ============================================================
+
+create table if not exists public.site_settings (
+  id                       int primary key default 1,
+  hero_image               text,
+  case_study_maali_image   text,
+  case_study_04_image      text,
+  data                     jsonb default '{}',
+  updated_at               timestamptz default now(),
+  constraint site_settings_singleton check (id = 1)
+);
+
+alter table public.site_settings enable row level security;
+
+create policy "Public read site_settings"
+  on public.site_settings for select
+  using (true);
+
+create policy "Auth write site_settings"
+  on public.site_settings for all
+  to authenticated
+  using (true) with check (true);
+
+-- Seed singleton row
+insert into public.site_settings (id) values (1) on conflict (id) do nothing;
+
+-- ── Site Premades ────────────────────────────────────────────
+
+create table if not exists public.site_premades (
+  id           uuid primary key default gen_random_uuid(),
+  slug         text unique,
+  title        text not null,
+  description  text,
+  image        text,
+  price        numeric,
+  status       text check (status in ('draft','published')) default 'draft',
+  position     int default 0,
+  created_at   timestamptz default now(),
+  updated_at   timestamptz default now()
+);
+
+alter table public.site_premades enable row level security;
+
+create policy "Public read published premades"
+  on public.site_premades for select
+  using (status = 'published');
+
+create policy "Auth read all premades"
+  on public.site_premades for select
+  to authenticated using (true);
+
+create policy "Auth write premades"
+  on public.site_premades for all
+  to authenticated
+  using (true) with check (true);
+
+-- ── Site assets storage (public images for the website) ──────
+
+insert into storage.buckets (id, name, public)
+  values ('site-assets', 'site-assets', true)
+  on conflict (id) do nothing;
+
+create policy "Public read site-assets"
+  on storage.objects for select
+  using (bucket_id = 'site-assets');
+
+create policy "Auth upload site-assets"
+  on storage.objects for insert to authenticated
+  with check (bucket_id = 'site-assets');
+
+create policy "Auth delete site-assets"
+  on storage.objects for delete to authenticated
+  using (bucket_id = 'site-assets');
+
 -- ── Push Subscriptions ────────────────────────────────────────
 create table if not exists public.push_subscriptions (
   id           uuid primary key default gen_random_uuid(),
