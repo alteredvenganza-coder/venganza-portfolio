@@ -424,8 +424,8 @@ const Home = () => {
   const [servicesOpen, setServicesOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
 
-  // Auto-advance slideshow
   useEffect(() => {
     if (slides.length < 2) return;
     const id = setInterval(() => setSlideIndex(i => (i + 1) % slides.length), 4000);
@@ -433,123 +433,315 @@ const Home = () => {
   }, [slides.length]);
 
   useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    ScrollTrigger.refresh();
     const ctx = gsap.context(() => {
       gsap.from('.nav-item', { y: -20, opacity: 0, stagger: 0.05, duration: 1, ease: 'power3.out' });
-      gsap.from('.hero-panel', { y: 40, opacity: 0, stagger: 0.15, duration: 1.5, ease: 'power3.out', delay: 0.3 });
+      gsap.from('.hero-eyebrow', { y: 16, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.1 });
+      gsap.from('.hero-line', { y: 36, opacity: 0, stagger: 0.12, duration: 1.4, ease: 'power3.out', delay: 0.2 });
+      gsap.from('.hero-sub', { y: 18, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.7 });
+      gsap.from('.hero-cta', { y: 18, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.9 });
+      gsap.utils.toArray('.reveal').forEach((el) => {
+        gsap.from(el, { y: 32, opacity: 0, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
+      });
     }, containerRef);
     return () => ctx.revert();
   }, []);
 
+  const strategicServices = [
+    { num: '01', title: 'Brand System', desc: 'Complete identity for clothing brands — strategy, logo system, visual language, label set.', price: '€3,500 – €5,500', delivery: '3–4 weeks', linkTo: '/brand-identity' },
+    { num: '02', title: 'Drop Starter', desc: 'For first-drop founders. Logo, palette, typography, social templates, print graphics.', price: '€900 – €1,800', delivery: '1–2 weeks', linkTo: '/brand-identity' },
+    { num: '03', title: 'Packaging Design', desc: 'Print-ready packaging built on top of an existing identity. Master and variant systems.', price: '€900 – €2,000', delivery: 'On request', linkTo: '/brand-identity' },
+    { num: '04', title: 'Retainer', desc: 'Ongoing creative continuity for brands that ship — graphics, social, ads, email.', price: '€600 – €2,500 / mo', delivery: 'Monthly', linkTo: '/brand-identity' },
+    { num: '05', title: 'Custom Apparel', desc: 'Tailored clothing graphics & techpacks built from your references and direction.', price: '€190 – €5,500', delivery: '3 days – 4 weeks', linkTo: '/designs' },
+  ];
+
+  const quickServices = [
+    { title: 'Premade Design', desc: 'Ready-to-buy clothing graphics. PSD/PNG, free mockup, factory contact.', price: '€150 – €250', delivery: '4h – 1 day', linkTo: '/premades' },
+    { title: 'Tech Pack', desc: 'Production-ready spec sheet — flat drawings, fabric specs, construction.', price: '€70 – €170', delivery: '1–2 days', linkTo: '/service/Techpack' },
+    { title: 'E-commerce Renders', desc: 'Studio-lit product renders for product pages and feed.', price: '€45 – €140', delivery: '4h – 1 day', linkTo: `/service/${encodeURIComponent('E-commerce Visual Asset')}` },
+  ];
+
+  const cases = [
+    {
+      type: 'Primary case study',
+      title: 'MAALI',
+      subtitle: 'Logo system · brand identity · apparel',
+      brief: 'A clothing label searching for an identity that could survive across drops without losing tension.',
+      approach: 'We built a modular logo system, an edited type voice, and a label set engineered for production — scaling from neckline tags to full campaign keyvisuals.',
+      result: 'A repeatable identity the brand can drop on for years without rebuilding.',
+      tags: ['Identity', 'Apparel', 'Production'],
+      year: '2025',
+    },
+    {
+      type: 'Secondary case study',
+      title: '[04]-STUDIOS',
+      subtitle: 'Logo · visual direction',
+      brief: 'A creative studio needing a confident logo and a quiet visual system to anchor it.',
+      approach: 'A typographic mark, a restrained palette, and motion-friendly visuals built to live across web, social and print.',
+      result: 'A direction the founder can defend in any room — minimal, deliberate, theirs.',
+      tags: ['Logo', 'Direction'],
+      year: '2025',
+    },
+  ];
+
+  const apps = [
+    { name: 'MAT Renders', tag: 'AI Fashion Rendering', desc: 'Production-ready clothing renders generated from references. Built to replace photoshoot dependency for emerging brands.', status: 'In private beta', to: '/mat-renders' },
+    { name: 'Showp Folio', tag: 'Portfolio + Storefront', desc: 'Portfolio SaaS for creators — one link that holds the work, the shop and the contact, fully synced.', status: 'Coming 2026', to: '/materializing-ideas' },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col relative z-10" ref={containerRef}>
 
-      {/* ============ TOP NAV BAR — ERD Style ============ */}
-      <header className="flex items-start px-6 md:px-10 pt-6 md:pt-8 pb-4 relative z-20">
-
-        {/* Left — Logo + Handle + Description */}
-        <div className="nav-item flex-shrink-0">
-          <Link to="/" className="heading-font leading-none text-black tracking-widest hover:opacity-70 transition-opacity block">
-            <span className="hidden lg:inline text-4xl xl:text-5xl">Altered Venganza</span>
-            <span className="lg:hidden text-3xl sm:text-4xl">Altered<br/>Venganza</span>
+      {/* ============ TOP NAV ============ */}
+      <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${scrolled ? 'bg-white/85 backdrop-blur-md border-b border-black/5' : ''}`}>
+        <div className="flex items-center justify-between px-6 md:px-10 py-4 md:py-5">
+          <Link to="/" className="nav-item heading-font tracking-widest text-black text-xl md:text-2xl hover:opacity-70 transition-opacity">
+            Altered Venganza
           </Link>
-          <a href="https://www.instagram.com/rare______________________/" target="_blank" rel="noopener noreferrer" className="font-mono text-[8px] md:text-[9px] text-black/40 hover:text-[color:var(--primary)] uppercase tracking-[0.1em] transition-colors mt-1.5 block">
-            rare______________________
-          </a>
-          <p className="font-mono text-[8px] md:text-[9px] text-black/50 uppercase tracking-[0.1em] leading-relaxed mt-2">
-            <span className="hidden lg:inline">Multi-disciplinary studio for brands that builds. Premium Branding + Custom Designs &bull; Pre-mades &amp; Softwares for Fashion Designers and Creatives.</span>
-            <span className="lg:hidden max-w-[260px] block">Multi-disciplinary studio<br/>for brands that builds.</span>
-          </p>
-        </div>
-
-        {/* Center — Desktop Navigation (truly centered) */}
-        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8 pt-2">
-          <div className="relative pb-2 -mb-2" onMouseEnter={() => setServicesOpen(true)} onMouseLeave={() => setServicesOpen(false)}>
-            <button onClick={() => setServicesOpen(o => !o)} className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors flex items-center gap-1">
-              Services <ChevronDown size={12} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
-            </button>
-            {servicesOpen && (
-              <div className="absolute top-full left-0 bg-white border border-black/10 rounded-lg shadow-xl py-2 min-w-[200px] z-50">
-                <Link to="/brand-identity" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">Brand Identity</Link>
-                <Link to="/designs" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.15em] transition-colors">Clothing Designs</Link>
-              </div>
-            )}
-          </div>
-          <Link to="/vag" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">VAG</Link>
-          <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">Premades</Link>
-          <Link to="/archive" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors">Archive</Link>
-          <Link to="/about" className="nav-item font-mono text-[11px] text-[color:var(--primary)] hover:text-black uppercase tracking-[0.15em] transition-colors">Who the f*ck is Rare?</Link>
-        </nav>
-
-        {/* Right — Contact + Cart + Burger */}
-        <div className="flex items-center gap-6 pt-2 ml-auto">
-          <Link to="/contact" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden md:block">Contact</Link>
-          <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.15em] transition-colors hidden md:block">Cart (0)</Link>
+          <nav className="hidden md:flex items-center gap-8">
+            <div className="relative pb-2 -mb-2" onMouseEnter={() => setServicesOpen(true)} onMouseLeave={() => setServicesOpen(false)}>
+              <button onClick={() => setServicesOpen(o => !o)} className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors flex items-center gap-1">
+                Services <ChevronDown size={12} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {servicesOpen && (
+                <div className="absolute top-full left-0 bg-white border border-black/10 rounded-lg shadow-xl py-2 min-w-[200px] z-50">
+                  <Link to="/brand-identity" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.2em] transition-colors">Brand Identity</Link>
+                  <Link to="/designs" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.2em] transition-colors">Clothing Designs</Link>
+                </div>
+              )}
+            </div>
+            <a href="#work" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Work</a>
+            <a href="#premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Premades</a>
+            <a href="#apps" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Apps</a>
+            <Link to="/about" className="nav-item font-mono text-[11px] text-[color:var(--primary)] hover:text-black uppercase tracking-[0.2em] transition-colors">Studio</Link>
+            <Link to="/contact" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Contact</Link>
+          </nav>
           <button onClick={() => setMenuOpen(true)} className="md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
             <Menu size={24} />
           </button>
         </div>
       </header>
 
-      {/* ============ HERO — Two panels side by side ============ */}
-      <div className="flex flex-col md:flex-row w-full relative z-10" style={{ minHeight: '70vh' }}>
-        {/* Left — Premades Slideshow */}
-        <Link to="/premades" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden group cursor-pointer">
-          {slidesLoading && (
-            <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
-              <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs animate-pulse">Loading...</span>
-            </div>
-          )}
-          {/* Slideshow images */}
-          {slides.map((slide, i) => (
-            <img
-              key={slide.imageUrl}
-              src={slide.imageUrl}
-              alt={`Premade ${i + 1}`}
-              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-              style={{ opacity: i === slideIndex ? 1 : 0 }}
-            />
-          ))}
-          {!slidesLoading && slides.length === 0 && theme.images?.heroLeft && (
-            <img src={theme.images.heroLeft} alt="Hero" className="absolute inset-0 w-full h-full object-cover" />
-          )}
-          {!slidesLoading && slides.length === 0 && !theme.images?.heroLeft && (
-            <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
-              <span className="font-mono text-black/30 uppercase tracking-[0.2em] text-xs">Coming Soon</span>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-          {/* Slide dots */}
-          {slides.length > 1 && (
-            <div className="absolute bottom-14 left-6 md:bottom-16 md:left-8 flex gap-1.5 z-10">
-              {slides.map((_, i) => (
-                <span key={i} className={`w-1 h-1 rounded-full transition-all duration-500 ${i === slideIndex ? 'bg-white w-3' : 'bg-white/40'}`} />
-              ))}
-            </div>
-          )}
-          <span className="absolute bottom-6 left-6 md:bottom-8 md:left-8 font-mono text-[11px] md:text-xs text-white uppercase tracking-[0.25em] group-hover:tracking-[0.35em] transition-all duration-500">
-            Shop Premades
-          </span>
-        </Link>
-
-        {/* Right — MAT Renders (clickable) */}
-        <Link to="/mat-renders" className="hero-panel relative w-full md:w-1/2 min-h-[50vh] md:min-h-0 overflow-hidden bg-neutral-900 flex items-center justify-center group cursor-pointer">
-          {theme.images?.heroRight && (
-            <img src={theme.images.heroRight} alt="MAT Renders" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
-          <div className="relative z-10 text-center flex flex-col items-center justify-center">
-            <h2 className="heading-font text-4xl md:text-6xl tracking-widest text-white">MAT RENDERS</h2>
-            <p className="font-mono text-[10px] md:text-xs text-white/70 uppercase tracking-[0.3em] mt-3 group-hover:tracking-[0.45em] transition-all duration-500">Explore →</p>
+      {/* ============ HERO ============ */}
+      <section className="relative min-h-screen flex items-center px-6 md:px-12 lg:px-20 pt-32 pb-24">
+        <div className="max-w-6xl w-full">
+          <p className="hero-eyebrow font-mono text-[10px] md:text-[11px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-8">
+            Italian Creative Studio · Trieste
+          </p>
+          <h1 className="serif-heading text-black leading-[1.02] text-[2.6rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[6.5rem] xl:text-[7.2rem] font-medium">
+            <span className="hero-line block">We build brands</span>
+            <span className="hero-line block italic text-black/80">worth defending.</span>
+          </h1>
+          <p className="hero-sub mt-10 max-w-xl text-black/65 text-base md:text-lg leading-relaxed font-light">
+            Altered Venganza is a small studio shaping identity systems, apparel and tools for emerging brands. Strategic, editorial, made to outlast a single drop.
+          </p>
+          <div className="hero-cta mt-12 flex flex-col sm:flex-row gap-4">
+            <Link to="/contact" className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[11px] uppercase tracking-[0.25em] rounded-full hover:bg-black hover:text-white transition-colors">
+              Schedule a Consultation
+              <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+            <a href="#services" className="inline-flex items-center justify-center gap-3 px-8 py-4 border border-black/15 text-black/80 hover:text-black hover:border-black/40 font-mono text-[11px] uppercase tracking-[0.25em] rounded-full transition-colors">
+              See What We Do
+            </a>
           </div>
-        </Link>
-      </div>
+        </div>
 
-      {/* Footer */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 text-black/30">
+          <span className="font-mono text-[9px] uppercase tracking-[0.4em]">Scroll</span>
+          <span className="w-px h-10 bg-gradient-to-b from-black/30 to-transparent" />
+        </div>
+      </section>
+
+      {/* ============ STRATEGIC SERVICES ============ */}
+      <section id="services" className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
+        <div className="max-w-6xl mx-auto">
+          <div className="reveal flex items-baseline justify-between flex-wrap gap-6 mb-16">
+            <div>
+              <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">01 — Strategic Engagements</p>
+              <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">What we build</h2>
+            </div>
+            <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.2em] max-w-xs leading-relaxed">
+              Built for brands that intend to ship more than once.
+            </p>
+          </div>
+
+          <div className="reveal divide-y divide-black/5 border-t border-black/5">
+            {strategicServices.map((s) => (
+              <Link key={s.num} to={s.linkTo} className="group grid grid-cols-12 gap-4 md:gap-8 py-8 md:py-10 items-baseline hover:bg-black/[0.02] transition-colors px-2 -mx-2">
+                <div className="col-span-2 md:col-span-1 font-mono text-[11px] text-black/30 uppercase tracking-widest pt-2">{s.num}</div>
+                <div className="col-span-10 md:col-span-5">
+                  <h3 className="serif-heading text-2xl md:text-3xl text-black group-hover:text-[color:var(--primary)] transition-colors">{s.title}</h3>
+                </div>
+                <div className="col-span-12 md:col-span-4 text-black/60 text-sm md:text-[15px] leading-relaxed font-light">{s.desc}</div>
+                <div className="col-span-12 md:col-span-2 md:text-right">
+                  <div className="font-mono text-[11px] text-[color:var(--primary)] uppercase tracking-[0.2em]">{s.price}</div>
+                  <div className="font-mono text-[9px] text-black/40 uppercase tracking-[0.2em] mt-1">{s.delivery}</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ CASE STUDIES ============ */}
+      <section id="work" className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
+        <div className="max-w-6xl mx-auto">
+          <div className="reveal mb-20">
+            <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">02 — Selected Work</p>
+            <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">Case studies</h2>
+          </div>
+
+          {/* MAALI — primary */}
+          <div className="reveal grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-24">
+            <div className="md:col-span-5 flex flex-col justify-center order-2 md:order-1">
+              <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.3em] mb-4">{cases[0].type}</p>
+              <h3 className="serif-heading text-black text-5xl md:text-6xl mb-3">{cases[0].title}</h3>
+              <p className="font-mono text-[11px] text-[color:var(--primary)] uppercase tracking-[0.25em] mb-8">{cases[0].subtitle}</p>
+              <div className="space-y-5 text-black/70 text-[15px] leading-relaxed font-light">
+                <div><span className="font-mono text-[10px] text-black/40 uppercase tracking-[0.25em] block mb-1">Brief</span>{cases[0].brief}</div>
+                <div><span className="font-mono text-[10px] text-black/40 uppercase tracking-[0.25em] block mb-1">Approach</span>{cases[0].approach}</div>
+                <div><span className="font-mono text-[10px] text-black/40 uppercase tracking-[0.25em] block mb-1">Result</span>{cases[0].result}</div>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-8">
+                {cases[0].tags.map(t => <span key={t} className="font-mono text-[9px] text-black/55 uppercase tracking-[0.2em] px-3 py-1.5 border border-black/10 rounded-full">{t}</span>)}
+              </div>
+            </div>
+            <div className="md:col-span-7 order-1 md:order-2 aspect-[4/5] bg-gradient-to-br from-black/[0.04] to-black/[0.01] border border-black/10 rounded-sm overflow-hidden relative">
+              {!slidesLoading && slides[0]?.imageUrl ? (
+                <img src={slides[0].imageUrl} alt="MAALI" className="absolute inset-0 w-full h-full object-cover" />
+              ) : theme.images?.matRender1 ? (
+                <img src={theme.images.matRender1} alt="MAALI" className="absolute inset-0 w-full h-full object-cover" />
+              ) : null}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+              <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+                <span className="serif-heading text-white text-2xl md:text-3xl italic">MAALI</span>
+                <span className="font-mono text-[9px] text-white/70 uppercase tracking-[0.25em]">{cases[0].year}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* [04]-STUDIOS — secondary */}
+          <div className="reveal grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
+            <div className="md:col-span-5 order-1 aspect-square bg-gradient-to-br from-black/[0.04] to-black/[0.01] border border-black/10 rounded-sm overflow-hidden relative flex items-center justify-center">
+              {theme.images?.matRender3 && (
+                <img src={theme.images.matRender3} alt="04 Studios" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+              )}
+              <div className="absolute inset-0 bg-black/55" />
+              <div className="relative z-10 text-center">
+                <span className="serif-heading text-white text-6xl md:text-7xl italic">[04]</span>
+                <p className="font-mono text-[10px] text-white/70 uppercase tracking-[0.3em] mt-2">STUDIOS</p>
+              </div>
+            </div>
+            <div className="md:col-span-7 order-2 flex flex-col justify-center">
+              <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.3em] mb-4">{cases[1].type}</p>
+              <h3 className="serif-heading text-black text-4xl md:text-5xl mb-3">{cases[1].title}</h3>
+              <p className="font-mono text-[11px] text-[color:var(--primary)] uppercase tracking-[0.25em] mb-6">{cases[1].subtitle}</p>
+              <p className="text-black/70 text-[15px] leading-relaxed font-light max-w-lg mb-3">{cases[1].brief}</p>
+              <p className="text-black/70 text-[15px] leading-relaxed font-light max-w-lg">{cases[1].approach}</p>
+              <div className="flex flex-wrap gap-2 mt-6">
+                {cases[1].tags.map(t => <span key={t} className="font-mono text-[9px] text-black/55 uppercase tracking-[0.2em] px-3 py-1.5 border border-black/10 rounded-full">{t}</span>)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ PREMADES / QUICK ============ */}
+      <section id="premades" className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
+        <div className="max-w-6xl mx-auto">
+          <div className="reveal mb-16 max-w-3xl">
+            <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">03 — Quick Services</p>
+            <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">Premades & deliverables</h2>
+            <p className="text-black/60 text-base md:text-lg mt-6 font-light leading-relaxed">
+              For founders who need speed — files, renders and packs that move from inbox to factory in days, not weeks.
+            </p>
+          </div>
+
+          <div className="reveal grid grid-cols-1 md:grid-cols-3 gap-6">
+            {quickServices.map((p) => (
+              <Link key={p.title} to={p.linkTo} className="group flex flex-col p-6 md:p-8 bg-black/[0.02] border border-black/10 hover:border-[color:var(--primary)] rounded-sm transition-colors">
+                <div className="flex items-center justify-between mb-6">
+                  <span className="font-mono text-[9px] text-black/40 uppercase tracking-[0.25em]">{p.delivery}</span>
+                  <span className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.2em]">{p.price}</span>
+                </div>
+                <h3 className="serif-heading text-black text-2xl md:text-3xl mb-3 group-hover:text-[color:var(--primary)] transition-colors">{p.title}</h3>
+                <p className="text-black/55 text-sm leading-relaxed font-light flex-1">{p.desc}</p>
+                <div className="mt-6 flex items-center gap-2 font-mono text-[10px] text-black/45 group-hover:text-[color:var(--primary)] uppercase tracking-[0.25em] transition-colors">
+                  Open <ArrowRight size={12} className="transition-transform group-hover:translate-x-1" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ APPS / PRODUCTS ============ */}
+      <section id="apps" className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
+        <div className="max-w-6xl mx-auto">
+          <div className="reveal mb-16 max-w-3xl">
+            <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">04 — Tools we're shipping</p>
+            <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">Software for creators</h2>
+            <p className="text-black/60 text-base md:text-lg mt-6 font-light leading-relaxed">
+              Two products spinning out of the studio — built to fix problems we kept hitting in client work.
+            </p>
+          </div>
+
+          <div className="reveal grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            {apps.map((a) => (
+              <Link key={a.name} to={a.to} className="group relative aspect-[5/6] md:aspect-[4/5] flex flex-col justify-between p-8 md:p-10 bg-gradient-to-br from-black/[0.04] to-black/[0.01] border border-black/10 hover:border-[color:var(--primary)] rounded-sm overflow-hidden transition-colors">
+                <div className="absolute inset-0 opacity-40 group-hover:opacity-70 transition-opacity" style={{ background: 'radial-gradient(circle at 70% 30%, rgba(123,31,36,0.10), transparent 60%)' }} />
+                <div className="relative z-10">
+                  <p className="font-mono text-[9px] text-[color:var(--primary)] uppercase tracking-[0.3em] mb-4">{a.tag}</p>
+                  <h3 className="serif-heading text-black text-4xl md:text-5xl">{a.name}</h3>
+                </div>
+                <div className="relative z-10">
+                  <p className="text-black/65 text-sm md:text-base leading-relaxed font-light max-w-md mb-6">{a.desc}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[9px] text-black/45 uppercase tracking-[0.3em]">{a.status}</span>
+                    <span className="flex items-center gap-2 font-mono text-[10px] text-black/60 group-hover:text-[color:var(--primary)] uppercase tracking-[0.25em] transition-colors">
+                      Learn more <ArrowRight size={12} className="transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ FINAL CTA ============ */}
+      <section className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
+        <div className="reveal max-w-4xl mx-auto text-center">
+          <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-6">Let's build it</p>
+          <h2 className="serif-heading text-black text-4xl md:text-6xl lg:text-7xl leading-[1.05] mb-10">
+            If your brand is going to <span className="italic text-black/75">last,</span><br />it deserves a real foundation.
+          </h2>
+          <p className="text-black/60 text-base md:text-lg max-w-xl mx-auto mb-12 font-light leading-relaxed">
+            Tell us where you are. We'll tell you honestly what makes sense — premade, custom, or somewhere between.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link to="/contact" className="group inline-flex items-center justify-center gap-3 px-10 py-4 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[11px] uppercase tracking-[0.25em] rounded-full hover:bg-black hover:text-white transition-colors">
+              Schedule a Consultation
+              <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+            <a href={INSTAGRAM_DM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-3 px-10 py-4 border border-black/15 text-black/80 hover:text-black hover:border-black/40 font-mono text-[11px] uppercase tracking-[0.25em] rounded-full transition-colors">
+              <Instagram size={14} /> @{INSTAGRAM_HANDLE}
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ FOOTER ============ */}
       <div className="px-6 md:px-10">
         <SiteFooter light={true} />
       </div>
 
-      {/* Mobile Menu */}
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
   );
