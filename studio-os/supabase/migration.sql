@@ -144,6 +144,76 @@ create policy "Auth write premades"
   to authenticated
   using (true) with check (true);
 
+-- ── Site Case Studies ────────────────────────────────────────
+
+create table if not exists public.site_case_studies (
+  id           uuid primary key default gen_random_uuid(),
+  slug         text unique,
+  title        text not null,
+  subtitle     text,
+  type_label   text,
+  brief        text,
+  approach     text,
+  result       text,
+  hero_image   text,
+  gallery      jsonb default '[]',
+  tags         jsonb default '[]',
+  year         text,
+  status       text check (status in ('draft','published')) default 'draft',
+  is_featured  boolean default false,
+  position     int default 0,
+  created_at   timestamptz default now(),
+  updated_at   timestamptz default now()
+);
+
+alter table public.site_case_studies enable row level security;
+
+create policy "Public read published case_studies"
+  on public.site_case_studies for select
+  using (status = 'published');
+
+create policy "Auth read all case_studies"
+  on public.site_case_studies for select
+  to authenticated using (true);
+
+create policy "Auth write case_studies"
+  on public.site_case_studies for all
+  to authenticated
+  using (true) with check (true);
+
+-- ── Site Services (strategic + quick) ────────────────────────
+
+create table if not exists public.site_services (
+  id           uuid primary key default gen_random_uuid(),
+  category     text check (category in ('strategic','quick')) not null,
+  num          text,
+  title        text not null,
+  subtitle     text,
+  description  text,
+  price_label  text,
+  delivery     text,
+  link_to      text,
+  status       text check (status in ('draft','published')) default 'published',
+  position     int default 0,
+  created_at   timestamptz default now(),
+  updated_at   timestamptz default now()
+);
+
+alter table public.site_services enable row level security;
+
+create policy "Public read published services"
+  on public.site_services for select
+  using (status = 'published');
+
+create policy "Auth read all services"
+  on public.site_services for select
+  to authenticated using (true);
+
+create policy "Auth write services"
+  on public.site_services for all
+  to authenticated
+  using (true) with check (true);
+
 -- ── Site assets storage (public images for the website) ──────
 
 insert into storage.buckets (id, name, public)

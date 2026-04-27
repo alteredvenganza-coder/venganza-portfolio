@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { INSTAGRAM_DM_URL, INSTAGRAM_HANDLE, PREMADE_PRICE_PREMIUM, PREMADE_PRICE_BASIC } from './config';
 import { useTheme } from './hooks/useTheme';
 import { useSiteSettings } from './hooks/useSiteSettings';
+import { useSiteCaseStudies, useSiteServices } from './hooks/useSiteCollections';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -418,15 +419,95 @@ const useLatestPremade = () => {
   return { latest: slides[0] || null, loading };
 };
 
+const DEFAULT_HOME_CONTENT = {
+  hero: {
+    eyebrow: 'Italian Creative Studio · Trieste',
+    headline_top: 'Altered',
+    headline_bottom: 'Venganza',
+    accent_line: 'We build brands worth defending.',
+    sub_paragraph: 'A small Italian studio shaping identity systems, apparel and tools for emerging brands. Strategic, editorial, made to outlast a single drop.',
+    cta_primary_label: 'Schedule a Consultation',
+    cta_primary_link: '/contact',
+    cta_secondary_label: 'See What We Do',
+    cta_secondary_link: '#services',
+    image_caption_left: 'Studio · 2026',
+    image_caption_right: 'Trieste · IT',
+  },
+  services: { eyebrow: '01 — Strategic Engagements', title: 'What we build', note: 'Built for brands that intend to ship more than once.' },
+  work:     { eyebrow: '02 — Selected Work',         title: 'Case studies' },
+  premades: { eyebrow: '03 — Quick Services', title: 'Premades & deliverables', sub: 'For founders who need speed — files, renders and packs that move from inbox to factory in days, not weeks.', browse_cta: 'Browse all premades' },
+  apps:     { eyebrow: "04 — Tools we're shipping", title: 'Software for creators', sub: "Two products spinning out of the studio — built to fix problems we kept hitting in client work." },
+  cta:      { eyebrow: "Let's build it", headline_top: 'If your brand is going to last,', headline_bottom: 'it deserves a real foundation.', sub: "Tell us where you are. We'll tell you honestly what makes sense — premade, custom, or somewhere between.", primary_label: 'Schedule a Consultation', primary_link: '/contact', secondary_label: 'Instagram', secondary_link: 'https://instagram.com' },
+};
+
+const DEFAULT_STRATEGIC_SERVICES = [
+  { num: '01', title: 'Brand System',     description: 'Complete identity for clothing brands — strategy, logo system, visual language, label set.', price_label: '€3,500 – €5,500', delivery: '3–4 weeks', link_to: '/brand-identity' },
+  { num: '02', title: 'Drop Starter',     description: 'For first-drop founders. Logo, palette, typography, social templates, print graphics.', price_label: '€900 – €1,800', delivery: '1–2 weeks', link_to: '/brand-identity' },
+  { num: '03', title: 'Packaging Design', description: 'Print-ready packaging built on top of an existing identity. Master and variant systems.', price_label: '€900 – €2,000', delivery: 'On request', link_to: '/brand-identity' },
+  { num: '04', title: 'Retainer',         description: 'Ongoing creative continuity for brands that ship — graphics, social, ads, email.', price_label: '€600 – €2,500 / mo', delivery: 'Monthly', link_to: '/brand-identity' },
+  { num: '05', title: 'Custom Apparel',   description: 'Tailored clothing graphics & techpacks built from your references and direction.', price_label: '€190 – €5,500', delivery: '3 days – 4 weeks', link_to: '/designs' },
+];
+
+const DEFAULT_QUICK_SERVICES = [
+  { title: 'Premade Design',      description: 'Ready-to-buy clothing graphics. PSD/PNG, free mockup, factory contact.', price_label: '€150 – €250', delivery: '4h – 1 day', link_to: '/premades' },
+  { title: 'Tech Pack',           description: 'Production-ready spec sheet — flat drawings, fabric specs, construction.', price_label: '€70 – €170',  delivery: '1–2 days',   link_to: '/service/Techpack' },
+  { title: 'E-commerce Renders',  description: 'Studio-lit product renders for product pages and feed.', price_label: '€45 – €140', delivery: '4h – 1 day', link_to: '/service/E-commerce%20Visual%20Asset' },
+];
+
+const DEFAULT_CASES = [
+  {
+    type_label: 'Primary case study', title: 'MAALI', subtitle: 'Logo system · brand identity · apparel',
+    brief: 'A clothing label searching for an identity that could survive across drops without losing tension.',
+    approach: 'We built a modular logo system, an edited type voice, and a label set engineered for production — scaling from neckline tags to full campaign keyvisuals.',
+    result: 'A repeatable identity the brand can drop on for years without rebuilding.',
+    tags: ['Identity', 'Apparel', 'Production'], year: '2025',
+  },
+  {
+    type_label: 'Secondary case study', title: '[04]-STUDIOS', subtitle: 'Logo · visual direction',
+    brief: 'A creative studio needing a confident logo and a quiet visual system to anchor it.',
+    approach: 'A typographic mark, a restrained palette, and motion-friendly visuals built to live across web, social and print.',
+    result: 'A direction the founder can defend in any room — minimal, deliberate, theirs.',
+    tags: ['Logo', 'Direction'], year: '2025',
+  },
+];
+
+const APPS = [
+  { name: 'MAT Renders', tag: 'AI Fashion Rendering', desc: 'Production-ready clothing renders generated from references. Built to replace photoshoot dependency for emerging brands.', status: 'In private beta', to: '/mat-renders' },
+  { name: 'Showp Folio', tag: 'Portfolio + Storefront', desc: 'Portfolio SaaS for creators — one link that holds the work, the shop and the contact, fully synced.', status: 'Coming 2026', to: '/materializing-ideas' },
+];
+
+function deepMerge(a, b) {
+  const out = { ...a };
+  for (const k of Object.keys(b || {})) {
+    if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k])) {
+      out[k] = deepMerge(a?.[k] || {}, b[k]);
+    } else if (b[k] !== undefined && b[k] !== null && b[k] !== '') {
+      out[k] = b[k];
+    }
+  }
+  return out;
+}
+
 const Home = () => {
   const containerRef = useRef();
   const { slides, loading: slidesLoading } = useHeroSlides(6);
   const theme = useTheme();
   const { settings: site } = useSiteSettings();
+  const { items: dbCases }    = useSiteCaseStudies();
+  const { items: dbServices } = useSiteServices();
   const [servicesOpen, setServicesOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+
+  // Apply theme primary color override (from OS Theme tab)
+  useEffect(() => {
+    const primary = site?.data?.theme?.colors?.primary;
+    if (primary) {
+      document.body.style.setProperty('--primary', primary);
+      return () => document.body.style.removeProperty('--primary');
+    }
+  }, [site?.data?.theme?.colors?.primary]);
 
   useEffect(() => {
     if (slides.length < 2) return;
@@ -456,47 +537,19 @@ const Home = () => {
     return () => ctx.revert();
   }, []);
 
-  const strategicServices = [
-    { num: '01', title: 'Brand System', desc: 'Complete identity for clothing brands — strategy, logo system, visual language, label set.', price: '€3,500 – €5,500', delivery: '3–4 weeks', linkTo: '/brand-identity' },
-    { num: '02', title: 'Drop Starter', desc: 'For first-drop founders. Logo, palette, typography, social templates, print graphics.', price: '€900 – €1,800', delivery: '1–2 weeks', linkTo: '/brand-identity' },
-    { num: '03', title: 'Packaging Design', desc: 'Print-ready packaging built on top of an existing identity. Master and variant systems.', price: '€900 – €2,000', delivery: 'On request', linkTo: '/brand-identity' },
-    { num: '04', title: 'Retainer', desc: 'Ongoing creative continuity for brands that ship — graphics, social, ads, email.', price: '€600 – €2,500 / mo', delivery: 'Monthly', linkTo: '/brand-identity' },
-    { num: '05', title: 'Custom Apparel', desc: 'Tailored clothing graphics & techpacks built from your references and direction.', price: '€190 – €5,500', delivery: '3 days – 4 weeks', linkTo: '/designs' },
-  ];
+  // Merge user-content overrides with defaults
+  const C = deepMerge(DEFAULT_HOME_CONTENT, site?.data?.content || {});
 
-  const quickServices = [
-    { title: 'Premade Design', desc: 'Ready-to-buy clothing graphics. PSD/PNG, free mockup, factory contact.', price: '€150 – €250', delivery: '4h – 1 day', linkTo: '/premades' },
-    { title: 'Tech Pack', desc: 'Production-ready spec sheet — flat drawings, fabric specs, construction.', price: '€70 – €170', delivery: '1–2 days', linkTo: '/service/Techpack' },
-    { title: 'E-commerce Renders', desc: 'Studio-lit product renders for product pages and feed.', price: '€45 – €140', delivery: '4h – 1 day', linkTo: `/service/${encodeURIComponent('E-commerce Visual Asset')}` },
-  ];
+  // Resolve services: DB first, fallback to defaults
+  const dbStrategic = dbServices.filter(s => s.category === 'strategic');
+  const dbQuick     = dbServices.filter(s => s.category === 'quick');
+  const strategicServices = dbStrategic.length ? dbStrategic : DEFAULT_STRATEGIC_SERVICES;
+  const quickServices     = dbQuick.length     ? dbQuick     : DEFAULT_QUICK_SERVICES;
 
-  const cases = [
-    {
-      type: 'Primary case study',
-      title: 'MAALI',
-      subtitle: 'Logo system · brand identity · apparel',
-      brief: 'A clothing label searching for an identity that could survive across drops without losing tension.',
-      approach: 'We built a modular logo system, an edited type voice, and a label set engineered for production — scaling from neckline tags to full campaign keyvisuals.',
-      result: 'A repeatable identity the brand can drop on for years without rebuilding.',
-      tags: ['Identity', 'Apparel', 'Production'],
-      year: '2025',
-    },
-    {
-      type: 'Secondary case study',
-      title: '[04]-STUDIOS',
-      subtitle: 'Logo · visual direction',
-      brief: 'A creative studio needing a confident logo and a quiet visual system to anchor it.',
-      approach: 'A typographic mark, a restrained palette, and motion-friendly visuals built to live across web, social and print.',
-      result: 'A direction the founder can defend in any room — minimal, deliberate, theirs.',
-      tags: ['Logo', 'Direction'],
-      year: '2025',
-    },
-  ];
-
-  const apps = [
-    { name: 'MAT Renders', tag: 'AI Fashion Rendering', desc: 'Production-ready clothing renders generated from references. Built to replace photoshoot dependency for emerging brands.', status: 'In private beta', to: '/mat-renders' },
-    { name: 'Showp Folio', tag: 'Portfolio + Storefront', desc: 'Portfolio SaaS for creators — one link that holds the work, the shop and the contact, fully synced.', status: 'Coming 2026', to: '/materializing-ideas' },
-  ];
+  // Resolve case studies: featured DB rows first, fallback to defaults
+  const featured = dbCases.filter(c => c.is_featured).sort((a, b) => (a.position || 0) - (b.position || 0));
+  const cases = featured.length >= 2 ? featured.slice(0, 2) : DEFAULT_CASES;
+  const apps = APPS;
 
   return (
     <div className="min-h-screen flex flex-col relative z-10" ref={containerRef}>
@@ -538,29 +591,29 @@ const Home = () => {
           {/* Left — Content */}
           <div className="md:col-span-7">
             <p className="hero-eyebrow font-mono text-[10px] md:text-[11px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-8">
-              Italian Creative Studio · Trieste
+              {C.hero.eyebrow}
             </p>
 
             <h1 className="hero-line heading-font text-black leading-[0.85] text-[4rem] sm:text-[5.5rem] md:text-[6.5rem] lg:text-[8.5rem] xl:text-[10rem] tracking-[0.01em] mb-6">
-              <span className="block">Altered</span>
-              <span className="block">Venganza</span>
+              <span className="block">{C.hero.headline_top}</span>
+              <span className="block">{C.hero.headline_bottom}</span>
             </h1>
 
             <p className="hero-line serif-heading italic text-black/75 text-[1.3rem] md:text-[1.7rem] lg:text-[2rem] leading-tight mb-10 max-w-xl">
-              We build brands worth defending.
+              {C.hero.accent_line}
             </p>
 
             <p className="hero-sub max-w-xl text-black/65 text-base md:text-lg leading-relaxed font-light mb-12">
-              A small Italian studio shaping identity systems, apparel and tools for emerging brands. Strategic, editorial, made to outlast a single drop.
+              {C.hero.sub_paragraph}
             </p>
 
             <div className="hero-cta flex flex-col sm:flex-row gap-4">
-              <Link to="/contact" className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[11px] uppercase tracking-[0.25em] rounded-full hover:bg-black hover:text-white transition-colors">
-                Schedule a Consultation
+              <Link to={C.hero.cta_primary_link} className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[11px] uppercase tracking-[0.25em] rounded-full hover:bg-black hover:text-white transition-colors">
+                {C.hero.cta_primary_label}
                 <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
               </Link>
-              <a href="#services" className="inline-flex items-center justify-center gap-3 px-8 py-4 border border-black/15 text-black/80 hover:text-black hover:border-black/40 font-mono text-[11px] uppercase tracking-[0.25em] rounded-full transition-colors">
-                See What We Do
+              <a href={C.hero.cta_secondary_link} className="inline-flex items-center justify-center gap-3 px-8 py-4 border border-black/15 text-black/80 hover:text-black hover:border-black/40 font-mono text-[11px] uppercase tracking-[0.25em] rounded-full transition-colors">
+                {C.hero.cta_secondary_label}
               </a>
             </div>
           </div>
@@ -575,8 +628,8 @@ const Home = () => {
               ) : null}
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between text-white">
-                <span className="font-mono text-[9px] uppercase tracking-[0.3em]">Studio · 2026</span>
-                <span className="font-mono text-[9px] uppercase tracking-[0.3em]">Trieste · IT</span>
+                <span className="font-mono text-[9px] uppercase tracking-[0.3em]">{C.hero.image_caption_left}</span>
+                <span className="font-mono text-[9px] uppercase tracking-[0.3em]">{C.hero.image_caption_right}</span>
               </div>
             </div>
           </div>
@@ -593,24 +646,24 @@ const Home = () => {
         <div className="max-w-6xl mx-auto">
           <div className="reveal flex items-baseline justify-between flex-wrap gap-6 mb-16">
             <div>
-              <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">01 — Strategic Engagements</p>
-              <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">What we build</h2>
+              <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">{C.services.eyebrow}</p>
+              <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">{C.services.title}</h2>
             </div>
             <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.2em] max-w-xs leading-relaxed">
-              Built for brands that intend to ship more than once.
+              {C.services.note}
             </p>
           </div>
 
           <div className="reveal divide-y divide-black/5 border-t border-black/5">
-            {strategicServices.map((s) => (
-              <Link key={s.num} to={s.linkTo} className="group grid grid-cols-12 gap-4 md:gap-8 py-8 md:py-10 items-baseline hover:bg-black/[0.02] transition-colors px-2 -mx-2">
-                <div className="col-span-2 md:col-span-1 font-mono text-[11px] text-black/30 uppercase tracking-widest pt-2">{s.num}</div>
+            {strategicServices.map((s, i) => (
+              <Link key={s.id || s.num || i} to={s.link_to || '#'} className="group grid grid-cols-12 gap-4 md:gap-8 py-8 md:py-10 items-baseline hover:bg-black/[0.02] transition-colors px-2 -mx-2">
+                <div className="col-span-2 md:col-span-1 font-mono text-[11px] text-black/30 uppercase tracking-widest pt-2">{s.num || String(i + 1).padStart(2, '0')}</div>
                 <div className="col-span-10 md:col-span-5">
                   <h3 className="serif-heading text-2xl md:text-3xl text-black group-hover:text-[color:var(--primary)] transition-colors">{s.title}</h3>
                 </div>
-                <div className="col-span-12 md:col-span-4 text-black/60 text-sm md:text-[15px] leading-relaxed font-light">{s.desc}</div>
+                <div className="col-span-12 md:col-span-4 text-black/60 text-sm md:text-[15px] leading-relaxed font-light">{s.description}</div>
                 <div className="col-span-12 md:col-span-2 md:text-right">
-                  <div className="font-mono text-[11px] text-[color:var(--primary)] uppercase tracking-[0.2em]">{s.price}</div>
+                  <div className="font-mono text-[11px] text-[color:var(--primary)] uppercase tracking-[0.2em]">{s.price_label}</div>
                   <div className="font-mono text-[9px] text-black/40 uppercase tracking-[0.2em] mt-1">{s.delivery}</div>
                 </div>
               </Link>
@@ -623,64 +676,72 @@ const Home = () => {
       <section id="work" className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
         <div className="max-w-6xl mx-auto">
           <div className="reveal mb-20">
-            <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">02 — Selected Work</p>
-            <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">Case studies</h2>
+            <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">{C.work.eyebrow}</p>
+            <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">{C.work.title}</h2>
           </div>
 
-          {/* MAALI — primary */}
+          {/* PRIMARY (cases[0]) */}
           <div className="reveal grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-24">
             <div className="md:col-span-5 flex flex-col justify-center order-2 md:order-1">
-              <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.3em] mb-4">{cases[0].type}</p>
+              <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.3em] mb-4">{cases[0].type_label}</p>
               <h3 className="serif-heading text-black text-5xl md:text-6xl mb-3">{cases[0].title}</h3>
-              <p className="font-mono text-[11px] text-[color:var(--primary)] uppercase tracking-[0.25em] mb-8">{cases[0].subtitle}</p>
+              {cases[0].subtitle && <p className="font-mono text-[11px] text-[color:var(--primary)] uppercase tracking-[0.25em] mb-8">{cases[0].subtitle}</p>}
               <div className="space-y-5 text-black/70 text-[15px] leading-relaxed font-light">
-                <div><span className="font-mono text-[10px] text-black/40 uppercase tracking-[0.25em] block mb-1">Brief</span>{cases[0].brief}</div>
-                <div><span className="font-mono text-[10px] text-black/40 uppercase tracking-[0.25em] block mb-1">Approach</span>{cases[0].approach}</div>
-                <div><span className="font-mono text-[10px] text-black/40 uppercase tracking-[0.25em] block mb-1">Result</span>{cases[0].result}</div>
+                {cases[0].brief    && <div><span className="font-mono text-[10px] text-black/40 uppercase tracking-[0.25em] block mb-1">Brief</span>{cases[0].brief}</div>}
+                {cases[0].approach && <div><span className="font-mono text-[10px] text-black/40 uppercase tracking-[0.25em] block mb-1">Approach</span>{cases[0].approach}</div>}
+                {cases[0].result   && <div><span className="font-mono text-[10px] text-black/40 uppercase tracking-[0.25em] block mb-1">Result</span>{cases[0].result}</div>}
               </div>
-              <div className="flex flex-wrap gap-2 mt-8">
-                {cases[0].tags.map(t => <span key={t} className="font-mono text-[9px] text-black/55 uppercase tracking-[0.2em] px-3 py-1.5 border border-black/10 rounded-full">{t}</span>)}
-              </div>
+              {cases[0].tags?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-8">
+                  {cases[0].tags.map(t => <span key={t} className="font-mono text-[9px] text-black/55 uppercase tracking-[0.2em] px-3 py-1.5 border border-black/10 rounded-full">{t}</span>)}
+                </div>
+              )}
             </div>
             <div className="md:col-span-7 order-1 md:order-2 aspect-[4/5] bg-gradient-to-br from-black/[0.04] to-black/[0.01] border border-black/10 rounded-sm overflow-hidden relative">
-              {site?.case_study_maali_image ? (
-                <img src={site.case_study_maali_image} alt="MAALI" className="absolute inset-0 w-full h-full object-cover" />
+              {cases[0].hero_image ? (
+                <img src={cases[0].hero_image} alt={cases[0].title} className="absolute inset-0 w-full h-full object-cover" />
+              ) : site?.case_study_maali_image ? (
+                <img src={site.case_study_maali_image} alt={cases[0].title} className="absolute inset-0 w-full h-full object-cover" />
               ) : !slidesLoading && slides[0]?.imageUrl ? (
-                <img src={slides[0].imageUrl} alt="MAALI" className="absolute inset-0 w-full h-full object-cover" />
+                <img src={slides[0].imageUrl} alt={cases[0].title} className="absolute inset-0 w-full h-full object-cover" />
               ) : theme.images?.matRender1 ? (
-                <img src={theme.images.matRender1} alt="MAALI" className="absolute inset-0 w-full h-full object-cover" />
+                <img src={theme.images.matRender1} alt={cases[0].title} className="absolute inset-0 w-full h-full object-cover" />
               ) : null}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
-                <span className="serif-heading text-white text-2xl md:text-3xl italic">MAALI</span>
-                <span className="font-mono text-[9px] text-white/70 uppercase tracking-[0.25em]">{cases[0].year}</span>
+                <span className="serif-heading text-white text-2xl md:text-3xl italic">{cases[0].title}</span>
+                {cases[0].year && <span className="font-mono text-[9px] text-white/70 uppercase tracking-[0.25em]">{cases[0].year}</span>}
               </div>
             </div>
           </div>
 
-          {/* [04]-STUDIOS — secondary */}
+          {/* SECONDARY (cases[1]) */}
           <div className="reveal grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
             <div className="md:col-span-5 order-1 aspect-square bg-gradient-to-br from-black/[0.04] to-black/[0.01] border border-black/10 rounded-sm overflow-hidden relative flex items-center justify-center">
-              {site?.case_study_04_image ? (
-                <img src={site.case_study_04_image} alt="04 Studios" className="absolute inset-0 w-full h-full object-cover opacity-70" />
+              {cases[1].hero_image ? (
+                <img src={cases[1].hero_image} alt={cases[1].title} className="absolute inset-0 w-full h-full object-cover opacity-70" />
+              ) : site?.case_study_04_image ? (
+                <img src={site.case_study_04_image} alt={cases[1].title} className="absolute inset-0 w-full h-full object-cover opacity-70" />
               ) : theme.images?.matRender3 ? (
-                <img src={theme.images.matRender3} alt="04 Studios" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+                <img src={theme.images.matRender3} alt={cases[1].title} className="absolute inset-0 w-full h-full object-cover opacity-40" />
               ) : null}
               <div className="absolute inset-0 bg-black/55" />
-              <div className="relative z-10 text-center">
-                <span className="serif-heading text-white text-6xl md:text-7xl italic">[04]</span>
-                <p className="font-mono text-[10px] text-white/70 uppercase tracking-[0.3em] mt-2">STUDIOS</p>
+              <div className="relative z-10 text-center px-4">
+                <span className="serif-heading text-white text-4xl md:text-6xl italic">{cases[1].title}</span>
+                {cases[1].year && <p className="font-mono text-[10px] text-white/70 uppercase tracking-[0.3em] mt-2">{cases[1].year}</p>}
               </div>
             </div>
             <div className="md:col-span-7 order-2 flex flex-col justify-center">
-              <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.3em] mb-4">{cases[1].type}</p>
+              <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.3em] mb-4">{cases[1].type_label}</p>
               <h3 className="serif-heading text-black text-4xl md:text-5xl mb-3">{cases[1].title}</h3>
-              <p className="font-mono text-[11px] text-[color:var(--primary)] uppercase tracking-[0.25em] mb-6">{cases[1].subtitle}</p>
-              <p className="text-black/70 text-[15px] leading-relaxed font-light max-w-lg mb-3">{cases[1].brief}</p>
-              <p className="text-black/70 text-[15px] leading-relaxed font-light max-w-lg">{cases[1].approach}</p>
-              <div className="flex flex-wrap gap-2 mt-6">
-                {cases[1].tags.map(t => <span key={t} className="font-mono text-[9px] text-black/55 uppercase tracking-[0.2em] px-3 py-1.5 border border-black/10 rounded-full">{t}</span>)}
-              </div>
+              {cases[1].subtitle && <p className="font-mono text-[11px] text-[color:var(--primary)] uppercase tracking-[0.25em] mb-6">{cases[1].subtitle}</p>}
+              {cases[1].brief    && <p className="text-black/70 text-[15px] leading-relaxed font-light max-w-lg mb-3">{cases[1].brief}</p>}
+              {cases[1].approach && <p className="text-black/70 text-[15px] leading-relaxed font-light max-w-lg">{cases[1].approach}</p>}
+              {cases[1].tags?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-6">
+                  {cases[1].tags.map(t => <span key={t} className="font-mono text-[9px] text-black/55 uppercase tracking-[0.2em] px-3 py-1.5 border border-black/10 rounded-full">{t}</span>)}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -690,25 +751,25 @@ const Home = () => {
       <section id="premades" className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
         <div className="max-w-6xl mx-auto">
           <div className="reveal mb-16 max-w-3xl">
-            <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">03 — Quick Services</p>
+            <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">{C.premades.eyebrow}</p>
             <Link to="/premades" className="group inline-flex items-baseline gap-4">
-              <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight group-hover:text-[color:var(--primary)] transition-colors">Premades & deliverables</h2>
+              <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight group-hover:text-[color:var(--primary)] transition-colors">{C.premades.title}</h2>
               <ArrowRight size={28} className="text-black/30 group-hover:text-[color:var(--primary)] group-hover:translate-x-2 transition-all" />
             </Link>
             <p className="text-black/60 text-base md:text-lg mt-6 font-light leading-relaxed">
-              For founders who need speed — files, renders and packs that move from inbox to factory in days, not weeks.
+              {C.premades.sub}
             </p>
           </div>
 
           <div className="reveal grid grid-cols-1 md:grid-cols-3 gap-6">
-            {quickServices.map((p) => (
-              <Link key={p.title} to={p.linkTo} className="group flex flex-col p-6 md:p-8 bg-black/[0.02] border border-black/10 hover:border-[color:var(--primary)] rounded-sm transition-colors">
+            {quickServices.map((p, i) => (
+              <Link key={p.id || p.title || i} to={p.link_to || '/premades'} className="group flex flex-col p-6 md:p-8 bg-black/[0.02] border border-black/10 hover:border-[color:var(--primary)] rounded-sm transition-colors">
                 <div className="flex items-center justify-between mb-6">
                   <span className="font-mono text-[9px] text-black/40 uppercase tracking-[0.25em]">{p.delivery}</span>
-                  <span className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.2em]">{p.price}</span>
+                  <span className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.2em]">{p.price_label}</span>
                 </div>
                 <h3 className="serif-heading text-black text-2xl md:text-3xl mb-3 group-hover:text-[color:var(--primary)] transition-colors">{p.title}</h3>
-                <p className="text-black/55 text-sm leading-relaxed font-light flex-1">{p.desc}</p>
+                <p className="text-black/55 text-sm leading-relaxed font-light flex-1">{p.description}</p>
                 <div className="mt-6 flex items-center gap-2 font-mono text-[10px] text-black/45 group-hover:text-[color:var(--primary)] uppercase tracking-[0.25em] transition-colors">
                   Open <ArrowRight size={12} className="transition-transform group-hover:translate-x-1" />
                 </div>
@@ -718,7 +779,7 @@ const Home = () => {
 
           <div className="reveal mt-12 flex justify-center">
             <Link to="/premades" className="group inline-flex items-center gap-3 px-8 py-4 border border-black/15 text-black/80 hover:text-black hover:border-black/40 font-mono text-[11px] uppercase tracking-[0.25em] rounded-full transition-colors">
-              Browse all premades
+              {C.premades.browse_cta}
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
@@ -729,10 +790,10 @@ const Home = () => {
       <section id="apps" className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
         <div className="max-w-6xl mx-auto">
           <div className="reveal mb-16 max-w-3xl">
-            <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">04 — Tools we're shipping</p>
-            <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">Software for creators</h2>
+            <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">{C.apps.eyebrow}</p>
+            <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">{C.apps.title}</h2>
             <p className="text-black/60 text-base md:text-lg mt-6 font-light leading-relaxed">
-              Two products spinning out of the studio — built to fix problems we kept hitting in client work.
+              {C.apps.sub}
             </p>
           </div>
 
@@ -762,20 +823,21 @@ const Home = () => {
       {/* ============ FINAL CTA ============ */}
       <section className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
         <div className="reveal max-w-4xl mx-auto text-center">
-          <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-6">Let's build it</p>
+          <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-6">{C.cta.eyebrow}</p>
           <h2 className="serif-heading text-black text-4xl md:text-6xl lg:text-7xl leading-[1.05] mb-10">
-            If your brand is going to <span className="italic text-black/75">last,</span><br />it deserves a real foundation.
+            {C.cta.headline_top}<br />
+            <span className="italic text-black/75">{C.cta.headline_bottom}</span>
           </h2>
           <p className="text-black/60 text-base md:text-lg max-w-xl mx-auto mb-12 font-light leading-relaxed">
-            Tell us where you are. We'll tell you honestly what makes sense — premade, custom, or somewhere between.
+            {C.cta.sub}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/contact" className="group inline-flex items-center justify-center gap-3 px-10 py-4 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[11px] uppercase tracking-[0.25em] rounded-full hover:bg-black hover:text-white transition-colors">
-              Schedule a Consultation
+            <Link to={C.cta.primary_link} className="group inline-flex items-center justify-center gap-3 px-10 py-4 bg-[color:var(--primary)] text-[color:var(--btn-tx)] font-mono text-[11px] uppercase tracking-[0.25em] rounded-full hover:bg-black hover:text-white transition-colors">
+              {C.cta.primary_label}
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
             </Link>
-            <a href={INSTAGRAM_DM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-3 px-10 py-4 border border-black/15 text-black/80 hover:text-black hover:border-black/40 font-mono text-[11px] uppercase tracking-[0.25em] rounded-full transition-colors">
-              <Instagram size={14} /> @{INSTAGRAM_HANDLE}
+            <a href={C.cta.secondary_link || INSTAGRAM_DM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-3 px-10 py-4 border border-black/15 text-black/80 hover:text-black hover:border-black/40 font-mono text-[11px] uppercase tracking-[0.25em] rounded-full transition-colors">
+              <Instagram size={14} /> {C.cta.secondary_label || `@${INSTAGRAM_HANDLE}`}
             </a>
           </div>
         </div>

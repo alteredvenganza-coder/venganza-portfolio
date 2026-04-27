@@ -481,3 +481,87 @@ export async function deleteSiteAsset(path) {
   const { error } = await supabase.storage.from('site-assets').remove([path]);
   if (error) throw error;
 }
+
+// ── Site Case Studies ───────────────────────────────────────────────────────
+
+export async function fetchSiteCaseStudies() {
+  const { data, error } = await supabase
+    .from('site_case_studies')
+    .select('*')
+    .order('position', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createSiteCaseStudy(payload) {
+  const { data, error } = await supabase
+    .from('site_case_studies')
+    .insert(payload)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateSiteCaseStudy(id, patch) {
+  const { error } = await supabase
+    .from('site_case_studies')
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function deleteSiteCaseStudy(id) {
+  const { error } = await supabase
+    .from('site_case_studies')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// ── Site Services ───────────────────────────────────────────────────────────
+
+export async function fetchSiteServices() {
+  const { data, error } = await supabase
+    .from('site_services')
+    .select('*')
+    .order('position', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createSiteService(payload) {
+  const { data, error } = await supabase
+    .from('site_services')
+    .insert(payload)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateSiteService(id, patch) {
+  const { error } = await supabase
+    .from('site_services')
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function deleteSiteService(id) {
+  const { error } = await supabase
+    .from('site_services')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// ── Site content / theme (stored as JSONB in site_settings.data) ────────────
+
+export async function updateSiteData(patch) {
+  // Merge into the data jsonb column
+  const current = await fetchSiteSettings();
+  const nextData = { ...(current.data || {}), ...patch };
+  await updateSiteSettings({ data: nextData });
+  return nextData;
+}

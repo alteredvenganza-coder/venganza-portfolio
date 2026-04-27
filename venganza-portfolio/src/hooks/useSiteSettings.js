@@ -5,6 +5,7 @@ const DEFAULT = {
   hero_image: null,
   case_study_maali_image: null,
   case_study_04_image: null,
+  data: {},
 };
 
 let cache = null;
