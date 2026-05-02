@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings, FolderKanban, Send, CalendarDays, Gift, Menu, Globe } from 'lucide-react';
+import { Search, LayoutDashboard, Users, TrendingUp, Wallet, X, Settings, FolderKanban, Send, CalendarDays, Gift, Menu, Globe, Zap } from 'lucide-react';
 import { useClients, useProjects, useGoals } from '../hooks/useStore';
 import { useI18n } from '../lib/i18n';
 import { useUserProfile } from '../hooks/useUserProfile';
@@ -16,6 +16,7 @@ const NAV = [
   { to: '/site',       i18nKey: 'nav.site',       icon: Globe, adminOnly: true },
   { to: '/send',       i18nKey: 'nav.sendFile',   icon: Send },
   { to: '/inviti',     label: 'Inviti',           icon: Gift, adminOnly: true },
+  { to: '/automations',label: 'Automazioni',      icon: Zap,  adminOnly: true },
 ];
 
 export default function Layout({ children }) {

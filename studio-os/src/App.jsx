@@ -40,6 +40,7 @@ import SendFilePage from './pages/SendFilePage';
 import CalendarPage from './pages/CalendarPage';
 import AdminInvitesPage from './pages/AdminInvitesPage';
 import SitePage from './pages/SitePage';
+import AutomationsPage from './pages/AutomationsPage';
 
 // ── Loading screen ─────────────────────────────────────────────────────────────
 function Spinner() {
@@ -78,6 +79,7 @@ function AdminContent() {
         <Route path="/cashflow"      element={<CashflowPage />} />
         <Route path="/calendario"    element={<CalendarPage />} />
         <Route path="/site"          element={<SitePage />} />
+        <Route path="/automations"   element={<AutomationsPage />} />
         <Route path="/send"          element={<SendFilePage />} />
         <Route path="/inviti"        element={<AdminInvitesPage />} />
         <Route path="*"              element={<Navigate to="/" replace />} />
