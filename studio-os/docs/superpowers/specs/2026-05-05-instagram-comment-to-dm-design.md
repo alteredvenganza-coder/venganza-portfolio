@@ -7,7 +7,12 @@
 
 ## Goal
 
-Internal "comment-to-sell" tool, ManyChat-style but minimal: when someone comments a configured **keyword** on a post/reel or replies to a story with the keyword, the system **DMs them automatically with a fixed text + link**. Single-shot — no buttons, no branching, no multi-turn.
+Internal "comment-to-sell" tool, ManyChat-style but minimal: when someone comments a configured **keyword** on a post/reel or replies to a story with the keyword, the system:
+
+1. **Sends them an automatic DM** with a fixed text + link, AND
+2. **(For comment triggers only) Publicly replies to their comment** with a fixed text the owner chooses (e.g. "Ti ho mandato il link in DM 📩").
+
+Both replies are single-shot — no buttons, no branching, no multi-turn. The public reply is **per-trigger optional**; if the field is empty, only the DM is sent.
 
 Owner uses it from studio-os admin (single user). Not a multi-tenant SaaS.
 
@@ -18,6 +23,7 @@ Owner uses it from studio-os admin (single user). Not a multi-tenant SaaS.
 - Webhook receiver (Vercel function) for Instagram comments + story replies
 - Keyword matcher (case-insensitive substring) scoped to a source filter
 - Auto-DM sender via Instagram Graph API (`/me/messages`)
+- **Auto public-reply** on the matched comment via `POST /<ig_comment_id>/replies`, when the trigger has a non-empty `comment_reply_text`. Comment-triggers only (story replies have no public-reply surface)
 - Admin UI in studio-os: setup credentials, manage triggers, view recent events, test DM
 - Persistence: triggers, credentials, event log
 - Basic deduplication (same `comment_id` + `sender_igsid` won't fire twice)
@@ -89,10 +95,11 @@ studio-os admin (/instagram-triggers)
 4. If none match → drop silently (no event row).
 5. If match found:
    - Check `ig_events` for an existing row with same `(trigger_id, source_event_id)` → if found, insert `status='skipped_dup'` row and exit.
+   - **(Comment events only)** If `trigger.comment_reply_text` is non-empty, `POST https://graph.facebook.com/v21.0/<comment_id>/replies?access_token=...` with body `{ message: trigger.comment_reply_text }`. Capture result into `comment_reply_status` (`sent`/`failed`) + `comment_reply_error`. **Do not abort on failure** — still try the DM next.
    - Build DM body: `${trigger.dm_text}\n\n${trigger.dm_link}` (link kept on its own line so Instagram auto-previews it).
    - `POST https://graph.facebook.com/v21.0/me/messages?access_token=...` with body `{ recipient: { id: sender_igsid }, message: { text } }`.
-   - On 2xx → insert `ig_events` row `status='sent'`.
-   - On error → insert `status='failed'` with the error message + http status.
+   - On DM 2xx → insert `ig_events` row `status='sent'` (with the captured `comment_reply_status`).
+   - On DM error → insert `status='failed'` with the error message + http status (still keep the `comment_reply_status` if the public reply did succeed).
 
 ### 2. Test-DM function — `api/instagram-test-dm.js`
 
@@ -111,16 +118,17 @@ Three sections, top to bottom:
 - Save button → upsert into `ig_credentials`
 - Below the card: a small "Test DM" mini-form — paste a recipient IGSID + click → calls `/api/instagram-test-dm`, shows green/red result inline.
 
-**Triggers list** — table with [Source, Keyword, DM preview, Active toggle, Edit, Delete]. "Nuovo trigger" button opens an inline form:
+**Triggers list** — table with [Source, Keyword, DM preview, Reply preview, Active toggle, Edit, Delete]. "Nuovo trigger" button opens an inline form:
 - Source type: select with 4 options (`any_post`, `any_story`, `specific_post`, `specific_story`)
 - Source ID: text input, shown only when type is `specific_*`. Helper text: "Incolla l'URL del post / storia o solo l'ID."
 - Keyword: text input
 - DM text: textarea (max 900 chars, IG limit is 1000)
 - DM link: URL input
+- **Risposta pubblica al commento (opzionale)**: textarea (max 250 chars, IG comment limit is 300). Shown only when source type is `any_post` or `specific_post` (story types hide this field). Helper text: "Lascia vuoto per non rispondere pubblicamente. Es: 'Ti ho mandato il link in DM 📩'"
 - Active: checkbox, default true
 - Save / Annulla
 
-**Event log** — read-only list of last 50 `ig_events` rows: timestamp, source media id, sender username, status badge, link to expand and see error if failed. Auto-refresh every 30 s.
+**Event log** — read-only list of last 50 `ig_events` rows: timestamp, source media id, sender username, **two status badges (DM + Reply)**, link to expand and see error if failed. Auto-refresh every 30 s.
 
 ### 4. Database — extend `supabase/migration.sql`
 
@@ -148,6 +156,7 @@ create table if not exists public.ig_triggers (
   keyword text not null,
   dm_text text not null,
   dm_link text not null,
+  comment_reply_text text,              -- public reply on the comment thread; null = skip public reply
   active boolean not null default true,
   created_at timestamptz default now()
 );
@@ -169,6 +178,8 @@ create table if not exists public.ig_events (
   sender_username text,
   status text not null check (status in ('sent','failed','skipped_dup')),
   error text,
+  comment_reply_status text check (comment_reply_status in ('sent','failed')),  -- null = not attempted
+  comment_reply_error text,
   created_at timestamptz default now()
 );
 
@@ -191,11 +202,13 @@ The webhook function has no Supabase JWT — it must use the **service role key*
 
 ## Data Flow Examples
 
-**Comment trigger:**
+**Comment trigger (with public reply):**
 1. User comments "INFO" on your reel.
 2. Meta POSTs `{ entry: [{ id: 'IG_USER_ID', changes: [{ field: 'comments', value: { id: 'COMMENT_ID', media: { id: 'MEDIA_ID' }, from: { id: 'IGSID', username: 'marco' }, text: 'INFO' } }] }] }`.
-3. Webhook verifies signature, finds matching trigger (`any_post` + keyword `info`), checks no existing `sent` event for this comment, sends DM, logs event.
-4. Marco gets the DM in his Instagram inbox within seconds.
+3. Webhook verifies signature, finds matching trigger (`any_post` + keyword `info`, with `comment_reply_text` = "Ti ho mandato il link in DM 📩"), checks no existing `sent` event for this comment.
+4. `POST /COMMENT_ID/replies` → public reply appears under marco's comment within seconds.
+5. `POST /me/messages` → DM lands in marco's inbox.
+6. Logs event with both `status='sent'` and `comment_reply_status='sent'`.
 
 **Story-reply trigger:**
 1. Someone replies to your story with "PREZZO".
@@ -214,7 +227,7 @@ The webhook function has no Supabase JWT — it must use the **service role key*
 The user does this once before code can fire end-to-end:
 1. Meta Developer Console → App → Products → add **Instagram**, **Webhooks**.
 2. Webhooks → Instagram → Callback URL = `https://<studio-os-prod>.vercel.app/api/instagram-webhook`, Verify Token = same string saved in admin UI.
-3. Subscribe to fields: `comments`, `messages`, `messaging_postbacks`.
+3. Subscribe to fields: `comments`, `messages`, `messaging_postbacks`. Required permissions on the access token: `instagram_basic`, `instagram_manage_messages` (DM send), `instagram_manage_comments` (read + public reply), `pages_show_list`, `pages_read_engagement`.
 4. App roles → ensure your IG account is added as **Tester** or **Admin** (no app review needed for owner usage).
 5. Generate a **Page Access Token** for the FB Page connected to your IG Business account, exchange for **long-lived** (60 days) via `/oauth/access_token?grant_type=fb_exchange_token`.
 6. Get the **IG Business User ID** via `GET /me/accounts?fields=instagram_business_account&access_token=<page_token>`.
@@ -238,6 +251,8 @@ These steps are referenced in the implementation plan but not coded — they're 
   - "Source ID" for `specific_post` accepts either Instagram media URL or raw ID — the admin form normalizes via a small helper (`extractIgMediaId(input)`).
   - Dedup is enforced at DB level via a partial unique index, not just an app check.
   - DM body shape (`text\n\nlink` so Instagram unfurls the link) is pinned.
+  - Public-reply field is **per-trigger optional, comment-only**. Empty string = treat as null (no reply). Story-reply triggers ignore the field entirely. Pinned in matcher and admin UI sections.
+  - Reply-then-DM order is pinned. A reply failure does not abort the DM (the DM is the more important payload — the link).
 - **Risks called out:**
   - 60-day Page token expiry — admin UI shows `updated_at`; user re-pastes token before day 60.
   - Webhook 7-day messaging window — comment events trigger fresh windows automatically; story replies too. Edge case: if a user comments and we DM 8 days later (e.g., outage), Meta refuses. Acceptable for v1.
