@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Instagram, Copy, Check, Plus, Trash2, Edit2, X } from 'lucide-react';
+import { Instagram, Copy, Check, Plus, Trash2, Edit2, X, CheckCircle2, XCircle, MinusCircle } from 'lucide-react';
 import Btn from '../components/Btn';
 import Field from '../components/Field';
 import { useAuth } from '../hooks/useAuth';
-import { fetchIgCredentials, upsertIgCredentials, fetchIgTriggers, insertIgTrigger, updateIgTrigger, deleteIgTrigger } from '../lib/db';
+import { fetchIgCredentials, upsertIgCredentials, fetchIgTriggers, insertIgTrigger, updateIgTrigger, deleteIgTrigger, fetchIgEvents } from '../lib/db';
 
 export default function InstagramTriggersPage() {
   const { user } = useAuth();
@@ -446,11 +446,103 @@ function TriggersSection({ userId }) {
   );
 }
 
-function EventLog({ userId }) {
+function eventTimeLabel(ts) {
+  const d = new Date(ts);
+  return d.toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+function StatusBadge({ status, label }) {
+  if (!status) return null;
+  const map = {
+    sent:        { Icon: CheckCircle2, color: 'text-green-400',  bg: 'bg-green-950/30 border-green-500/20' },
+    failed:      { Icon: XCircle,      color: 'text-red-400',    bg: 'bg-red-950/30 border-red-500/20' },
+    skipped_dup: { Icon: MinusCircle,  color: 'text-yellow-400', bg: 'bg-yellow-950/30 border-yellow-500/20' },
+  };
+  const cfg = map[status] ?? map.failed;
   return (
-    <div className="glass rounded-lg p-5">
-      <p className="label-meta mb-2">Eventi recenti</p>
-      <p className="text-sm text-muted">Da implementare in Task 6.</p>
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-mono ${cfg.bg} ${cfg.color}`}>
+      <cfg.Icon size={10} />
+      {label}: {status}
+    </span>
+  );
+}
+
+function EventLog({ userId }) {
+  const [events,  setEvents]  = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState(null);
+
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    async function refresh() {
+      try {
+        const list = await fetchIgEvents(userId, { limit: 50 });
+        if (!cancelled) setEvents(list);
+      } catch (e) {
+        console.error('[ig] fetch events failed', e);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    refresh();
+    const interval = setInterval(refresh, 30_000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, [userId]);
+
+  return (
+    <div className="glass rounded-lg p-5 flex flex-col gap-3">
+      <div>
+        <p className="label-meta mb-1">Eventi recenti</p>
+        <p className="text-[11px] text-subtle">
+          Aggiornamento automatico ogni 30 s. Ultimi 50 eventi.
+        </p>
+      </div>
+
+      {loading && <p className="text-sm text-muted">Caricamento eventi…</p>}
+
+      {!loading && events.length === 0 && (
+        <p className="text-sm text-subtle py-6 text-center">
+          Nessun evento ancora. Riceverai eventi qui dopo aver completato il setup Meta (Fase 2).
+        </p>
+      )}
+
+      {!loading && events.length > 0 && (
+        <div className="flex flex-col gap-1">
+          {events.map(ev => {
+            const isOpen = expanded === ev.id;
+            return (
+              <div
+                key={ev.id}
+                className="rounded-md border border-white/10 bg-white/5 px-3 py-2 cursor-pointer hover:bg-white/8"
+                onClick={() => setExpanded(isOpen ? null : ev.id)}
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-mono text-subtle">{eventTimeLabel(ev.createdAt)}</span>
+                  <span className="text-[10px] uppercase tracking-wide text-burgundy-muted">
+                    {ev.sourceKind === 'comment' ? 'commento' : 'story-reply'}
+                  </span>
+                  <span className="text-xs text-ink truncate max-w-[160px]" title={ev.senderUsername || ev.senderIgsid}>
+                    @{ev.senderUsername || ev.senderIgsid}
+                  </span>
+                  <div className="flex items-center gap-1 ml-auto">
+                    <StatusBadge status={ev.status} label="DM" />
+                    {ev.commentReplyStatus && <StatusBadge status={ev.commentReplyStatus} label="Reply" />}
+                  </div>
+                </div>
+                {isOpen && (
+                  <div className="mt-2 pt-2 border-t border-white/10 text-[11px] text-muted font-mono space-y-1">
+                    <div>media: {ev.sourceMediaId ?? '—'}</div>
+                    <div>event id: {ev.sourceEventId}</div>
+                    {ev.error && <div className="text-red-400">DM error: {ev.error}</div>}
+                    {ev.commentReplyError && <div className="text-red-400">Reply error: {ev.commentReplyError}</div>}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
