@@ -40,6 +40,7 @@ import SendFilePage from './pages/SendFilePage';
 import CalendarPage from './pages/CalendarPage';
 import AdminInvitesPage from './pages/AdminInvitesPage';
 import SitePage from './pages/SitePage';
+import InstagramTriggersPage from './pages/InstagramTriggersPage';
 
 // ── Loading screen ─────────────────────────────────────────────────────────────
 function Spinner() {
@@ -80,6 +81,7 @@ function AdminContent() {
         <Route path="/site"          element={<SitePage />} />
         <Route path="/send"          element={<SendFilePage />} />
         <Route path="/inviti"        element={<AdminInvitesPage />} />
+        <Route path="/instagram-triggers" element={<InstagramTriggersPage />} />
         <Route path="*"              element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
