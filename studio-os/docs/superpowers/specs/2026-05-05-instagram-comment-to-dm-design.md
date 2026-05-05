@@ -241,7 +241,43 @@ These steps are referenced in the implementation plan but not coded — they're 
 - **Owner identity in webhook** — single-user assumption: webhook picks the only row in `ig_credentials`. If a second user appears, refactor to look up by `entry.id` (= `IG_USER_ID`) against `ig_credentials.ig_user_id`.
 - **Story-reply payload shape** — Meta v21 documents `message.reply_to.story` for story replies. If the live payload differs (some accounts get `attachments[].type='story_mention'` instead), the parser will be hardened during testing; the matcher logic stays unchanged.
 
-## Self-Review Notes
+## Delivery phasing
+
+Owner preference: ship the UI first, deploy, look at it live, then add the webhook + Meta integration. This is feasible because the UI-side persistence (Supabase) is independent of Meta, and the webhook can be added later without touching the admin page contract.
+
+### Phase 1 — UI + DB + deploy (~50 min)
+
+Goal: working admin page in production, fully styled, persists data, no Meta integration yet.
+
+In scope:
+- Migration: all three tables (`ig_credentials`, `ig_triggers`, `ig_events`) with RLS.
+- Page `/instagram-triggers` with three sections: Setup card (form saves to DB), Trigger list + form (full CRUD), Event log (empty-state for now).
+- Nav entry in `Layout.jsx`.
+- "Test DM" button is **rendered but disabled**, with helper text: "Disponibile dopo il setup Meta (Fase 2)".
+- The Webhook URL line in the Setup card is shown live (computed from `window.location.origin`) so the user can copy it ready for Meta Console when Phase 2 lands.
+- Deploy to Vercel **prod** so the user can browse it on the real domain and copy the webhook URL into Meta Console.
+
+Out of scope (Phase 2):
+- Webhook function
+- Test-DM function
+- Graph API calls
+- Meta Console setup steps
+
+End of Phase 1: user opens `/instagram-triggers` on prod, fills the Setup card with placeholder values, creates two test triggers, sees them listed, toggles active/inactive, deletes one. No DMs sent. Event log says "Nessun evento ancora".
+
+### Phase 2 — Webhook + DM/reply integration (~70 min)
+
+Goal: actual triggering end-to-end.
+
+In scope:
+- `api/instagram-webhook.js` (verify, parse, match, dispatch reply + DM, log to `ig_events`).
+- `api/instagram-test-dm.js` + un-disable the Test DM button.
+- Manual Meta Console setup (user runs the 7-step checklist with the URL already copied from the live admin page).
+- End-to-end smoke: real comment on a test post → real DM in Instagram inbox.
+
+End of Phase 2: full feature live.
+
+
 
 - **Placeholder scan:** No TBDs in normative sections. The Vercel domain is flagged as an open assumption (resolved at implementation time, not blocking).
 - **Internal consistency:** `ig_credentials` is single-row; the webhook explicitly assumes single-user. Multi-user path is documented as a refactor target. No contradictions.
