@@ -272,3 +272,62 @@ create policy "Owner calendar tasks"
 alter table public.calendar_tasks
   add column if not exists client_id  uuid references public.clients(id)  on delete set null,
   add column if not exists project_id uuid references public.projects(id) on delete set null;
+
+-- ── Instagram comment-to-DM ──────────────────────────────────
+
+create table if not exists public.ig_credentials (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  ig_user_id text not null,
+  page_access_token text not null,
+  app_secret text not null,
+  verify_token text not null,
+  updated_at timestamptz default now()
+);
+
+alter table public.ig_credentials enable row level security;
+create policy "ig_credentials_owner" on public.ig_credentials
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+create table if not exists public.ig_triggers (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  source_type text not null check (source_type in ('any_post','any_story','specific_post','specific_story')),
+  source_id text,
+  keyword text not null,
+  dm_text text not null,
+  dm_link text not null,
+  comment_reply_text text,
+  active boolean not null default true,
+  created_at timestamptz default now()
+);
+
+create index if not exists ig_triggers_active_idx
+  on public.ig_triggers (user_id, active);
+
+alter table public.ig_triggers enable row level security;
+create policy "ig_triggers_owner" on public.ig_triggers
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+create table if not exists public.ig_events (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  trigger_id uuid references public.ig_triggers(id) on delete set null,
+  source_kind text not null check (source_kind in ('comment','story_reply')),
+  source_event_id text not null,
+  source_media_id text,
+  sender_igsid text not null,
+  sender_username text,
+  status text not null check (status in ('sent','failed','skipped_dup')),
+  error text,
+  comment_reply_status text check (comment_reply_status in ('sent','failed')),
+  comment_reply_error text,
+  created_at timestamptz default now()
+);
+
+create unique index if not exists ig_events_dedup_idx
+  on public.ig_events (trigger_id, source_event_id)
+  where status = 'sent';
+
+alter table public.ig_events enable row level security;
+create policy "ig_events_owner" on public.ig_events
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
