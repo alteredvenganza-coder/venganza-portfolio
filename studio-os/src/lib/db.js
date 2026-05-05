@@ -481,3 +481,137 @@ export async function deleteSiteAsset(path) {
   const { error } = await supabase.storage.from('site-assets').remove([path]);
   if (error) throw error;
 }
+
+// ── Instagram comment-to-DM ─────────────────────────────────────────────────
+
+function igCredentialsFromDb(row) {
+  if (!row) return null;
+  return {
+    userId:          row.user_id,
+    igUserId:        row.ig_user_id,
+    pageAccessToken: row.page_access_token,
+    appSecret:       row.app_secret,
+    verifyToken:     row.verify_token,
+    updatedAt:       row.updated_at,
+  };
+}
+
+export async function fetchIgCredentials(userId) {
+  const { data, error } = await supabase
+    .from('ig_credentials')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) throw error;
+  return igCredentialsFromDb(data);
+}
+
+export async function upsertIgCredentials(userId, patch) {
+  const row = {
+    user_id:           userId,
+    ig_user_id:        patch.igUserId        ?? '',
+    page_access_token: patch.pageAccessToken ?? '',
+    app_secret:        patch.appSecret       ?? '',
+    verify_token:      patch.verifyToken     ?? '',
+    updated_at:        new Date().toISOString(),
+  };
+  const { error } = await supabase
+    .from('ig_credentials')
+    .upsert(row, { onConflict: 'user_id' });
+  if (error) throw error;
+}
+
+function igTriggerFromDb(row) {
+  return {
+    id:               row.id,
+    userId:           row.user_id,
+    sourceType:       row.source_type,
+    sourceId:         row.source_id,
+    keyword:          row.keyword,
+    dmText:           row.dm_text,
+    dmLink:           row.dm_link,
+    commentReplyText: row.comment_reply_text,
+    active:           row.active,
+    createdAt:        row.created_at,
+  };
+}
+
+export async function fetchIgTriggers(userId) {
+  const { data, error } = await supabase
+    .from('ig_triggers')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data.map(igTriggerFromDb);
+}
+
+export async function insertIgTrigger(userId, patch) {
+  const row = {
+    user_id:            userId,
+    source_type:        patch.sourceType,
+    source_id:          patch.sourceId || null,
+    keyword:            patch.keyword,
+    dm_text:            patch.dmText,
+    dm_link:            patch.dmLink,
+    comment_reply_text: patch.commentReplyText || null,
+    active:             patch.active ?? true,
+  };
+  const { data, error } = await supabase
+    .from('ig_triggers')
+    .insert(row)
+    .select()
+    .single();
+  if (error) throw error;
+  return igTriggerFromDb(data);
+}
+
+export async function updateIgTrigger(id, patch) {
+  const row = {};
+  if (patch.sourceType        !== undefined) row.source_type        = patch.sourceType;
+  if (patch.sourceId          !== undefined) row.source_id          = patch.sourceId || null;
+  if (patch.keyword           !== undefined) row.keyword            = patch.keyword;
+  if (patch.dmText            !== undefined) row.dm_text            = patch.dmText;
+  if (patch.dmLink            !== undefined) row.dm_link            = patch.dmLink;
+  if (patch.commentReplyText  !== undefined) row.comment_reply_text = patch.commentReplyText || null;
+  if (patch.active            !== undefined) row.active             = patch.active;
+  const { error } = await supabase
+    .from('ig_triggers')
+    .update(row)
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function deleteIgTrigger(id) {
+  const { error } = await supabase.from('ig_triggers').delete().eq('id', id);
+  if (error) throw error;
+}
+
+function igEventFromDb(row) {
+  return {
+    id:                  row.id,
+    userId:              row.user_id,
+    triggerId:           row.trigger_id,
+    sourceKind:          row.source_kind,
+    sourceEventId:       row.source_event_id,
+    sourceMediaId:       row.source_media_id,
+    senderIgsid:         row.sender_igsid,
+    senderUsername:      row.sender_username,
+    status:              row.status,
+    error:               row.error,
+    commentReplyStatus:  row.comment_reply_status,
+    commentReplyError:   row.comment_reply_error,
+    createdAt:           row.created_at,
+  };
+}
+
+export async function fetchIgEvents(userId, { limit = 50 } = {}) {
+  const { data, error } = await supabase
+    .from('ig_events')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data.map(igEventFromDb);
+}
