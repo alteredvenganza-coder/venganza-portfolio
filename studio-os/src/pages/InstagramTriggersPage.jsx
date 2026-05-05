@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Instagram, Copy, Check } from 'lucide-react';
+import { Instagram, Copy, Check, Plus, Trash2, Edit2, X } from 'lucide-react';
 import Btn from '../components/Btn';
 import Field from '../components/Field';
 import { useAuth } from '../hooks/useAuth';
-import { fetchIgCredentials, upsertIgCredentials } from '../lib/db';
+import { fetchIgCredentials, upsertIgCredentials, fetchIgTriggers, insertIgTrigger, updateIgTrigger, deleteIgTrigger } from '../lib/db';
 
 export default function InstagramTriggersPage() {
   const { user } = useAuth();
@@ -163,11 +163,285 @@ function SetupCard({ userId }) {
   );
 }
 
+const SOURCE_LABELS = {
+  any_post:       'Qualsiasi post',
+  any_story:      'Qualsiasi storia',
+  specific_post:  'Post specifico',
+  specific_story: 'Storia specifica',
+};
+
+const EMPTY_DRAFT = {
+  sourceType: 'any_post',
+  sourceId: '',
+  keyword: '',
+  dmText: '',
+  dmLink: '',
+  commentReplyText: '',
+  active: true,
+};
+
 function TriggersSection({ userId }) {
+  const [triggers, setTriggers] = useState([]);
+  const [loading,  setLoading]  = useState(true);
+  const [editing,  setEditing]  = useState(null);   // null | 'new' | trigger.id
+  const [draft,    setDraft]    = useState(EMPTY_DRAFT);
+  const [saving,   setSaving]   = useState(false);
+
+  useEffect(() => {
+    if (!userId) return;
+    setLoading(true);
+    fetchIgTriggers(userId)
+      .then(setTriggers)
+      .catch(err => console.error('[ig] fetch triggers failed', err))
+      .finally(() => setLoading(false));
+  }, [userId]);
+
+  function startNew() {
+    setDraft(EMPTY_DRAFT);
+    setEditing('new');
+  }
+
+  function startEdit(t) {
+    setDraft({
+      sourceType:       t.sourceType,
+      sourceId:         t.sourceId       ?? '',
+      keyword:          t.keyword,
+      dmText:           t.dmText,
+      dmLink:           t.dmLink,
+      commentReplyText: t.commentReplyText ?? '',
+      active:           t.active,
+    });
+    setEditing(t.id);
+  }
+
+  function cancelEdit() {
+    setEditing(null);
+    setDraft(EMPTY_DRAFT);
+  }
+
+  async function handleSave() {
+    if (!userId) return;
+    if (!draft.keyword.trim() || !draft.dmText.trim() || !draft.dmLink.trim()) {
+      alert('Keyword, testo DM e link sono obbligatori.');
+      return;
+    }
+    if ((draft.sourceType === 'specific_post' || draft.sourceType === 'specific_story') && !draft.sourceId.trim()) {
+      alert('Per "Post specifico" / "Storia specifica" devi indicare un ID o URL.');
+      return;
+    }
+    setSaving(true);
+    try {
+      if (editing === 'new') {
+        const created = await insertIgTrigger(userId, draft);
+        setTriggers(prev => [created, ...prev]);
+      } else {
+        await updateIgTrigger(editing, draft);
+        setTriggers(prev => prev.map(t => t.id === editing ? { ...t, ...draft, sourceId: draft.sourceId || null, commentReplyText: draft.commentReplyText || null } : t));
+      }
+      cancelEdit();
+    } catch (e) {
+      alert('Errore: ' + e.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(t) {
+    if (!confirm(`Eliminare il trigger "${t.keyword}"?`)) return;
+    try {
+      await deleteIgTrigger(t.id);
+      setTriggers(prev => prev.filter(x => x.id !== t.id));
+    } catch (e) {
+      alert('Errore: ' + e.message);
+    }
+  }
+
+  async function handleToggleActive(t) {
+    const next = !t.active;
+    setTriggers(prev => prev.map(x => x.id === t.id ? { ...x, active: next } : x));
+    try {
+      await updateIgTrigger(t.id, { active: next });
+    } catch (e) {
+      // revert on error
+      setTriggers(prev => prev.map(x => x.id === t.id ? { ...x, active: t.active } : x));
+      alert('Errore: ' + e.message);
+    }
+  }
+
+  const isPostSource = draft.sourceType === 'any_post' || draft.sourceType === 'specific_post';
+  const isSpecific   = draft.sourceType === 'specific_post' || draft.sourceType === 'specific_story';
+
   return (
-    <div className="glass rounded-lg p-5">
-      <p className="label-meta mb-2">Trigger</p>
-      <p className="text-sm text-muted">Da implementare in Task 5.</p>
+    <div className="glass rounded-lg p-5 flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="label-meta mb-1">Trigger</p>
+          <p className="text-[11px] text-subtle">
+            Una keyword + una sorgente (post/storia) + un DM. Quando qualcuno commenta o risponde, parte tutto in automatico.
+          </p>
+        </div>
+        {editing === null && (
+          <Btn variant="primary" size="sm" onClick={startNew}>
+            <Plus size={13} /> Nuovo trigger
+          </Btn>
+        )}
+      </div>
+
+      {editing !== null && (
+        <div className="rounded-md border border-burgundy/30 bg-burgundy/8 p-4 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-ink">{editing === 'new' ? 'Nuovo trigger' : 'Modifica trigger'}</p>
+            <button onClick={cancelEdit} className="text-subtle hover:text-ink">
+              <X size={14} />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Field label="Sorgente">
+              <select
+                value={draft.sourceType}
+                onChange={e => setDraft({ ...draft, sourceType: e.target.value })}
+              >
+                <option value="any_post">{SOURCE_LABELS.any_post}</option>
+                <option value="any_story">{SOURCE_LABELS.any_story}</option>
+                <option value="specific_post">{SOURCE_LABELS.specific_post}</option>
+                <option value="specific_story">{SOURCE_LABELS.specific_story}</option>
+              </select>
+            </Field>
+
+            <Field label="Keyword (case-insensitive)">
+              <input
+                value={draft.keyword}
+                onChange={e => setDraft({ ...draft, keyword: e.target.value })}
+                placeholder="info"
+              />
+            </Field>
+
+            {isSpecific && (
+              <Field label="ID o URL del post/storia" className="sm:col-span-2">
+                <input
+                  value={draft.sourceId}
+                  onChange={e => setDraft({ ...draft, sourceId: e.target.value })}
+                  placeholder="https://www.instagram.com/p/… oppure 178…"
+                />
+              </Field>
+            )}
+
+            <Field label="Testo DM" className="sm:col-span-2">
+              <textarea
+                rows={3}
+                maxLength={900}
+                value={draft.dmText}
+                onChange={e => setDraft({ ...draft, dmText: e.target.value })}
+                placeholder="Ciao! Ecco il link che hai chiesto 👇"
+                className="resize-none"
+              />
+            </Field>
+
+            <Field label="Link nel DM" className="sm:col-span-2">
+              <input
+                type="url"
+                value={draft.dmLink}
+                onChange={e => setDraft({ ...draft, dmLink: e.target.value })}
+                placeholder="https://altered.example/checkout"
+              />
+            </Field>
+
+            {isPostSource && (
+              <Field label="Risposta pubblica al commento (opzionale)" className="sm:col-span-2">
+                <textarea
+                  rows={2}
+                  maxLength={250}
+                  value={draft.commentReplyText}
+                  onChange={e => setDraft({ ...draft, commentReplyText: e.target.value })}
+                  placeholder="Ti ho mandato il link in DM 📩"
+                  className="resize-none"
+                />
+              </Field>
+            )}
+
+            <Field label="Attivo" className="sm:col-span-2">
+              <label className="inline-flex items-center gap-2 text-sm text-ink cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={draft.active}
+                  onChange={e => setDraft({ ...draft, active: e.target.checked })}
+                />
+                Trigger attivo
+              </label>
+            </Field>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Btn variant="primary" size="sm" onClick={handleSave} disabled={saving}>
+              {saving ? 'Salvataggio…' : 'Salva trigger'}
+            </Btn>
+            <Btn variant="ghost" size="sm" onClick={cancelEdit}>Annulla</Btn>
+          </div>
+        </div>
+      )}
+
+      {loading && <p className="text-sm text-muted">Caricamento trigger…</p>}
+
+      {!loading && triggers.length === 0 && editing === null && (
+        <p className="text-sm text-subtle py-6 text-center">
+          Nessun trigger. Premi <strong>Nuovo trigger</strong> per crearne uno.
+        </p>
+      )}
+
+      {!loading && triggers.length > 0 && (
+        <div className="flex flex-col gap-2">
+          {triggers.map(t => (
+            <div key={t.id} className="rounded-md border border-white/10 bg-white/5 p-3 flex items-start gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] uppercase tracking-wide text-burgundy-muted font-mono">
+                    {SOURCE_LABELS[t.sourceType]}
+                  </span>
+                  {t.sourceId && (
+                    <span className="text-[10px] text-subtle font-mono truncate max-w-[180px]" title={t.sourceId}>
+                      · {t.sourceId}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-ink mb-1">
+                  Se commento contiene <code className="px-1 rounded bg-white/10 text-burgundy-muted">{t.keyword}</code>
+                  {' '}→ DM con link
+                </p>
+                <p className="text-[11px] text-muted line-clamp-2">{t.dmText}</p>
+                {t.commentReplyText && (
+                  <p className="text-[11px] text-subtle italic mt-1">
+                    Reply pubblico: "{t.commentReplyText}"
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <label className="inline-flex items-center gap-1 cursor-pointer mr-1" title={t.active ? 'Attivo' : 'Disattivato'}>
+                  <input
+                    type="checkbox"
+                    checked={t.active}
+                    onChange={() => handleToggleActive(t)}
+                  />
+                </label>
+                <button
+                  onClick={() => startEdit(t)}
+                  className="p-1.5 rounded text-muted hover:text-ink hover:bg-white/8"
+                  title="Modifica"
+                >
+                  <Edit2 size={13} />
+                </button>
+                <button
+                  onClick={() => handleDelete(t)}
+                  className="p-1.5 rounded text-muted hover:text-red-400 hover:bg-white/8"
+                  title="Elimina"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
