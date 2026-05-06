@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Instagram, Copy, Check, Plus, Trash2, Edit2, X, CheckCircle2, XCircle, MinusCircle } from 'lucide-react';
+import { Instagram, Copy, Check, Plus, Trash2, Edit2, X, CheckCircle2, XCircle, MinusCircle, Send } from 'lucide-react';
 import Btn from '../components/Btn';
 import Field from '../components/Field';
 import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../lib/supabase';
 import { fetchIgCredentials, upsertIgCredentials, fetchIgTriggers, insertIgTrigger, updateIgTrigger, deleteIgTrigger, fetchIgEvents } from '../lib/db';
 
 export default function InstagramTriggersPage() {
@@ -153,11 +154,85 @@ function SetupCard({ userId }) {
         {savedAt > 0 && Date.now() - savedAt < 3000 && (
           <span className="text-xs text-burgundy-muted">Salvato</span>
         )}
+      </div>
 
-        <Btn variant="secondary" size="sm" disabled>
-          Test DM
+      <TestDmInline />
+    </div>
+  );
+}
+
+function TestDmInline() {
+  const [recipient, setRecipient] = useState('');
+  const [text,      setText]      = useState('Test DM dal CRM ✓');
+  const [sending,   setSending]   = useState(false);
+  const [result,    setResult]    = useState(null); // { ok, msg }
+
+  async function handleTest() {
+    if (!recipient.trim() || !text.trim()) {
+      setResult({ ok: false, msg: 'IGSID destinatario e testo obbligatori' });
+      return;
+    }
+    setSending(true);
+    setResult(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) {
+        setResult({ ok: false, msg: 'Sessione scaduta, ricarica la pagina' });
+        return;
+      }
+      const r = await fetch('/api/instagram-test-dm', {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ recipient_igsid: recipient.trim(), text: text.trim() }),
+      });
+      const json = await r.json().catch(() => ({}));
+      if (r.ok && json.ok) {
+        setResult({ ok: true, msg: 'DM inviato!' });
+      } else {
+        setResult({ ok: false, msg: json.error ?? `http ${r.status}` });
+      }
+    } catch (e) {
+      setResult({ ok: false, msg: e.message });
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <div className="rounded-md border border-white/10 bg-white/5 p-3 flex flex-col gap-2">
+      <p className="label-meta">Test DM</p>
+      <p className="text-[10px] text-subtle">
+        Invia un DM di prova a un IGSID specifico (il tuo Instagram-scoped user ID, lo trovi nei webhook ricevuti o nel Graph API Explorer). Verifica che il token funzioni prima di andare live.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <Field label="Recipient IGSID">
+          <input
+            value={recipient}
+            onChange={e => setRecipient(e.target.value)}
+            placeholder="178…"
+          />
+        </Field>
+        <Field label="Testo">
+          <input
+            value={text}
+            onChange={e => setText(e.target.value)}
+          />
+        </Field>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <Btn variant="secondary" size="sm" onClick={handleTest} disabled={sending}>
+          <Send size={12} />
+          {sending ? 'Invio…' : 'Test DM'}
         </Btn>
-        <span className="text-[10px] text-subtle">Disponibile dopo il setup webhook (Fase 2)</span>
+        {result && (
+          <span className={`text-xs ${result.ok ? 'text-green-400' : 'text-red-400'}`}>
+            {result.ok ? '✓' : '✗'} {result.msg}
+          </span>
+        )}
       </div>
     </div>
   );
