@@ -496,6 +496,39 @@ function deepMerge(a, b) {
   return out;
 }
 
+// Bold editorial section header: oversized ghost index numeral, hairline rule, large serif title.
+const SectionHeader = ({ eyebrow = '', title, note, className = '' }) => {
+  const [rawIndex, ...rest] = eyebrow.split('—');
+  const index = rawIndex.trim();
+  const label = rest.join('—').trim();
+  const hasIndex = /\d/.test(index) && label;
+  return (
+    <div className={`reveal ${className}`}>
+      <div className="flex items-center gap-4 mb-5">
+        <span className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] whitespace-nowrap">
+          {hasIndex ? label : eyebrow}
+        </span>
+        <span className="flex-1 h-px bg-black/10" />
+        {note && (
+          <span className="hidden md:block font-mono text-[10px] text-black/40 uppercase tracking-[0.2em] max-w-xs text-right leading-relaxed">
+            {note}
+          </span>
+        )}
+      </div>
+      <div className="flex items-start gap-4 md:gap-8">
+        {hasIndex && (
+          <span className="heading-font text-black/10 text-6xl md:text-8xl lg:text-9xl leading-[0.8] select-none pointer-events-none">
+            {index}
+          </span>
+        )}
+        <h2 className="serif-heading text-black text-5xl md:text-7xl lg:text-8xl leading-[0.9] tracking-[-0.02em]">
+          {title}
+        </h2>
+      </div>
+    </div>
+  );
+};
+
 const Home = () => {
   const containerRef = useRef();
   const { slides, loading: slidesLoading } = useHeroSlides(6);
@@ -618,16 +651,20 @@ const Home = () => {
 
           {/* Left — Content */}
           <div className="md:col-span-7">
-            <p className="hero-eyebrow font-mono text-[10px] md:text-[11px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-8">
-              {C.hero.eyebrow}
-            </p>
+            <div className="hero-eyebrow flex items-center gap-4 mb-8">
+              <span className="font-mono text-[10px] md:text-[11px] text-[color:var(--primary)] uppercase tracking-[0.4em] whitespace-nowrap">
+                {C.hero.eyebrow}
+              </span>
+              <span className="flex-1 h-px bg-black/15" />
+              <span className="font-mono text-[10px] md:text-[11px] text-black/40 uppercase tracking-[0.3em] whitespace-nowrap">N° 01</span>
+            </div>
 
-            <h1 className="hero-line heading-font text-black leading-[0.85] text-[4rem] sm:text-[5.5rem] md:text-[6.5rem] lg:text-[8.5rem] xl:text-[10rem] tracking-[0.01em] mb-6">
+            <h1 className="hero-line heading-font text-black leading-[0.82] text-[4rem] sm:text-[5.5rem] md:text-[6.5rem] lg:text-[8rem] xl:text-[9.5rem] tracking-[0.01em] mb-6">
               <span className="block">{C.hero.headline_top}</span>
-              <span className="block">{C.hero.headline_bottom}</span>
+              <span className="block text-[color:var(--primary)]">{C.hero.headline_bottom}</span>
             </h1>
 
-            <p className="hero-line serif-heading italic text-black/75 text-[1.3rem] md:text-[1.7rem] lg:text-[2rem] leading-tight mb-10 max-w-xl">
+            <p className="hero-line serif-heading italic text-black/75 text-[1.5rem] md:text-[2rem] lg:text-[2.4rem] leading-tight mb-10 max-w-xl">
               {C.hero.accent_line}
             </p>
 
@@ -672,15 +709,7 @@ const Home = () => {
       {/* ============ STRATEGIC SERVICES ============ */}
       <section id="services" className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
         <div className="max-w-6xl mx-auto">
-          <div className="reveal flex items-baseline justify-between flex-wrap gap-6 mb-16">
-            <div>
-              <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">{C.services.eyebrow}</p>
-              <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">{C.services.title}</h2>
-            </div>
-            <p className="font-mono text-[10px] text-black/40 uppercase tracking-[0.2em] max-w-xs leading-relaxed">
-              {C.services.note}
-            </p>
-          </div>
+          <SectionHeader eyebrow={C.services.eyebrow} title={C.services.title} note={C.services.note} className="mb-16" />
 
           <div className="reveal divide-y divide-black/5 border-t border-black/5">
             {strategicServices.map((s, i) => (
@@ -703,10 +732,7 @@ const Home = () => {
       {/* ============ CASE STUDIES ============ */}
       <section id="work" className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
         <div className="max-w-6xl mx-auto">
-          <div className="reveal mb-20">
-            <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">{C.work.eyebrow}</p>
-            <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">{C.work.title}</h2>
-          </div>
+          <SectionHeader eyebrow={C.work.eyebrow} title={C.work.title} className="mb-20" />
 
           {/* PRIMARY (cases[0]) */}
           <div className="reveal grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-24">
@@ -779,10 +805,13 @@ const Home = () => {
       <section id="premades" className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
         <div className="max-w-6xl mx-auto">
           <div className="reveal mb-16 max-w-3xl">
-            <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">{C.premades.eyebrow}</p>
+            <div className="flex items-center gap-4 mb-5">
+              <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] whitespace-nowrap">{C.premades.eyebrow}</p>
+              <span className="flex-1 h-px bg-black/10" />
+            </div>
             <Link to="/premades" className="group inline-flex items-baseline gap-4">
-              <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight group-hover:text-[color:var(--primary)] transition-colors">{C.premades.title}</h2>
-              <ArrowRight size={28} className="text-black/30 group-hover:text-[color:var(--primary)] group-hover:translate-x-2 transition-all" />
+              <h2 className="serif-heading text-black text-5xl md:text-7xl lg:text-8xl leading-[0.9] tracking-[-0.02em] group-hover:text-[color:var(--primary)] transition-colors">{C.premades.title}</h2>
+              <ArrowRight size={32} className="text-black/30 group-hover:text-[color:var(--primary)] group-hover:translate-x-2 transition-all" />
             </Link>
             <p className="text-black/60 text-base md:text-lg mt-6 font-light leading-relaxed">
               {C.premades.sub}
@@ -817,10 +846,9 @@ const Home = () => {
       {/* ============ APPS / PRODUCTS ============ */}
       <section id="apps" className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
         <div className="max-w-6xl mx-auto">
+          <SectionHeader eyebrow={C.apps.eyebrow} title={C.apps.title} className="mb-6 max-w-3xl" />
           <div className="reveal mb-16 max-w-3xl">
-            <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-3">{C.apps.eyebrow}</p>
-            <h2 className="serif-heading text-black text-4xl md:text-6xl leading-tight">{C.apps.title}</h2>
-            <p className="text-black/60 text-base md:text-lg mt-6 font-light leading-relaxed">
+            <p className="text-black/60 text-base md:text-lg font-light leading-relaxed">
               {C.apps.sub}
             </p>
           </div>
