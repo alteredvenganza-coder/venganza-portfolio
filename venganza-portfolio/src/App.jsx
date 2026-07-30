@@ -1560,9 +1560,12 @@ const AboutPage = () => {
       <div className="relative z-10 max-w-xl">
         <div className="slide-up-1 flex items-center justify-center gap-3">
           <span className="w-8 h-px bg-black/20" />
-          <span className="font-mono text-[9px] text-black/25 uppercase tracking-[0.3em]">Altered Venganza</span>
+          <span className="font-mono text-[9px] text-black/25 uppercase tracking-[0.3em]">Altered Venganza Design Studio</span>
           <span className="w-8 h-px bg-black/20" />
         </div>
+        <p className="slide-up-2 font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.35em] mt-4">
+          by Nadir Martinez
+        </p>
       </div>
 
       <div className="w-full max-w-2xl mt-auto relative z-10"><SiteFooter light={true} /></div>
