@@ -713,10 +713,10 @@ const Home = () => {
 
           <div className="reveal divide-y divide-black/5 border-t border-black/5">
             {strategicServices.map((s, i) => (
-              <Link key={s.id || s.num || i} to={s.link_to || '#'} className="group grid grid-cols-12 gap-4 md:gap-8 py-8 md:py-10 items-baseline hover:bg-black/[0.02] transition-colors px-2 -mx-2">
-                <div className="col-span-2 md:col-span-1 font-mono text-[11px] text-black/30 uppercase tracking-widest pt-2">{s.num || String(i + 1).padStart(2, '0')}</div>
+              <Link key={s.id || s.num || i} to={s.link_to || '#'} className="group grid grid-cols-12 gap-4 md:gap-8 py-8 md:py-10 items-baseline hover:bg-black/[0.03] transition-colors duration-300 px-2 -mx-2">
+                <div className="col-span-2 md:col-span-1 font-mono text-[11px] text-black/30 group-hover:text-[color:var(--primary)] uppercase tracking-widest pt-2 transition-colors">{s.num || String(i + 1).padStart(2, '0')}</div>
                 <div className="col-span-10 md:col-span-5">
-                  <h3 className="serif-heading text-2xl md:text-3xl text-black group-hover:text-[color:var(--primary)] transition-colors">{s.title}</h3>
+                  <h3 className="serif-heading text-2xl md:text-3xl text-black group-hover:text-[color:var(--primary)] transition-all duration-300 inline-block group-hover:translate-x-2">{s.title}</h3>
                 </div>
                 <div className="col-span-12 md:col-span-4 text-black/60 text-sm md:text-[15px] leading-relaxed font-light">{s.description}</div>
                 <div className="col-span-12 md:col-span-2 md:text-right">
@@ -820,7 +820,7 @@ const Home = () => {
 
           <div className="reveal grid grid-cols-1 md:grid-cols-3 gap-6">
             {quickServices.map((p, i) => (
-              <Link key={p.id || p.title || i} to={p.link_to || '/premades'} className="group flex flex-col p-6 md:p-8 bg-black/[0.02] border border-black/10 hover:border-[color:var(--primary)] rounded-sm transition-colors">
+              <Link key={p.id || p.title || i} to={p.link_to || '/premades'} className="group flex flex-col p-6 md:p-8 bg-black/[0.02] border border-black/10 hover:border-[color:var(--primary)] rounded-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_18px_40px_-20px_rgba(0,0,0,0.25)]">
                 <div className="flex items-center justify-between mb-6">
                   <span className="font-mono text-[9px] text-black/40 uppercase tracking-[0.25em]">{p.delivery}</span>
                   <span className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.2em]">{p.price_label}</span>
@@ -855,11 +855,11 @@ const Home = () => {
 
           <div className="reveal grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {apps.map((a) => (
-              <Link key={a.name} to={a.to} className="group relative aspect-[5/6] md:aspect-[4/5] flex flex-col justify-between p-8 md:p-10 bg-gradient-to-br from-black/[0.04] to-black/[0.01] border border-black/10 hover:border-[color:var(--primary)] rounded-sm overflow-hidden transition-colors">
+              <Link key={a.name} to={a.to} className="group relative aspect-[5/6] md:aspect-[4/5] flex flex-col justify-between p-8 md:p-10 bg-gradient-to-br from-black/[0.04] to-black/[0.01] border border-black/10 hover:border-[color:var(--primary)] rounded-sm overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_22px_50px_-24px_rgba(0,0,0,0.3)]">
                 <div className="absolute inset-0 opacity-40 group-hover:opacity-70 transition-opacity" style={{ background: 'radial-gradient(circle at 70% 30%, rgba(123,31,36,0.10), transparent 60%)' }} />
                 <div className="relative z-10">
                   <p className="font-mono text-[9px] text-[color:var(--primary)] uppercase tracking-[0.3em] mb-4">{a.tag}</p>
-                  <h3 className="serif-heading text-black text-4xl md:text-5xl">{a.name}</h3>
+                  <h3 className="serif-heading text-black text-4xl md:text-5xl group-hover:text-[color:var(--primary)] transition-colors">{a.name}</h3>
                 </div>
                 <div className="relative z-10">
                   <p className="text-black/65 text-sm md:text-base leading-relaxed font-light max-w-md mb-6">{a.desc}</p>
@@ -878,11 +878,11 @@ const Home = () => {
 
       {/* ============ FINAL CTA ============ */}
       <section className="relative px-6 md:px-12 lg:px-20 py-24 md:py-32 border-t border-black/5">
-        <div className="reveal max-w-4xl mx-auto text-center">
+        <div className="reveal max-w-5xl mx-auto text-center">
           <p className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em] mb-6">{C.cta.eyebrow}</p>
-          <h2 className="serif-heading text-black text-4xl md:text-6xl lg:text-7xl leading-[1.05] mb-10">
+          <h2 className="serif-heading text-black text-5xl md:text-7xl lg:text-8xl leading-[0.98] tracking-[-0.02em] mb-10">
             {C.cta.headline_top}<br />
-            <span className="italic text-black/75">{C.cta.headline_bottom}</span>
+            <span className="italic text-[color:var(--primary)]">{C.cta.headline_bottom}</span>
           </h2>
           <p className="text-black/60 text-base md:text-lg max-w-xl mx-auto mb-12 font-light leading-relaxed">
             {C.cta.sub}
