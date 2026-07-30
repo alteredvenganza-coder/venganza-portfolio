@@ -346,7 +346,7 @@ const SiteFooter = ({ light = true }) => {
 
       {/* Copyright */}
       <p className={`font-mono text-[8px] md:text-[9px] ${textColor} uppercase tracking-[0.15em] text-center pb-6`}>
-        &copy; 2026 Altered Venganza. VAT IT01433140322 — All rights reserved.
+        &copy; 2026 Altered Venganza Design Studio — by Nadir Martinez. VAT IT01433140322 — All rights reserved.
       </p>
     </footer>
   );
@@ -369,7 +369,11 @@ const useHeroSlides = (count = 5) => {
     const fetch_ = async () => {
       try {
         const res = await fetch('/api/instagram-feed');
-        if (!res.ok) throw new Error('API error');
+        // In local dev the serverless function isn't running and the SPA fallback
+        // returns HTML/JS, so guard against non-JSON before parsing.
+        if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
+          throw new Error('instagram-feed unavailable');
+        }
         const { data } = await res.json();
         setSlides(
           (data || []).slice(0, count).map(p => ({
@@ -378,7 +382,8 @@ const useHeroSlides = (count = 5) => {
           }))
         );
       } catch (err) {
-        console.error('Failed to fetch hero slides:', err);
+        // Non-fatal: the hero has a static fallback. Keep dev console quiet.
+        if (import.meta.env.DEV) console.debug('Hero slides unavailable:', err.message);
       } finally {
         setLoading(false);
       }
@@ -398,11 +403,14 @@ const useLatestReel = () => {
     const fetch_ = async () => {
       try {
         const res = await fetch('/api/instagram-reel');
-        if (!res.ok) throw new Error('API error');
+        if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
+          throw new Error('instagram-reel unavailable');
+        }
         const { reel: r } = await res.json();
         setReel(r || null);
       } catch (err) {
-        console.error('Failed to fetch latest reel:', err);
+        // Non-fatal: falls back to no reel. Keep dev console quiet.
+        if (import.meta.env.DEV) console.debug('Latest reel unavailable:', err.message);
       } finally {
         setLoading(false);
       }
@@ -522,7 +530,10 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    ScrollTrigger.refresh();
+    // Respect users who prefer reduced motion: keep everything visible, skip animations.
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
     const ctx = gsap.context(() => {
       gsap.from('.nav-item', { y: -20, opacity: 0, stagger: 0.05, duration: 1, ease: 'power3.out' });
       gsap.from('.hero-eyebrow', { y: 16, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.1 });
@@ -531,10 +542,27 @@ const Home = () => {
       gsap.from('.hero-cta', { y: 18, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.9 });
       gsap.from('.hero-image', { x: 40, opacity: 0, duration: 1.4, ease: 'power3.out', delay: 0.4 });
       gsap.utils.toArray('.reveal').forEach((el) => {
-        gsap.from(el, { y: 32, opacity: 0, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
+        gsap.from(el, {
+          y: 32,
+          opacity: 0,
+          duration: 1.1,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 90%', once: true },
+        });
       });
     }, containerRef);
-    return () => ctx.revert();
+
+    // Recompute trigger positions once late-loading assets (images, fonts) settle,
+    // so below-the-fold sections never get stuck at opacity 0.
+    ScrollTrigger.refresh();
+    const onLoad = () => ScrollTrigger.refresh();
+    window.addEventListener('load', onLoad);
+    document.fonts?.ready.then(() => ScrollTrigger.refresh()).catch(() => {});
+
+    return () => {
+      window.removeEventListener('load', onLoad);
+      ctx.revert();
+    };
   }, []);
 
   // Merge user-content overrides with defaults
