@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <title>Altered Venganza — Design Studio · Trieste</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <style>/* cyrillic-ext */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/caveat-1.woff2") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/caveat-2.woff2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/caveat-3.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/caveat-4.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("fonts/caveat-1.woff2") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("fonts/caveat-2.woff2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("fonts/caveat-3.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("fonts/caveat-4.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/caveat-1.woff2") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/caveat-2.woff2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/caveat-3.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/caveat-4.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Patrick Hand';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/caveat-5.woff2") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Patrick Hand';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/caveat-6.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Patrick Hand';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/caveat-7.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin */
+@font-face {
+  font-family: 'Permanent Marker';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/caveat-8.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+  <script src="image-slot.js"></script>
+  <style>
+    :root { --ax: #1F3A5F; }
+    html, body { height: 100%; overflow: hidden; }
+    body { margin: 0; background: #FAF6EC; color: #131313; font-family: 'Patrick Hand',cursive; -webkit-font-smoothing: antialiased; }
+    a { color: #131313; text-decoration: none; }
+    a:hover { color: var(--ax, #1F3A5F); }
+    ::selection { background: var(--ax, #1F3A5F); color: #FAFAF8; }
+    @keyframes penWiggle { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(8deg); } }
+    @keyframes coverFloat { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-16px) rotate(1deg); } }
+    @media (prefers-reduced-motion: reduce) { .cover-float { animation: none !important; } }
+    @keyframes emberRise {
+      0% { opacity: 0; transform: translate(0,0) scale(.4); }
+      15% { opacity: 1; }
+      100% { opacity: 0; transform: translate(var(--dx,0px), calc(-1 * var(--rise,120px))) scale(1.5); }
+    }
+    /* slow burn: a charred edge eats the paper from the bottom up */
+    @keyframes burnAway {
+      0%   { -webkit-mask-position: 0% 0%; mask-position: 0% 0%; filter: none; }
+      12%  { filter: sepia(.5) saturate(2) brightness(.95); }
+      100% { -webkit-mask-position: 0% 100%; mask-position: 0% 100%; filter: sepia(1) saturate(6) hue-rotate(-28deg) brightness(.42) contrast(1.9); }
+    }
+    .burning-away {
+      -webkit-mask-image: linear-gradient(to top, transparent 0%, transparent 28%, rgba(0,0,0,.35) 36%, #000 52%);
+      mask-image: linear-gradient(to top, transparent 0%, transparent 28%, rgba(0,0,0,.35) 36%, #000 52%);
+      -webkit-mask-size: 100% 320%; mask-size: 100% 320%;
+      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+      animation: burnAway 3.4s ease-in forwards !important;
+    }
+    @media (prefers-reduced-motion: reduce) { .burning-away { animation-duration: .4s; } }
+    @keyframes shakeNo { 0%,100% { translate: 0 0; } 20% { translate: -9px 0; } 45% { translate: 8px 0; } 70% { translate: -5px 0; } }
+    .shake-no { animation: shakeNo .5s ease-in-out; }
+    /* wind gust: gentle paper flutter, applied to inner wrappers so drag transforms stay intact */
+    /* uses independent translate/rotate props so it composes with the inline drag transform */
+    @keyframes windFlutter {
+      0% { rotate: 0deg; translate: 0 0; }
+      18% { rotate: 2.4deg; translate: 2px -3px; }
+      38% { rotate: -1.8deg; translate: -2px 1px; }
+      58% { rotate: 1.2deg; translate: 1px -2px; }
+      78% { rotate: -0.6deg; translate: -1px 0; }
+      100% { rotate: 0deg; translate: 0 0; }
+    }
+    .wind-gust { animation: windFlutter 1.6s ease-in-out; transform-origin: 50% -10px; }
+    @media (prefers-reduced-motion: reduce) { .wind-gust { animation: none; } }
+  </style>
+</helmet>
+
+<!-- ============ MENU POST-IT — fixed top-left, always ============ -->
+<sc-if value="{{ menuScrim }}" hint-placeholder-val="{{ false }}">
+  <button type="button" sc-camel-on-click="{{ toggleMenu }}" aria-label="Close menu" style="position:fixed;inset:0;z-index:110;border:none;background:rgba(7,8,11,0.5);cursor:pointer"></button>
+</sc-if>
+<header data-board-id="menu" data-rot="-2deg" sc-camel-on-pointer-down="{{ dragMenu }}" style="{{ menuStyle }}">
+  <span aria-hidden="true" style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(3deg);width:64px;height:18px;background:rgba(250,250,248,0.75);box-shadow:0 1px 3px rgba(19,19,19,0.12)"></span>
+  <div style="{{ menuHeadStyle }}">
+    <button type="button" sc-camel-on-click="{{ openCover }}" aria-label="{{ t.openBook }}" title="{{ t.openBook }}" style="{{ headThumbStyle }}" style-hover="transform:rotate(0deg) scale(1.08)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px"><img src="nadir-photo.png" alt="" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(19,19,19,0.3))"></button>
+    <button type="button" sc-camel-on-click="{{ toggleMenu }}" aria-expanded="{{ menuOpenFlag }}" style="{{ menuBtnStyle }}" style-hover="color:var(--ax,#1F3A5F)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">
+      <svg sc-camel-view-box="0 0 24 34" width="{{ clipW }}" height="{{ clipH }}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16.5 10.5V7.2C16.5 4.3 14.4 2 11.8 2S7 4.3 7 7.2v16.4c0 1.9 1.4 3.4 3.2 3.4s3.3-1.5 3.3-3.4V9.4c0-1-.8-1.9-1.7-1.9s-1.8.9-1.8 1.9v13"></path>
+      </svg>
+      <span>{{ t.menu }} {{ menuChevron }}</span>
+    </button>
+  </div>
+  <div role="group" aria-label="Language / Lingua" style="{{ langTopStyle }}">
+    <button type="button" sc-camel-on-click="{{ setIt }}" aria-pressed="{{ isIt }}" style="{{ itBtnStyle }}" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:-2px">IT</button>
+    <button type="button" sc-camel-on-click="{{ setEn }}" aria-pressed="{{ isEn }}" style="{{ enBtnStyle }}" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:-2px">EN</button>
+  </div>
+  <nav aria-label="Primary" style="{{ navBodyStyle }}">
+    <sc-for list="{{ navSheets }}" as="ns" hint-placeholder-count="4">
+      <button type="button" sc-camel-on-click="{{ ns.go }}" aria-pressed="{{ ns.active }}" style="{{ ns.style }}" style-hover="color:var(--ax,#1F3A5F);transform:translateX(4px)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">
+        <span style="display:flex;align-items:baseline;gap:8px"><span aria-hidden="true" style="{{ ns.numStyle }}">{{ ns.num }}</span><span>{{ ns.label }}</span></span>
+        <span aria-hidden="true" style="font-size:14px">{{ ns.arrow }}</span>
+      </button>
+    </sc-for>
+    <!-- the sketchbook itself lives in the menu: back to the cover -->
+    <button type="button" sc-camel-on-click="{{ openCover }}" style="{{ coverRowStyle }}" style-hover="color:var(--ax,#1F3A5F);transform:translateX(4px)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">
+      <span style="display:flex;align-items:center;gap:10px"><img src="nadir-photo.png" alt="" style="{{ coverRowThumbStyle }}">{{ t.openBook }}</span>
+      <span aria-hidden="true" style="font-size:14px">✎</span>
+    </button>
+  </nav>
+
+</header>
+
+
+
+<!-- ============ INTRO: the floating sketchbook cover — click to enter ============ -->
+<sc-if value="{{ showIntro }}" hint-placeholder-val="{{ true }}">
+  <div style="position:fixed;inset:0;z-index:90;background:#07080B;display:flex;align-items:center;justify-content:center;overflow:hidden">
+    <!-- stage spotlight: a pool of light behind the book, everything else dark -->
+    <div aria-hidden="true" style="position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:min(150vh,150vw);height:min(150vh,150vw);border-radius:50%;background:radial-gradient(circle at 50% 50%, rgba(120,164,224,0.34) 0%, rgba(56,88,140,0.22) 26%, rgba(20,34,62,0.12) 44%, rgba(7,8,11,0) 62%);pointer-events:none"></div>
+    <div aria-hidden="true" style="position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);width:min(84vh,88vw);height:min(84vh,88vw);border-radius:50%;background:radial-gradient(circle at 50% 45%, rgba(214,231,255,0.3) 0%, rgba(140,178,232,0.16) 35%, rgba(7,8,11,0) 70%);pointer-events:none"></div>
+    <!-- faint blueprint grid, only readable inside the lit pool -->
+    <div aria-hidden="true" style="position:absolute;inset:0;background-image:radial-gradient(circle, rgba(200,224,255,0.5) 1.2px, transparent 1.5px),linear-gradient(rgba(200,224,255,0.16) 1px, transparent 1px),linear-gradient(90deg, rgba(200,224,255,0.16) 1px, transparent 1px);background-size:26px 26px, 130px 130px, 130px 130px;-webkit-mask-image:radial-gradient(circle at 50% 47%, #000 0%, rgba(0,0,0,0.5) 34%, transparent 60%);mask-image:radial-gradient(circle at 50% 47%, #000 0%, rgba(0,0,0,0.5) 34%, transparent 60%);pointer-events:none"></div>
+    <!-- architectural blueprint study of the monogram -->
+    <div aria-hidden="true" style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+      <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(120vh,92vw);aspect-ratio:1">
+        <img src="logo-monogram.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0.16">
+      </div>
+    </div>
+    <button type="button" sc-camel-on-click="{{ closeIntro }}" aria-label="{{ t.openBook }}" style="position:relative;z-index:2;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:18px">
+      <img src="nadir-photo.png" alt="Sketchbook Altered Venganza — Multidisciplinary Studio by Nadir Martinez" class="cover-float" style="filter:drop-shadow(0 46px 70px rgba(0,0,0,0.85)) drop-shadow(0 0 60px rgba(150,190,245,0.28)) brightness(1.12) contrast(1.05);width:min(78vw,700px);height:auto;animation:coverFloat 4.5s ease-in-out infinite">
+      <span style="font-family:'Caveat',cursive;font-size:clamp(19px,2vw,26px);font-weight:700;color:rgba(250,246,236,0.92)">{{ t.openBook }} ✎</span>
+    </button>
+  </div>
+</sc-if>
+
+<!-- phone: the wordmark sheet rides above every page (never over the cover) -->
+<sc-if value="{{ phoneMasthead }}" hint-placeholder-val="{{ false }}">
+  <button type="button" sc-camel-on-click="{{ goHome }}" aria-label="Home" title="Home" style="{{ fixedMastheadStyle }}">
+    <div style="position:relative;filter:drop-shadow(0 14px 26px rgba(19,19,19,0.16));transform:rotate(-1.2deg)">
+      <!-- strip of tape holding the sheet down -->
+      <span style="position:absolute;top:-26px;left:50%;transform:translateX(-50%) rotate(-3deg);width:190px;height:52px;background:rgba(220,220,212,0.72);box-shadow:0 2px 6px rgba(19,19,19,0.14);z-index:2"></span>
+      <div style="background:#FFFDF4;padding:30px 52px 36px;clip-path:polygon(1% 4%, 6% 1%, 14% 3%, 22% 0%, 31% 3%, 40% 1%, 50% 4%, 59% 1%, 68% 3%, 77% 0%, 86% 3%, 94% 1%, 99% 5%, 98% 18%, 100% 32%, 97% 47%, 100% 62%, 98% 78%, 100% 90%, 96% 98%, 87% 95%, 78% 99%, 68% 96%, 58% 100%, 48% 96%, 38% 99%, 28% 95%, 18% 99%, 9% 96%, 2% 99%, 0% 88%, 3% 74%, 0% 60%, 2% 45%, 0% 30%, 3% 16%)">
+        <p style="font-family:'Permanent Marker',cursive;font-weight:400;font-size:74px;line-height:1.15;margin:0">ALTERED <span style="color:var(--ax,#1F3A5F)">VENGANZA</span></p>
+      </div>
+    </div>
+  </button>
+</sc-if>
+
+<!-- ============ THE BIG BOARD — 3×2 viewports; the camera pans between regions ============ -->
+<main style="position:fixed;inset:0;overflow:hidden">
+  <div id="board" style="position:absolute;left:0;top:0;width:300vw;height:300vh;background-color:#EFEDE7;background-image:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.85), rgba(255,255,255,0) 60%),radial-gradient(circle, rgba(60,56,44,0.42) 0.9px, rgba(60,56,44,0.10) 1.6px, transparent 2px),radial-gradient(circle, rgba(120,112,92,0.05) 0.6px, transparent 1px),linear-gradient(157deg, rgba(19,19,19,0.035) 0%, rgba(19,19,19,0) 38%, rgba(19,19,19,0.03) 72%, rgba(19,19,19,0) 100%);background-size:120vw 120vh,24px 24px,7px 7px,100% 100%;background-position:center,0.5px 0.5px,0 0,0 0;transition:transform 1s cubic-bezier(.65,0,.3,1);will-change:transform">
+
+    <!-- ── COVER (0,0) ── -->
+    <section data-region="home" data-screen-label="Copertina" aria-label="Copertina" style="position:absolute;left:0;top:0;width:100vw;height:100vh;box-sizing:border-box;overflow:hidden;touch-action:none">
+      <div aria-hidden="true" style="position:absolute;top:-15%;right:-8%;width:55vw;height:55vw;max-width:820px;max-height:820px;border-radius:50%;background:radial-gradient(circle, rgba(31,58,95,0.08) 0%, rgba(31,58,95,0) 65%);pointer-events:none"></div>
+
+      <!-- fixed-size stage: the whole arrangement scales as one, so the default layout holds at any size -->
+      <div id="board-stage" style="position:absolute;left:50%;top:50%;width:1500px;height:880px;transform:translate(-50%,-50%);transform-origin:center center">
+
+<!-- home masthead: torn paper sheet -->
+      <div id="cover-head" data-board-id="masthead" data-rot="0deg" sc-camel-on-pointer-down="{{ dragMasthead }}" style="{{ coverHeadStyle }}">
+        <div style="{{ mastheadInnerStyle }}">
+          <div data-paper="" style="filter:drop-shadow(0 14px 26px rgba(19,19,19,0.16));transform:rotate(-1.2deg)">
+            <div style="background:#FFFDF4;padding:30px 52px 36px;clip-path:polygon(1% 4%, 6% 1%, 14% 3%, 22% 0%, 31% 3%, 40% 1%, 50% 4%, 59% 1%, 68% 3%, 77% 0%, 86% 3%, 94% 1%, 99% 5%, 98% 18%, 100% 32%, 97% 47%, 100% 62%, 98% 78%, 100% 90%, 96% 98%, 87% 95%, 78% 99%, 68% 96%, 58% 100%, 48% 96%, 38% 99%, 28% 95%, 18% 99%, 9% 96%, 2% 99%, 0% 88%, 3% 74%, 0% 60%, 2% 45%, 0% 30%, 3% 16%)">
+              <h1 style="font-family:'Permanent Marker',cursive;font-weight:400;font-size:74px;line-height:1.15;margin:0;white-space:nowrap">ALTERED <span style="color:var(--ax,#1F3A5F)">VENGANZA</span></h1>
+            </div>
+          </div>
+          <span aria-hidden="true" style="position:absolute;top:-12px;left:50%;transform:translateX(-50%) rotate(-2deg);width:88px;height:22px;background:rgba(220,220,212,0.7);box-shadow:0 1px 3px rgba(19,19,19,0.12)"></span>
+        </div>
+      </div>
+
+      <!-- motto post-it — its own draggable item -->
+      <div data-board-id="motto" data-rot="-2deg" sc-camel-on-pointer-down="{{ dragMotto }}" style="{{ sayingOuterStyle }}">
+        <div data-paper="" style="{{ sayingWrapStyle }}">
+            <span aria-hidden="true" style="position:absolute;top:-11px;left:50%;transform:translateX(-50%) rotate(2deg);width:64px;height:18px;background:rgba(250,250,248,0.75);box-shadow:0 1px 3px rgba(19,19,19,0.12)"></span>
+            <p style="font-family:'Caveat',cursive;font-weight:700;font-size:30px;line-height:1.3;margin:0">{{ t.saying }}</p>
+          <p style="font-family:'Caveat',cursive;font-size:19px;color:var(--ax,#1F3A5F);margin:10px 0 0;text-align:right">— Altered</p>
+        </div>
+      </div>
+
+      <!-- scattered hand-drawn icons: click one to fly to that part of the board -->
+      <sc-for list="{{ boardIcons }}" as="ic" hint-placeholder-count="4">
+        <button type="button" data-board-id="{{ ic.id }}" data-rot="{{ ic.rot }}" sc-camel-on-pointer-down="{{ ic.down }}" sc-camel-on-click="{{ ic.go }}" title="{{ ic.label }}" style="{{ ic.style }}" style-hover="color:var(--ax,#1F3A5F);transform:rotate(0deg) scale(1.1)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:4px">
+          <svg sc-camel-view-box="0 0 48 48" width="46" height="46" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="{{ ic.d }}"></path>
+            <path d="{{ ic.d2 }}"></path>
+          </svg>
+          <span style="font-family:'Caveat',cursive;font-size:18px;font-weight:700;line-height:1">{{ ic.label }} <span aria-hidden="true">{{ ic.arrow }}</span></span>
+        </button>
+      </sc-for>
+
+      <sc-for list="{{ boardNotes }}" as="bn" hint-placeholder-count="2">
+        <div data-board-id="{{ bn.id }}" data-rot="{{ bn.rot }}" sc-camel-on-pointer-down="{{ bn.down }}" style="{{ bn.style }}">
+          <p style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0 0 8px;border-bottom:1px solid rgba(19,19,19,0.25);padding-bottom:6px">{{ bn.title }}</p>
+          <sc-for list="{{ bn.lines }}" as="ln" hint-placeholder-count="3">
+            <p style="font-size:11px;line-height:1.6;margin:2px 0">{{ ln }}</p>
+          </sc-for>
+        </div>
+      </sc-for>
+
+      <sc-for list="{{ boardPhotos }}" as="bp" hint-placeholder-count="2">
+        <figure data-board-id="{{ bp.id }}" data-rot="{{ bp.rot }}" style="{{ bp.style }}">
+          <div sc-camel-on-pointer-down="{{ bp.down }}" style="cursor:grab;display:flex;align-items:center;justify-content:space-between;padding:6px 10px 8px;touch-action:none" title="Drag / Trascina">
+            <span style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#5a5a56">{{ bp.tag }}</span>
+            <span aria-hidden="true" style="font-size:10px;color:#c9c9c2;letter-spacing:2px">⠿</span>
+          </div>
+          <div style="position:relative;aspect-ratio:{{ bp.ratio }};margin:0 8px;width:calc(100% - 16px)">
+            <image-slot id="{{ bp.slotId }}" shape="rect" placeholder="{{ bp.placeholder }}" style="width:100%;height:100%"></image-slot>
+          </div>
+          <figcaption style="padding:8px 8px 12px;text-align:center">
+            <button type="button" sc-camel-on-click="{{ bp.go }}" style="background:none;border:none;cursor:pointer;font-family:'Patrick Hand',cursive;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#4a4a46;padding:2px;transition:color .2s ease" style-hover="color:var(--ax,#1F3A5F)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">{{ bp.caption }} <span aria-hidden="true" style="color:var(--ax,#1F3A5F)">→</span></button>
+          </figcaption>
+        </figure>
+      </sc-for>
+
+      <div id="hero-toolbar" style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;flex-direction:column;gap:12px;align-items:center;z-index:6">
+        <p style="{{ hintStyle }}">{{ t.dragHint }}</p>
+        <div style="display:flex;gap:10px;align-items:center">
+        <button type="button" sc-camel-on-click="{{ resetBoard }}" title="{{ t.resetTitle }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e5ddc6;border-radius:8px;padding:8px 16px;font-family:'Patrick Hand',cursive;font-size:13px;letter-spacing:0.06em;color:#4a4a46;cursor:pointer;box-shadow:0 6px 20px rgba(19,19,19,0.08);transition:color .25s ease, border-color .25s ease" style-hover="color:var(--ax,#1F3A5F);border-color:var(--ax,#1F3A5F)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">
+          <svg sc-camel-view-box="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3.2-6.9"></path><path d="M3 4v5h5"></path></svg>
+          <span>{{ t.reset }}</span>
+        </button>
+        </div>
+      </div>
+      <div id="hero-email" style="{{ emailStyle }}">
+        <a href="mailto:hello@altered-venganza.com" style="font-size:11px;letter-spacing:0.18em;color:#5a5a56" style-hover="color:var(--ax,#1F3A5F)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:3px">hello@altered-venganza.com</a>
+        <span style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#8a8574">P.IVA 12448730969</span>
+      </div>
+
+      <!-- burn bin: drag a post-it onto it -->
+      <div id="burn-bin" style="position:absolute;right:4%;bottom:4.5%;display:flex;flex-direction:column;align-items:center;gap:6px;color:#8a8574;transition:color .25s ease, transform .25s ease;pointer-events:none">
+        <svg sc-camel-view-box="0 0 48 48" width="52" height="52" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M8 13c10.5-1 21-1 32 0"></path>
+          <path d="M18 13c0-3.5.5-5 6-5s6 1.5 6 5"></path>
+          <path d="M11.5 16c-.4 8 .2 17 1.2 24 .3 2 1.4 3 3.3 3.2 5.3.6 10.7.6 16 0 1.9-.2 3-1.2 3.3-3.2 1-7 1.6-16 1.2-24"></path>
+          <path d="M20 22c-.4 6-.4 12 0 17M28 22c.4 6 .4 12 0 17"></path>
+        </svg>
+        <span style="font-family:'Caveat',cursive;font-size:17px;font-weight:700;line-height:1">{{ t.burn }}</span>
+      </div>
+      <p id="burn-msg" style="position:absolute;right:4%;bottom:1%;margin:0;font-family:'Caveat',cursive;font-size:19px;font-weight:700;color:var(--ax,#1F3A5F);opacity:0;transition:opacity .3s ease;pointer-events:none">{{ t.noBurn }}</p>
+      </div>
+    </section>
+
+    <!-- ── WORK (1,0): folders, filterable ── -->
+    <section data-region="work" data-screen-label="Lavori" aria-label="Selected work" style="position:absolute;left:100vw;top:0;width:100vw;height:100vh;box-sizing:border-box;overflow:hidden auto;border-left:2px dashed #d9d0b6">
+      <div data-pad="" style="max-width:1180px;margin:0 auto;padding:clamp(50px,8vh,90px) clamp(20px,5vw,64px) 140px">
+        <button type="button" sc-camel-on-click="{{ goHome }}" style="{{ backChipStyle }}" style-hover="color:var(--ax,#1F3A5F);border-color:var(--ax,#1F3A5F)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">← {{ t.backBoard }}</button>
+        <div style="position:relative;display:flex;justify-content:center;margin:10px 0 clamp(16px,2.2vw,24px)">
+          <span aria-hidden="true" style="position:absolute;top:50%;left:0;transform:translateY(-58%);font-family:'Permanent Marker',cursive;font-size:clamp(110px,16vw,220px);line-height:1;color:rgba(19,19,19,0.05);pointer-events:none;user-select:none">01</span>
+          <div style="position:relative;background:#fff;border:1px solid #e5ddc6;box-shadow:0 12px 30px rgba(19,19,19,0.1);padding:22px 40px 26px;transform:rotate(-1deg)">
+            <span aria-hidden="true" style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(2deg);width:70px;height:20px;background:rgba(220,220,212,0.75);box-shadow:0 1px 3px rgba(19,19,19,0.12)"></span>
+            <p style="font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:var(--ax,#1F3A5F);margin:0 0 8px;text-align:center">01 — {{ t.workEyebrow }}</p>
+            <h2 style="font-family:'Caveat',cursive;font-weight:600;font-size:clamp(26px,3.6vw,42px);line-height:1.1;margin:0;text-align:center">{{ t.workTitleA }} <em style="color:var(--ax,#1F3A5F)">{{ t.workTitleEm }}</em>.</h2>
+          </div>
+        </div>
+
+        <!-- filters: year + discipline -->
+        <div style="display:flex;flex-wrap:wrap;gap:18px;justify-content:center;margin-bottom:clamp(32px,5vw,52px)">
+          <div role="group" aria-label="{{ t.fltYear }}" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#5a5a56">{{ t.fltYear }}:</span>
+            <sc-for list="{{ yearChips }}" as="yc" hint-placeholder-count="3">
+              <button type="button" sc-camel-on-click="{{ yc.set }}" aria-pressed="{{ yc.active }}" style="{{ yc.style }}" style-hover="transform:rotate(0deg) translateY(-3px);box-shadow:0 12px 24px rgba(19,19,19,0.2)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">{{ yc.label }}</button>
+            </sc-for>
+          </div>
+          <div role="group" aria-label="{{ t.fltDisc }}" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#5a5a56">{{ t.fltDisc }}:</span>
+            <sc-for list="{{ discChips }}" as="dc" hint-placeholder-count="5">
+              <button type="button" sc-camel-on-click="{{ dc.set }}" aria-pressed="{{ dc.active }}" style="{{ dc.style }}" style-hover="transform:rotate(0deg) translateY(-3px);box-shadow:0 12px 24px rgba(19,19,19,0.2)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">{{ dc.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- folders -->
+        <div style="display:flex;flex-direction:column;gap:clamp(40px,5vw,64px)">
+          <sc-for list="{{ cases }}" as="cs" hint-placeholder-count="3">
+            <article style="position:relative">
+              <!-- folder tab -->
+              <div style="display:inline-flex;align-items:baseline;gap:12px;background:#EFDFB4;border:1px solid #d9c68f;border-bottom:none;border-radius:10px 10px 0 0;padding:9px 24px 8px;margin-left:26px;position:relative;z-index:1;box-shadow:0 -4px 12px rgba(19,19,19,0.05)">
+                <span style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase">{{ cs.client }}</span>
+                <span style="font-size:10px;letter-spacing:0.14em;color:#7a6c45">{{ cs.year }} · {{ cs.discLabel }}</span>
+              </div>
+              <!-- folder body -->
+              <div data-paper="" style="{{ cs.cardStyle }}" style-hover="transform:rotate(0deg) translateY(-6px);box-shadow:0 26px 54px rgba(19,19,19,0.16)">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(24px,3.5vw,48px);align-items:start">
+                  <div style="order:{{ cs.imgOrder }}">
+                    <div style="background:#fff;border:1px solid #131313;padding:10px">
+                      <div style="position:relative;width:100%;aspect-ratio:16/11">
+                        <image-slot id="{{ cs.slotId }}" shape="rect" placeholder="{{ cs.placeholder }}" style="width:100%;height:100%"></image-slot>
+                        <div aria-hidden="true" style="position:absolute;left:0;right:0;bottom:0;height:38%;background:linear-gradient(to top, rgba(19,19,19,0.55), rgba(19,19,19,0));pointer-events:none"></div>
+                        <p style="position:absolute;right:14px;bottom:10px;margin:0;color:#FAFAF8;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;pointer-events:none">{{ cs.caption }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="order:{{ cs.txtOrder }}">
+                    <p style="font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#5a5a56;margin:0 0 10px">{{ cs.index }} · {{ cs.year }}</p>
+                    <h3 style="font-family:'Caveat',cursive;font-weight:600;font-size:clamp(26px,3vw,38px);line-height:1.1;margin:0 0 20px">{{ cs.title }}</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:20px">
+                      <div style="flex:1 1 150px;background:#f4e9d8;padding:14px 16px;box-shadow:0 8px 20px rgba(19,19,19,0.1);transform:rotate(-1deg)">
+                        <p style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--ax,#1F3A5F);margin:0 0 8px;border-bottom:1px solid rgba(19,19,19,0.2);padding-bottom:6px">{{ t.lblBrief }}</p>
+                        <p style="font-size:11px;line-height:1.65;margin:0;color:#131313">{{ cs.brief }}</p>
+                      </div>
+                      <div style="flex:1 1 150px;background:#efd9d6;padding:14px 16px;box-shadow:0 8px 20px rgba(19,19,19,0.1);transform:rotate(0.8deg)">
+                        <p style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--ax,#1F3A5F);margin:0 0 8px;border-bottom:1px solid rgba(19,19,19,0.2);padding-bottom:6px">{{ t.lblApproach }}</p>
+                        <p style="font-size:11px;line-height:1.65;margin:0;color:#131313">{{ cs.approach }}</p>
+                      </div>
+                      <div style="flex:1 1 150px;background:#e8e6d9;padding:14px 16px;box-shadow:0 8px 20px rgba(19,19,19,0.1);transform:rotate(-0.6deg)">
+                        <p style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--ax,#1F3A5F);margin:0 0 8px;border-bottom:1px solid rgba(19,19,19,0.2);padding-bottom:6px">{{ t.lblResult }}</p>
+                        <p style="font-size:11px;line-height:1.65;margin:0;color:#131313">{{ cs.result }}</p>
+                      </div>
+                    </div>
+                    <ul style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px">
+                      <sc-for list="{{ cs.tags }}" as="tag" hint-placeholder-count="3">
+                        <li style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;border:1px solid #c3ac74;border-radius:999px;padding:6px 14px;color:#4a4a46;background:rgba(255,255,255,0.6)">{{ tag }}</li>
+                      </sc-for>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </sc-for>
+          <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+            <div style="align-self:center;background:#f4e9d8;padding:20px 28px;box-shadow:0 10px 26px rgba(19,19,19,0.12);transform:rotate(-1.5deg);font-size:13px">{{ t.noResults }}</div>
+          </sc-if>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CONTACT (2,0) ── -->
+    <section data-region="contact" data-screen-label="Contatti" aria-label="Contact" style="position:absolute;left:200vw;top:0;width:100vw;height:100vh;box-sizing:border-box;overflow:hidden auto;border-left:2px dashed #d9d0b6">
+      <div aria-hidden="true" style="position:absolute;bottom:-30%;left:-10%;width:55vw;height:55vw;max-width:800px;max-height:800px;border-radius:50%;background:radial-gradient(circle, rgba(31,58,95,0.08) 0%, rgba(31,58,95,0) 65%);pointer-events:none"></div>
+      <div data-pad="" style="max-width:1180px;margin:0 auto;padding:clamp(50px,8vh,90px) clamp(20px,5vw,64px) 140px;position:relative">
+        <button type="button" sc-camel-on-click="{{ goHome }}" style="{{ backChipStyle }}" style-hover="color:var(--ax,#1F3A5F);border-color:var(--ax,#1F3A5F)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">← {{ t.backBoard }}</button>
+        <div style="{{ contactGridStyle }}">
+          <div>
+            <p style="font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--ax,#1F3A5F);margin:0 0 20px">04 — {{ t.navContact }}</p>
+            <h2 style="font-family:'Caveat',cursive;font-weight:600;font-size:clamp(34px,5.4vw,72px);line-height:1.08;margin:0;max-width:18ch">{{ t.ctaLine1 }}<br><em style="color:var(--ax,#1F3A5F)">{{ t.ctaLine2 }}</em></h2>
+          </div>
+          <!-- sketchbook flyleaf: "this sketchbook belongs to…" -->
+          <div data-paper="" style="position:relative;justify-self:center;filter:drop-shadow(0 16px 34px rgba(19,19,19,0.16));transform:rotate(1.2deg);width:min(100%,380px)">
+            <div style="position:relative;background:#FFFDF4;border:1px solid #e5ddc6;border-radius:2px;padding:34px 26px 26px">
+              <!-- spiral binding -->
+              <div aria-hidden="true" style="position:absolute;top:-12px;left:14px;right:14px;display:flex;justify-content:space-between">
+                <sc-for list="{{ rings }}" as="r" hint-placeholder-count="10">
+                  <span style="width:12px;height:22px;border:2.5px solid #9a9484;border-radius:50%;background:transparent"></span>
+                </sc-for>
+              </div>
+              <p style="font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--ax,#1F3A5F);margin:0 0 18px;text-align:center">{{ t.flyleafTitle }}</p>
+              <div style="display:flex;flex-direction:column;gap:18px">
+                <label style="display:block">
+                  <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#5a5a56">{{ t.fldName }}</span>
+                  <input type="text" value="{{ formName }}" sc-camel-on-change="{{ setFormName }}" placeholder="{{ t.phName }}" style="display:block;width:100%;box-sizing:border-box;background:transparent;border:none;border-bottom:1.5px solid #b3a980;font-family:'Caveat',cursive;font-size:22px;color:#131313;padding:4px 2px;outline:none" style-focus="border-color:var(--ax,#1F3A5F)">
+                </label>
+                <label style="display:block">
+                  <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#5a5a56">{{ t.fldEmail }}</span>
+                  <input type="email" value="{{ formEmail }}" sc-camel-on-change="{{ setFormEmail }}" placeholder="{{ t.phEmail }}" style="display:block;width:100%;box-sizing:border-box;background:transparent;border:none;border-bottom:1.5px solid #b3a980;font-family:'Caveat',cursive;font-size:22px;color:#131313;padding:4px 2px;outline:none" style-focus="border-color:var(--ax,#1F3A5F)">
+                </label>
+                <label style="display:block">
+                  <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#5a5a56">{{ t.fldMsg }}</span>
+                  <textarea rows="3" value="{{ formMsg }}" sc-camel-on-change="{{ setFormMsg }}" placeholder="{{ t.phMsg }}" style="display:block;width:100%;box-sizing:border-box;background:transparent;border:none;font-family:'Caveat',cursive;font-size:21px;line-height:33px;color:#131313;padding:4px 2px;outline:none;resize:none;background-image:repeating-linear-gradient(transparent 0, transparent 32px, #d8cfae 32px, #d8cfae 33px)"></textarea>
+                </label>
+              </div>
+              <button type="button" sc-camel-on-click="{{ sendForm }}" style="display:block;margin:22px auto 0;background:var(--ax,#1F3A5F);color:#FAF6EC;border:none;cursor:pointer;border-radius:14px;padding:11px 26px;font-family:'Patrick Hand',cursive;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;box-shadow:0 6px 18px rgba(31,58,95,0.3);transition:transform .25s ease" style-hover="transform:translateY(-2px)" style-focus="outline:2px solid #131313;outline-offset:2px">{{ t.send }} ✎</button>
+              <p style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8a8574;margin:18px 0 0;text-align:center">hello@altered-venganza.com · <a href="https://instagram.com/alteredvenganza" target="_blank" rel="noopener" style="color:#8a8574;border-bottom:1px solid #b3a980" style-hover="color:var(--ax,#1F3A5F)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">@alteredvenganza</a><br>via Alessandro Manzoni, Trieste</p>
+            </div>
+          </div>
+        </div>
+        <footer style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;border-top:1px solid #ddd4bc;padding-top:22px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#5a5a56">
+          <span>© 2026 Altered Venganza Design Studio</span>
+          <span>Trieste, IT — P.IVA 12448730969</span>
+        </footer>
+      </div>
+    </section>
+
+    <!-- ── SERVICES (0,1) ── -->
+    <section data-region="services" data-screen-label="Servizi" aria-label="Services" style="position:absolute;left:0;top:100vh;width:100vw;height:100vh;box-sizing:border-box;overflow:hidden auto;border-top:2px dashed #d9d0b6">
+      <div data-pad="" style="max-width:1180px;margin:0 auto;padding:clamp(50px,8vh,90px) clamp(20px,5vw,64px) 140px">
+        <button type="button" sc-camel-on-click="{{ goHome }}" style="{{ backChipStyle }}" style-hover="color:var(--ax,#1F3A5F);border-color:var(--ax,#1F3A5F)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">↑ {{ t.backBoard }}</button>
+        <div style="position:relative;display:flex;justify-content:center;margin:10px 0 clamp(18px,2.4vw,28px)">
+          <span aria-hidden="true" style="position:absolute;top:50%;left:0;transform:translateY(-58%);font-family:'Permanent Marker',cursive;font-size:clamp(110px,16vw,220px);line-height:1;color:rgba(19,19,19,0.05);pointer-events:none;user-select:none">02</span>
+          <div style="position:relative;background:#fff;border:1px solid #e5ddc6;box-shadow:0 12px 30px rgba(19,19,19,0.1);padding:22px 40px 26px;transform:rotate(0.8deg)">
+            <span aria-hidden="true" style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-2deg);width:70px;height:20px;background:rgba(220,220,212,0.75);box-shadow:0 1px 3px rgba(19,19,19,0.12)"></span>
+            <p style="font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:var(--ax,#1F3A5F);margin:0 0 8px;text-align:center">02 — {{ t.svcEyebrow }}</p>
+            <h2 style="font-family:'Caveat',cursive;font-weight:600;font-size:clamp(26px,3.6vw,42px);line-height:1.1;margin:0;text-align:center">{{ t.svcTitleA }} <em style="color:var(--ax,#1F3A5F)">{{ t.svcTitleEm }}</em>.</h2>
+          </div>
+        </div>
+        <div role="list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:clamp(20px,3vw,36px);align-items:stretch">
+          <sc-for list="{{ services }}" as="svc" hint-placeholder-count="4">
+            <div role="listitem" style="{{ svc.noteStyle }}" style-hover="transform:rotate(0deg) translateY(-8px);box-shadow:0 24px 46px rgba(19,19,19,0.16)">
+              <span aria-hidden="true" style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(3deg);width:60px;height:18px;background:rgba(250,250,248,0.7);box-shadow:0 1px 3px rgba(19,19,19,0.12)"></span>
+              <span aria-hidden="true" style="font-family:'Permanent Marker',cursive;font-size:44px;line-height:1;color:var(--ax,#1F3A5F)">{{ svc.num }}</span>
+              <h3 style="font-family:'Caveat',cursive;font-weight:600;font-size:clamp(20px,2vw,26px);line-height:1.15;margin:10px 0 12px">{{ svc.title }}</h3>
+              <p style="font-size:11px;line-height:1.7;color:#131313;margin:0;flex:1">{{ svc.desc }}</p>
+              <div style="display:flex;justify-content:space-between;gap:10px;border-top:1px solid rgba(19,19,19,0.2);margin-top:16px;padding-top:12px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase">
+                <span style="font-weight:700">{{ svc.price }}</span>
+                <span style="color:#4a4a46">{{ svc.timeline }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STUDIO (1,1) ── -->
+    <section data-region="studio" data-screen-label="Studio" aria-label="Studio" style="position:absolute;left:100vw;top:100vh;width:100vw;height:100vh;box-sizing:border-box;overflow:hidden auto;border-top:2px dashed #d9d0b6;border-left:2px dashed #d9d0b6">
+      <div data-pad="" style="max-width:1180px;margin:0 auto;padding:clamp(50px,8vh,90px) clamp(20px,5vw,64px) 140px">
+        <button type="button" sc-camel-on-click="{{ goHome }}" style="{{ backChipStyle }}" style-hover="color:var(--ax,#1F3A5F);border-color:var(--ax,#1F3A5F)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">↖ {{ t.backBoard }}</button>
+        <div style="position:relative;display:flex;justify-content:center;margin:10px 0 clamp(18px,2.4vw,28px)">
+          <span aria-hidden="true" style="position:absolute;top:50%;left:0;transform:translateY(-58%);font-family:'Permanent Marker',cursive;font-size:clamp(110px,16vw,220px);line-height:1;color:rgba(19,19,19,0.05);pointer-events:none;user-select:none">03</span>
+          <div style="position:relative;background:#fff;border:1px solid #e5ddc6;box-shadow:0 12px 30px rgba(19,19,19,0.1);padding:22px 40px 26px;transform:rotate(-0.8deg)">
+            <span aria-hidden="true" style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(2deg);width:70px;height:20px;background:rgba(220,220,212,0.75);box-shadow:0 1px 3px rgba(19,19,19,0.12)"></span>
+            <p style="font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:var(--ax,#1F3A5F);margin:0 0 8px;text-align:center">03 — Studio</p>
+            <h2 style="font-family:'Caveat',cursive;font-weight:600;font-size:clamp(26px,3.6vw,42px);line-height:1.1;margin:0;text-align:center">{{ t.stuTitleA }} <em style="color:var(--ax,#1F3A5F)">{{ t.stuTitleEm }}</em>.</h2>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,64px);align-items:start">
+          <div data-paper="" style="position:relative;background:#fff;background-image:repeating-linear-gradient(transparent 0, transparent 27px, #e8e0c8 27px, #e8e0c8 28px);border:1px solid #e5ddc6;box-shadow:0 14px 34px rgba(19,19,19,0.12);padding:30px 28px;transform:rotate(-0.6deg)">
+            <span aria-hidden="true" style="position:absolute;top:-11px;left:38px;transform:rotate(-4deg);width:72px;height:20px;background:rgba(220,220,212,0.75);box-shadow:0 1px 3px rgba(19,19,19,0.12)"></span>
+            <p style="font-family:'Caveat',cursive;font-size:clamp(18px,2vw,23px);line-height:28px;margin:0 0 28px">{{ t.stuManifesto1 }}</p>
+            <p style="font-size:12px;line-height:28px;color:#4a4a46;margin:0 0 28px">{{ t.stuManifesto2 }}</p>
+            <p style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#5a5a56;margin:0;line-height:28px">{{ t.by }} <span style="color:var(--ax,#1F3A5F)">Nadir Martinez</span> — Creative Director</p>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;align-content:start">
+            <sc-for list="{{ facts }}" as="f" hint-placeholder-count="4">
+              <div data-paper="" style="{{ f.style }}" style-hover="transform:rotate(0deg) translateY(-4px)">
+                <span style="font-family:'Permanent Marker',cursive;font-size:28px;line-height:1;color:var(--ax,#1F3A5F);display:block;margin-bottom:8px">{{ f.stat }}</span>
+                <p style="font-family:'Caveat',cursive;font-size:17px;font-weight:600;margin:0">{{ f.label }}</p>
+                <p style="font-size:10px;line-height:1.6;color:#4a4a46;margin:6px 0 0">{{ f.note }}</p>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- brand story: photo strip + milestone post-its -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:clamp(18px,2.6vw,30px);margin-top:clamp(34px,5vw,58px)">
+          <sc-for list="{{ studioShots }}" as="sh" hint-placeholder-count="3">
+            <figure data-paper="" style="{{ sh.style }}" style-hover="transform:rotate(0deg) translateY(-6px);box-shadow:0 24px 46px rgba(19,19,19,0.18)">
+              <div style="position:relative;aspect-ratio:4/3;margin:0 0 10px">
+                <image-slot id="{{ sh.slotId }}" shape="rect" placeholder="{{ sh.placeholder }}" style="width:100%;height:100%"></image-slot>
+              </div>
+              <figcaption style="text-align:center">
+                <p style="font-family:'Caveat',cursive;font-size:19px;font-weight:700;margin:0">{{ sh.caption }}</p>
+                <p style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#8a8574;margin:4px 0 0">{{ sh.tag }}</p>
+              </figcaption>
+            </figure>
+          </sc-for>
+        </div>
+
+        <p style="font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:var(--ax,#1F3A5F);margin:clamp(30px,4.5vw,52px) 0 16px">{{ t.brandStory }}</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:clamp(18px,2.6vw,30px)">
+          <sc-for list="{{ brandStory }}" as="bs" hint-placeholder-count="4">
+            <div data-paper="" style="{{ bs.style }}" style-hover="transform:rotate(0deg) translateY(-5px);box-shadow:0 22px 44px rgba(19,19,19,0.16)">
+              <p style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--ax,#1F3A5F);margin:0 0 10px;border-bottom:1px solid rgba(19,19,19,0.2);padding-bottom:7px">{{ bs.year }}</p>
+              <p style="font-family:'Caveat',cursive;font-size:21px;font-weight:700;line-height:1.3;margin:0 0 8px">{{ bs.title }}</p>
+              <p style="font-size:11px;line-height:1.7;color:#131313;margin:0">{{ bs.body }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STORY PAGES (0,2) Nadir · (1,2) Studio Trieste ── -->
+    <sc-for list="{{ stories }}" as="st" hint-placeholder-count="2">
+      <section data-region="{{ st.region }}" data-screen-label="{{ st.label }}" aria-label="{{ st.label }}" style="{{ st.sectionStyle }}">
+        <div data-pad="" style="max-width:1180px;margin:0 auto;padding:clamp(50px,8vh,90px) clamp(20px,5vw,64px) 140px">
+          <button type="button" sc-camel-on-click="{{ goHome }}" style="{{ backChipStyle }}" style-hover="color:var(--ax,#1F3A5F);border-color:var(--ax,#1F3A5F)" style-focus="outline:2px solid var(--ax,#1F3A5F);outline-offset:2px">↑ {{ t.backBoard }}</button>
+          <div style="position:relative;display:flex;justify-content:center;margin:10px 0 clamp(18px,2.4vw,28px)">
+            <span aria-hidden="true" style="position:absolute;top:50%;left:0;transform:translateY(-58%);font-family:'Permanent Marker',cursive;font-size:clamp(110px,16vw,220px);line-height:1;color:rgba(19,19,19,0.05);pointer-events:none;user-select:none">{{ st.ghost }}</span>
+            <div style="position:relative;background:#fff;border:1px solid #e5ddc6;box-shadow:0 12px 30px rgba(19,19,19,0.1);padding:22px 40px 26px;transform:rotate(-0.9deg)">
+              <span aria-hidden="true" style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(2deg);width:70px;height:20px;background:rgba(220,220,212,0.75);box-shadow:0 1px 3px rgba(19,19,19,0.12)"></span>
+              <p style="font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:var(--ax,#1F3A5F);margin:0 0 8px;text-align:center">{{ st.eyebrow }}</p>
+              <h2 style="font-family:'Caveat',cursive;font-weight:600;font-size:clamp(26px,3.6vw,42px);line-height:1.1;margin:0;text-align:center">{{ st.title }}</h2>
+            </div>
+          </div>
+          <!-- scrapbook: alternating polaroids and post-its -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:clamp(22px,3vw,40px);align-items:start">
+            <sc-for list="{{ st.items }}" as="it2" hint-placeholder-count="6">
+              <div style="{{ it2.wrapStyle }}" style-hover="transform:rotate(0deg) translateY(-6px);box-shadow:0 24px 46px rgba(19,19,19,0.18)">
+                <sc-if value="{{ it2.isPhoto }}" hint-placeholder-val="{{ true }}">
+                  <div>
+                    <div style="position:relative;aspect-ratio:4/3;margin:0 0 10px">
+                      <image-slot id="{{ it2.slotId }}" shape="rect" placeholder="{{ it2.placeholder }}" style="width:100%;height:100%"></image-slot>
+                    </div>
+                    <p style="font-family:'Caveat',cursive;font-size:19px;font-weight:700;margin:0;text-align:center">{{ it2.caption }}</p>
+                    <p style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#8a8574;margin:4px 0 0;text-align:center">{{ it2.year }}</p>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ it2.isNote }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <p style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--ax,#1F3A5F);margin:0 0 10px;border-bottom:1px solid rgba(19,19,19,0.2);padding-bottom:7px">{{ it2.year }}</p>
+                    <p style="font-family:'Caveat',cursive;font-size:21px;font-weight:700;line-height:1.3;margin:0 0 8px">{{ it2.caption }}</p>
+                    <p style="font-size:11px;line-height:1.7;color:#131313;margin:0">{{ it2.body }}</p>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+    </sc-for>
+
+  </div>
+</main>
+
+<!-- film grain -->
+<div aria-hidden="true" style="position:fixed;inset:0;z-index:60;pointer-events:none;opacity:0.3;mix-blend-mode:multiply;background-image:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMTQwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC45IiBudW1PY3RhdmVzPSIyIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAuMDUgMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxNDAiIGhlaWdodD0iMTQwIiBmaWx0ZXI9InVybCgjbikiLz48L3N2Zz4=)"></div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{
+  &quot;accent&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#1F3A5F&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;#1F3A5F&quot;, &quot;#7B1F24&quot;, &quot;#2E4A2E&quot;, &quot;#131313&quot;], &quot;section&quot;: &quot;Brand&quot;}
+}">
+class Component extends DCLogic {
+  state = { lang: 'it', pos: {}, view: 'home', fYear: 'all', fDisc: 'all', formName: '', formEmail: '', formMsg: '', menuOpen: false, intro: true };
+
+  componentDidMount() {
+    this._reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this._mq = window.matchMedia('(max-width: 1100px)');
+    this._mqPhone = window.matchMedia('(max-width: 640px)');
+    this._mqCb = () => this.setState({ narrow: this._mq.matches, phone: this._mqPhone.matches });
+    this._onResize = () => this.fitStage();
+    window.addEventListener('resize', this._onResize);
+    this._mq.addEventListener('change', this._mqCb);
+    this._mqPhone.addEventListener('change', this._mqCb);
+    this.setState({ narrow: this._mq.matches, phone: this._mqPhone.matches });
+    try {
+      const lang = localStorage.getItem('av-lang');
+      const pos = JSON.parse(localStorage.getItem('av-nav-pos') || '{}');
+      this.setState({ lang: lang === 'en' ? 'en' : 'it', pos });
+    } catch (e) {}
+    setTimeout(() => { this.applyView(); this.applyLayout(); }, 50);
+  }
+  componentWillUnmount() {
+    if (this._mq) this._mq.removeEventListener('change', this._mqCb);
+    if (this._onResize) window.removeEventListener('resize', this._onResize);
+    if (this._typeTimer) clearInterval(this._typeTimer);
+  }
+  componentDidUpdate() {
+    this.applyView();
+    this.applyLayout();
+    if (this._typedLang !== this.state.lang) this.typeSaying();
+  }
+
+  applyLayout() {
+    const phone = !!this.state.phone;
+    document.querySelectorAll('[data-pad]').forEach((d) => { d.style.paddingTop = phone ? '96px' : 'clamp(34px,5vh,58px)'; });
+    this.fitStage();
+  }
+  // scale the home arrangement to fit any viewport, keeping the default composition intact
+  fitStage() {
+    const stage = document.getElementById('board-stage');
+    if (!stage) return;
+    const phone = !!this.state.phone;
+    // phones get a portrait stage so the arrangement fills the screen like an app
+    const SW = phone ? 420 : 1500, SH = phone ? 880 : 880;
+    stage.style.width = SW + 'px';
+    stage.style.height = SH + 'px';
+    const w = Math.max(window.innerWidth - (phone ? 4 : 16), 300);
+    const h = Math.max(window.innerHeight - (phone ? 4 : 16), 300);
+    const s = Math.min(w / SW, h / SH);
+    this._scale = s;
+    stage.style.transform = `translate(-50%,-50%) scale(${s})`;
+    // the menu is fixed in SCREEN px while the stage is scaled — convert its footprint into stage units
+    const mn = document.querySelector('[data-board-id="menu"]');
+    if (mn && !phone) {
+      const sr = stage.getBoundingClientRect();
+      const mr = mn.getBoundingClientRect();
+      stage.style.setProperty('--menu-clear-x', `${Math.max(0, (mr.right - sr.left) / s) + 28}px`);
+      stage.style.setProperty('--menu-clear-y', `${Math.max(0, (mr.bottom - sr.top) / s) + 24}px`);
+    } else if (mn) {
+      stage.style.setProperty('--menu-clear-x', '0px');
+      stage.style.setProperty('--menu-clear-y', '0px');
+    }
+    // keep the fixed menu in proportion with the scaled board
+    const menu = document.querySelector('[data-board-id="menu"]');
+    if (menu && !menu._dragging && !(phone && this.state.menuOpen)) {
+      const ms = phone ? 1 : Math.min(1, Math.max(0.62, s * 1.15));
+      const p = this.state.pos.menu || { x: 0, y: 0 };
+      menu.style.zIndex = '80'; // a stray reset once cleared this and buried the menu under the stage
+      menu.style.transformOrigin = 'top left';
+      menu.style.transform = `translate(${p.x}px,${p.y}px) rotate(-2deg) scale(${ms})`;
+      menu.setAttribute('data-scale', String(ms));
+    }
+  }
+
+  // ---- camera pan ----
+  applyView() {
+    const coords = { home: [0, 0], work: [1, 0], contact: [2, 0], services: [0, 1], studio: [1, 1], nadir: [0, 2], trieste: [1, 2] };
+    const board = document.getElementById('board');
+    if (!board) return;
+    const [c, r] = coords[this.state.view] || [0, 0];
+    if (this._reduced) board.style.transition = 'none';
+    board.style.transform = `translate(${-c * 100}vw, ${-r * 100}vh)`;
+  }
+  // ---- wind: occasional gusts + on page change ----
+  gust() {
+    if (this._reduced) return;
+    const papers = document.querySelectorAll('[data-board-id], [data-paper]');
+    papers.forEach((el) => {
+      el.classList.remove('wind-gust');
+      void el.offsetWidth; // restart animation
+      el.classList.add('wind-gust');
+    });
+  }
+
+  goTo(view) {
+    this.setState({ view, menuOpen: false });
+    this.gust(); // breeze the papers the instant you move
+    // reset the region's inner scroll so you land at its top
+    setTimeout(() => {
+      const sec = document.querySelector(`[data-region="${view}"]`);
+      if (sec) sec.scrollTop = 0;
+    }, 60);
+  }
+
+  // ---- handwriting animation ----
+  typeSaying() {
+    const el = document.getElementById('saying-text');
+    const pen = document.getElementById('saying-pen');
+    if (!el) return;
+    const it = this.state.lang === 'it';
+    const text = it ? 'Costruiamo marchi degni di essere difesi.' : 'We build brands worth defending.';
+    this._typedLang = this.state.lang;
+    if (this._typeTimer) clearInterval(this._typeTimer);
+    if (this._reduced) { el.textContent = text; if (pen) pen.style.display = 'none'; return; }
+    el.textContent = '';
+    if (pen) pen.style.display = 'inline-block';
+    let i = 0;
+    this._typeTimer = setInterval(() => {
+      i += 1;
+      el.textContent = text.slice(0, i);
+      if (i >= text.length) {
+        clearInterval(this._typeTimer);
+        this._typeTimer = null;
+        if (pen) setTimeout(() => { pen.style.display = 'none'; }, 900);
+      }
+    }, 65);
+  }
+
+  setLang(lang) { this.setState({ lang }); try { localStorage.setItem('av-lang', lang); } catch (e) {} }
+
+  // ---- cover drag ----
+  dragStart(id, e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    // let buttons/inputs inside a draggable card keep working
+    if (e.target.closest && e.target.closest('button, a, input, textarea, image-slot')) return;
+    if (this._burning) return;
+    e.preventDefault();
+    const base = this.state.pos[id] || { x: 0, y: 0 };
+    const sx = e.clientX, sy = e.clientY;
+    let el = e.currentTarget;
+    while (el && !el.getAttribute('data-board-id')) el = el.parentElement;
+    if (!el) return;
+    const k = (el.id === 'board-stage' || !el.closest('#board-stage')) ? 1 : (this._scale || 1);
+    el._dragging = true;
+    const extra = id === 'menu' ? ` scale(${el.getAttribute('data-scale') || 1})` : '';
+    const move = (ev) => {
+      const x = base.x + (ev.clientX - sx) / k, y = base.y + (ev.clientY - sy) / k;
+      el.style.transform = `translate(${x}px, ${y}px) rotate(${el.getAttribute('data-rot') || '0deg'})${extra}`;
+      el._last = { x, y };
+    };
+    const up = (ev) => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+      el._dragging = false;
+      const bin = document.getElementById('burn-bin');
+      if (id !== 'menu' && bin && ev && ev.clientX !== undefined) {
+        const b = bin.getBoundingClientRect();
+        const hit = ev.clientX >= b.left - 30 && ev.clientX <= b.right + 30 && ev.clientY >= b.top - 30 && ev.clientY <= b.bottom + 30;
+        if (hit) { this.burn(id, el, base); return; }
+      }
+      if (el._last) {
+        const pos = { ...this.state.pos, [id]: el._last };
+        this.setState({ pos }, () => this.fitStage());
+        try { localStorage.setItem('av-nav-pos', JSON.stringify(pos)); } catch (e2) {}
+      }
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+  }
+  // ---- burn bin ----
+  flashMsg() {
+    const m = document.getElementById('burn-msg');
+    if (!m) return;
+    m.style.opacity = '1';
+    clearTimeout(this._msgT);
+    this._msgT = setTimeout(() => { m.style.opacity = '0'; }, 2200);
+  }
+  // embers rise from a moving burn line; called repeatedly during the slow burn
+  embers(el, count, progress) {
+    const host = document.getElementById('board-stage');
+    if (!host) return;
+    const r = el.getBoundingClientRect();
+    const hr = host.getBoundingClientRect();
+    const s = this._scale || 1;
+    const w = r.width / s, hgt = r.height / s;
+    const x0 = (r.left - hr.left) / s, y0 = (r.top - hr.top) / s;
+    // burn line travels bottom → top as progress goes 0 → 1
+    const lineY = y0 + hgt * (1 - (progress || 0));
+    for (let i = 0; i < (count || 10); i++) {
+      const sp = document.createElement('span');
+      const size = 3 + Math.random() * 8;
+      const life = 1.4 + Math.random() * 1.4;
+      sp.style.cssText = `position:absolute;left:${x0 + Math.random() * w}px;top:${lineY - 10 + Math.random() * 26}px;width:${size}px;height:${size}px;border-radius:50%;background:radial-gradient(circle,#fff2c0,#ffb347 40%,#e2571f 70%,rgba(226,87,31,0));box-shadow:0 0 10px rgba(255,150,60,.7);pointer-events:none;z-index:26;--dx:${(Math.random() - 0.5) * 90}px;--rise:${90 + Math.random() * 130}px;animation:emberRise ${life}s ease-out forwards;animation-delay:${Math.random() * 0.4}s`;
+      host.appendChild(sp);
+      setTimeout(() => sp.remove(), (life + 0.6) * 1000);
+    }
+  }
+  emberStorm(el, duration) {
+    let t = 0;
+    const step = 260;
+    const iv = setInterval(() => {
+      t += step;
+      this.embers(el, 6, Math.min(t / duration, 1));
+      if (t >= duration) clearInterval(iv);
+    }, step);
+    this._emberIv = iv;
+  }
+  burn(id, el, base) {
+    if (this._burning) return;
+    // Nadir is fireproof
+    if (id === 'ph1') {
+      el.classList.remove('shake-no'); void el.offsetWidth; el.classList.add('shake-no');
+      this.flashMsg();
+      return;
+    }
+    // the wordmark burns the whole home down and sends you back to the cover
+    if (id === 'masthead') {
+      const stage = document.getElementById('board-stage');
+      this._burning = true;
+      this.emberStorm(el, 1200);
+      if (stage) {
+        setTimeout(() => this.emberStorm(stage, 3000), 600);
+        stage.classList.add('burning-away');
+      }
+      setTimeout(() => {
+        if (stage) { stage.classList.remove('burning-away'); stage.style.filter = ''; }
+        this._burning = false;
+        this.setState({ intro: true, pos: {} });
+        try { localStorage.setItem('av-nav-pos', '{}'); } catch (e) {}
+      }, 4200);
+      return;
+    }
+    // everything else: fly to the centre, burn, come back after 5s
+    this._burning = true;
+    const stage = document.getElementById('board-stage');
+    const rot = el.getAttribute('data-rot') || '0deg';
+    const s = this._scale || 1;
+    const r = el.getBoundingClientRect();
+    const sr = stage ? stage.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+    const dx = (sr.left + sr.width / 2 - (r.left + r.width / 2)) / s;
+    const dy = (sr.top + sr.height / 2 - (r.top + r.height / 2)) / s;
+    // come back exactly where it was picked up from
+    const home = base || { x: 0, y: 0 };
+    el.style.zIndex = '25';
+    el.style.transition = 'transform .7s cubic-bezier(.2,.8,.3,1)';
+    el.style.transform = `translate(${home.x + dx}px,${home.y + dy}px) rotate(${rot}) scale(1.2)`;
+    // slow burn: charred edge climbs the paper while embers drift off it
+    setTimeout(() => {
+      el.style.transition = 'transform 3.4s ease-in';
+      el.style.transform = `translate(${home.x + dx}px,${home.y + dy - 26}px) rotate(${rot}) scale(1.14)`;
+      el.classList.remove('wind-gust'); // wind animation would win the cascade
+      el.classList.add('burning-away');
+      this.emberStorm(el, 3400);
+    }, 750);
+    // ashes settle, then it drifts back to where it was picked up
+    setTimeout(() => {
+      el.classList.remove('burning-away');
+      el.style.opacity = '0';
+      el.style.filter = '';
+      el.style.transition = 'none';
+      el.style.transform = `translate(${home.x}px,${home.y + 24}px) rotate(${rot}) scale(0.9)`;
+      requestAnimationFrame(() => {
+        el.style.transition = 'opacity 1.1s ease-out, transform 1.2s cubic-bezier(.2,.8,.3,1)';
+        el.style.opacity = '1';
+        el.style.transform = `translate(${home.x}px,${home.y}px) rotate(${rot})`;
+      });
+      setTimeout(() => { el.style.transition = ''; el.style.zIndex = ''; this._burning = false; }, 1400);
+    }, 5600);
+  }
+
+  itemStyle(id, css, rot) {
+    const p = this.state.pos[id] || { x: 0, y: 0 };
+    return `position:absolute;${css};transform:translate(${p.x}px,${p.y}px) rotate(${rot || '0deg'});touch-action:none`;
+  }
+
+  renderVals() {
+    const ax = this.props.accent ?? '#1F3A5F';
+    const it = this.state.lang === 'it';
+    const narrow = !!this.state.narrow;
+    const phone = !!this.state.phone;
+    const view = this.state.view;
+    // phones always start collapsed (clip + "Menu"); desktop only collapses off the home
+    const collapsed = this.state.phone ? !this.state.menuOpen : (view !== 'home' && !this.state.menuOpen);
+    const go = (v) => () => this.goTo(v);
+
+    const T = {
+      it: {
+        navWork: 'Lavori', navStudio: 'Studio', navServices: 'Servizi', navContact: 'Contatti',
+        dragHint: 'Lavagna interattiva — trascina gli elementi, naviga la board', reset: 'Rimetti in ordine', resetTitle: 'Riporta ogni foglio al suo posto', since: 'dal',
+        sayingLabel: 'Il nostro motto', saying: 'Costruiamo marchi degni di essere difesi.',
+        legendTitle: 'Sulla board', backBoard: 'Copertina', startTour: 'Sfoglia l\u2019indice',
+        workEyebrow: 'Lavori selezionati', workTitleA: 'Ogni progetto nella sua', workTitleEm: 'cartella',
+        fltYear: 'Anno', fltDisc: 'Disciplina', all: 'Tutti', allF: 'Tutte', noResults: 'Nessuna cartella con questi filtri — prova "Tutti".',
+        lblBrief: 'Brief', lblApproach: 'Approccio', lblResult: 'Risultato',
+        svcEyebrow: 'Servizi', svcTitleA: 'Cosa facciamo, fatto', svcTitleEm: 'come si deve',
+        stuTitleA: 'Piccoli per scelta,', stuTitleEm: 'deliberati per natura',
+        stuManifesto1: 'Altered Venganza è uno studio multidisciplinare a Trieste. Costruiamo sistemi di marca, strumenti digitali per creativi e capi di moda — pensati per durare un decennio, non una stagione.',
+        stuManifesto2: 'Niente progetti una tantum: sistemi. Ricerca, tipografia e disciplina di produzione — dal marchio sulla carta intestata al plugin nella tua toolbar.',
+        by: 'di', writeUs: 'Scrivici', brandStory: 'La storia del brand',
+        menu: 'Indice', burn: 'Brucia', noBurn: 'Nadir non si brucia. 🔥✋',
+        indexTitle: 'Indice — Tutte le pagine', seeWork: 'Vedi i lavori', openBook: 'Clicca per aprire lo sketchbook',
+        flyleafTitle: 'Questo sketchbook appartiene a…', fldName: 'Nome', fldEmail: 'Email', fldMsg: 'Il tuo progetto',
+        phName: 'Il tuo nome…', phEmail: 'nome@studio.it', phMsg: 'Raccontaci cosa vuoi costruire…', send: 'Invia',
+        ctaLine1: 'Hai un marchio che merita di più?', ctaLine2: 'Costruiamolo per durare.',
+      },
+      en: {
+        navWork: 'Work', navStudio: 'Studio', navServices: 'Services', navContact: 'Contact',
+        dragHint: 'Interactive board — drag things, navigate around', reset: 'Put it back', resetTitle: 'Send every sheet back to its place', since: 'since',
+        sayingLabel: 'Our saying', saying: 'We build brands worth defending.',
+        legendTitle: 'On the board', backBoard: 'Cover', startTour: 'Browse the index',
+        workEyebrow: 'Selected Work', workTitleA: 'Every project in its own', workTitleEm: 'folder',
+        fltYear: 'Year', fltDisc: 'Discipline', all: 'All', allF: 'All', noResults: 'No folders match these filters — try "All".',
+        lblBrief: 'Brief', lblApproach: 'Approach', lblResult: 'Result',
+        svcEyebrow: 'Services', svcTitleA: 'What we do, done', svcTitleEm: 'properly',
+        stuTitleA: 'Small by design,', stuTitleEm: 'deliberate by nature',
+        stuManifesto1: 'Altered Venganza is a multi-disciplinary design studio in Trieste. We build brand systems, digital tools for creatives, and fashion pieces — made to last a decade, not a season.',
+        stuManifesto2: 'No one-off projects: systems. Research, typography and production discipline — from the mark on the letterhead to the plugin in your toolbar.',
+        by: 'by', writeUs: 'Write to us', brandStory: 'The brand story',
+        menu: 'Index', burn: 'Burn it', noBurn: 'Nadir doesn\u2019t burn. 🔥✋',
+        indexTitle: 'Index — All pages', seeWork: 'See the work', openBook: 'Click to open the sketchbook',
+        flyleafTitle: 'This sketchbook belongs to…', fldName: 'Name', fldEmail: 'Email', fldMsg: 'Your project',
+        phName: 'Your name…', phEmail: 'name@studio.com', phMsg: 'Tell us what you want to build…', send: 'Send',
+        ctaLine1: 'Have a brand that deserves better?', ctaLine2: 'Let\u2019s build it to last.',
+      },
+    };
+    const t = T[this.state.lang];
+
+    const discLabels = {
+      identity: it ? 'Identità' : 'Identity',
+      fashion: it ? 'Moda' : 'Fashion',
+      tools: it ? 'Strumenti digitali' : 'Digital Tools',
+      print: it ? 'Stampa' : 'Print',
+    };
+
+    // ---- cover items ----
+    const noteDefs = [
+      { id: 'nt1', css: phone ? 'left:10px;top:562px;width:170px' : 'left:var(--menu-clear-x,240px);top:63%;width:270px', rot: '-3deg', bg: '#f4e9d8',
+        title: it ? 'Da fare' : 'To do',
+        lines: it ? ['☑ Identity Ferrovia', '☑ Plugin kit v2', '☐ Artwork drop 004'] : ['☑ Ferrovia identity', '☑ Plugin kit v2', '☐ Artwork drop 004'] },
+      { id: 'nt2', css: phone ? 'right:10px;top:574px;width:135px' : 'left:calc(var(--menu-clear-x,240px) + 300px);top:63%;width:220px', rot: '2deg', bg: '#efd9d6',
+        title: it ? 'Promemoria' : 'Reminder',
+        lines: it ? ['Review ore 14:00', 'Stampa provini ⏱'] : ['Review at 2 pm', 'Print proofs ⏱'] },
+    ];
+    // small screens: notes off the cover — masthead, motto, portrait and legend only
+    const boardNotes = noteDefs.map((d0) => { const d = { ...d0, rot: phone ? d0.rot : '0deg' }; return ({
+      ...d,
+      style: this.itemStyle(d.id, `${d.css};cursor:grab;user-select:none;box-sizing:border-box;background:${d.bg};padding:14px 16px;box-shadow:0 10px 24px rgba(19,19,19,0.12)`, d.rot),
+      down: (e) => this.dragStart(d.id, e),
+    }); });
+
+    const photoDefs = [
+      { id: 'ph1', region: 'nadir', slotId: 'board-portrait', css: phone ? 'right:10px;top:308px;width:146px' : 'left:calc(var(--menu-clear-x,240px) + 800px);top:26%;width:190px', rot: '3deg', ratio: '4/5', tag: 'FIG. 01', caption: 'Nadir Martinez', placeholder: it ? 'Trascina un ritratto' : 'Drop a portrait' },
+      { id: 'ph2', region: 'trieste', slotId: 'board-studio', css: phone ? 'left:10px;top:308px;width:146px' : 'left:calc(var(--menu-clear-x,240px) + 590px);top:26%;width:190px', rot: '-2deg', ratio: '1/1', tag: 'FIG. 02', caption: '[04]-STUDIOS™', placeholder: it ? 'Trascina una foto' : 'Drop a photo' },
+    ];
+    // the cover gets crowded on small screens — keep only the portrait there
+    const boardPhotos = photoDefs.map((d0) => { const d = { ...d0, rot: phone ? d0.rot : '0deg' }; return ({
+      ...d,
+      style: this.itemStyle(d.id, `${d.css};margin:0;background:#fff;border:1px solid #e5ddc6;box-shadow:0 14px 34px rgba(19,19,19,0.14);user-select:none`, d.rot),
+      down: (e) => this.dragStart(d.id, e),
+      go: go(d.region),
+    }); });
+
+    // ---- story pages: Nadir & the Trieste studio ----
+    const storyDefs = [
+      {
+        region: 'nadir', col: 0, row: 2, ghost: '05', label: 'Nadir',
+        eyebrow: it ? '05 — La storia' : '05 — The story',
+        title: it ? 'Nadir Martinez, in breve' : 'Nadir Martinez, in short',
+        items: it ? [
+          { kind: 'photo', slotId: 'story-nadir-1', year: '1994 · Trieste', caption: 'Dove è iniziato tutto', placeholder: 'Trascina una foto d\u2019infanzia' },
+          { kind: 'note', year: '2012', caption: 'Il primo logo', body: 'Disegnato per la band di un amico, su un quaderno a quadretti. Pagato in pizza. Ancora appeso in studio.' },
+          { kind: 'photo', slotId: 'story-nadir-2', year: '2015 · Milano', caption: 'Anni di gavetta', placeholder: 'Trascina una foto' },
+          { kind: 'note', year: '2016–2019', caption: 'Studi e agenzia', body: 'Tipografia, stampa e produzione. Quattro anni a impaginare cataloghi: la disciplina che ancora regge ogni progetto.' },
+          { kind: 'photo', slotId: 'story-nadir-3', year: '2020', caption: 'Il salto', placeholder: 'Trascina una foto' },
+          { kind: 'note', year: 'Oggi', caption: 'Perché "Rare"', body: 'Poche cose, fatte bene. Sei progetti l\u2019anno, nessun compromesso sul tempo che serve.' },
+        ] : [
+          { kind: 'photo', slotId: 'story-nadir-1', year: '1994 · Trieste', caption: 'Where it started', placeholder: 'Drop a childhood photo' },
+          { kind: 'note', year: '2012', caption: 'The first logo', body: 'Drawn for a friend\u2019s band on squared paper. Paid in pizza. Still pinned in the studio.' },
+          { kind: 'photo', slotId: 'story-nadir-2', year: '2015 · Milan', caption: 'Learning the trade', placeholder: 'Drop a photo' },
+          { kind: 'note', year: '2016–2019', caption: 'School & agency', body: 'Typography, print and production. Four years laying out catalogues: the discipline behind every project since.' },
+          { kind: 'photo', slotId: 'story-nadir-3', year: '2020', caption: 'The leap', placeholder: 'Drop a photo' },
+          { kind: 'note', year: 'Today', caption: 'Why "Rare"', body: 'Few things, done well. Six projects a year, no compromise on the time they need.' },
+        ],
+      },
+      {
+        region: 'trieste', col: 1, row: 2, ghost: '06', label: '[04]-STUDIOS™',
+        eyebrow: '[04]-STUDIOS™',
+        title: it ? 'Una stanza in via Manzoni' : 'One room on via Manzoni',
+        items: it ? [
+          { kind: 'photo', slotId: 'story-studio-1', year: 'via Alessandro Manzoni', caption: 'La porta', placeholder: 'Trascina la foto della porta' },
+          { kind: 'note', year: '2020', caption: 'Il primo giorno', body: 'Due scrivanie, un Risograph di seconda mano e nessun cliente. La prima chiamata è arrivata dopo tre settimane.' },
+          { kind: 'photo', slotId: 'story-studio-2', year: 'Trieste', caption: 'Il muro dei provini', placeholder: 'Trascina una foto del muro' },
+          { kind: 'note', year: 'Ogni lunedì', caption: 'Rito del lunedì', body: 'Caffè al bar sotto casa, poi si stampa tutto e si appende al muro. Se non regge sulla carta, non regge.' },
+          { kind: 'photo', slotId: 'story-studio-3', year: 'Golfo di Trieste', caption: 'La città', placeholder: 'Trascina una foto della città' },
+          { kind: 'note', year: 'Perché Trieste', caption: 'Confine e vento', body: 'Tre lingue in cinque chilometri e la bora che rimette tutto in ordine. Il posto giusto per fare marchi che durano.' },
+        ] : [
+          { kind: 'photo', slotId: 'story-studio-1', year: 'via Alessandro Manzoni', caption: 'The door', placeholder: 'Drop a photo of the door' },
+          { kind: 'note', year: '2020', caption: 'Day one', body: 'Two desks, a second-hand Risograph and no clients. The first call came three weeks later.' },
+          { kind: 'photo', slotId: 'story-studio-2', year: 'Trieste', caption: 'The proof wall', placeholder: 'Drop a photo of the wall' },
+          { kind: 'note', year: 'Every Monday', caption: 'Monday ritual', body: 'Coffee at the bar downstairs, then everything gets printed and pinned up. If it fails on paper, it fails.' },
+          { kind: 'photo', slotId: 'story-studio-3', year: 'Gulf of Trieste', caption: 'The city', placeholder: 'Drop a city photo' },
+          { kind: 'note', year: 'Why Trieste', caption: 'Border & wind', body: 'Three languages within five kilometres and the bora that puts everything back in order. The right place to build brands that last.' },
+        ],
+      },
+    ];
+    // ---- [04]-STUDIOS™ : photo strip + brand story ----
+    const shotDefs = it ? [
+      { slotId: 'studio-shot-1', caption: 'La porta, via Manzoni', tag: 'Trieste · 2020', placeholder: 'Trascina la foto dello studio' },
+      { slotId: 'studio-shot-2', caption: 'Il muro dei provini', tag: 'Rito del lunedì', placeholder: 'Trascina una foto del muro' },
+      { slotId: 'studio-shot-3', caption: 'Risograph & inchiostri', tag: 'Produzione interna', placeholder: 'Trascina una foto' },
+    ] : [
+      { slotId: 'studio-shot-1', caption: 'The door, via Manzoni', tag: 'Trieste · 2020', placeholder: 'Drop a studio photo' },
+      { slotId: 'studio-shot-2', caption: 'The proof wall', tag: 'Monday ritual', placeholder: 'Drop a photo of the wall' },
+      { slotId: 'studio-shot-3', caption: 'Risograph & inks', tag: 'In-house production', placeholder: 'Drop a photo' },
+    ];
+    const studioShots = shotDefs.map((s, i) => ({
+      ...s,
+      style: `margin:0;background:#fff;border:1px solid #e5ddc6;padding:12px 12px 16px;box-shadow:0 14px 32px rgba(19,19,19,0.14);transform:rotate(${[-1.6, 1.4, -1][i % 3]}deg);transition:transform .35s ease, box-shadow .35s ease`,
+    }));
+    const storyDefsBrand = it ? [
+      { year: '2020', title: 'Il nome', body: 'Altered Venganza nasce da un quaderno di prove: “alterare” ciò che esiste e difenderlo. Prima commessa a tre settimane dall\u2019apertura.' },
+      { year: '2021–2022', title: 'Dal marchio al sistema', body: 'Smettiamo di vendere loghi singoli: ogni cliente riceve un sistema completo, con regole d\u2019uso e file di produzione.' },
+      { year: '2023–2024', title: 'Strumenti e artworks', body: 'Nascono i plugin usati in studio e le opere in tiratura limitata vendute direttamente dalla nostra piattaforma.' },
+      { year: '2025 →', title: 'Quattro discipline', body: 'Identità, strumenti digitali, moda e webdesign sotto lo stesso tetto: 14 marchi costruiti, oltre 300 aiutati.' },
+    ] : [
+      { year: '2020', title: 'The name', body: 'Altered Venganza came out of a sketchbook: alter what exists, then defend it. First commission three weeks after opening.' },
+      { year: '2021–2022', title: 'From mark to system', body: 'We stopped selling single logos: every client gets a full system, with usage rules and production files.' },
+      { year: '2023–2024', title: 'Tools & artworks', body: 'The plugins we use in the studio, and limited-run artworks sold directly through our own platform.' },
+      { year: '2025 →', title: 'Four disciplines', body: 'Identity, digital tools, fashion and web design under one roof: 14 brands built, 300+ helped.' },
+    ];
+    const brandStory = storyDefsBrand.map((s, i) => ({
+      ...s,
+      style: `background:${['#f4e9d8', '#efd9d6', '#e8e6d9'][i % 3]};padding:22px 22px 24px;box-shadow:0 14px 32px rgba(19,19,19,0.12);transform:rotate(${[1.2, -1.4, 1, -1.2][i % 4]}deg);transition:transform .35s ease, box-shadow .35s ease`,
+    }));
+
+    const noteBgs = ['#f4e9d8', '#efd9d6', '#e8e6d9'];
+    const stories = storyDefs.map((s) => ({
+      ...s,
+      sectionStyle: `position:absolute;left:${s.col * 100}vw;top:${s.row * 100}vh;width:100vw;height:100vh;box-sizing:border-box;overflow:hidden auto;border-top:2px dashed #d9d0b6;${s.col ? 'border-left:2px dashed #d9d0b6;' : ''}`,
+      items: s.items.map((i2, k) => ({
+        ...i2,
+        isPhoto: i2.kind === 'photo',
+        isNote: i2.kind === 'note',
+        wrapStyle: i2.kind === 'photo'
+          ? `background:#fff;border:1px solid #e5ddc6;padding:12px 12px 16px;box-shadow:0 14px 32px rgba(19,19,19,0.14);transform:rotate(${k % 2 ? 1.4 : -1.6}deg);transition:transform .35s ease, box-shadow .35s ease`
+          : `background:${noteBgs[k % 3]};padding:22px 22px 24px;box-shadow:0 14px 32px rgba(19,19,19,0.12);transform:rotate(${k % 2 ? -1.2 : 1.5}deg);transition:transform .35s ease, box-shadow .35s ease`,
+      })),
+    }));
+
+    // ---- cases (folders) ----
+    const caseData = [
+      { index: 'No. 01', year: '2025', client: 'Venganza Apparel', title: 'No Mercy — SS26 Capsule', slotId: 'case-nomercy', caption: 'SS26 Lookbook', rot: '-0.8deg', discs: ['identity', 'fashion'],
+        placeholder: it ? 'Trascina il lookbook' : 'Drop lookbook image',
+        brief: it ? 'Prima capsule di un marchio streetwear senza identità — logo, etichette e campagna in otto settimane.' : 'First capsule for a streetwear label with no prior identity — logo, labeling and campaign in eight weeks.',
+        approach: it ? 'Logotipo condensato per il ricamo, etichette a due colori, lookbook in pellicola.' : 'Condensed wordmark cut for embroidery, two-color labels, lookbook shot on film.',
+        result: it ? 'Esaurita in 11 giorni; l\u2019identità regge tre drop successivi invariata.' : 'Sold through in 11 days; the identity carries three later drops unchanged.' },
+      { index: 'No. 02', year: '2025', client: 'Altered Venganza Tools', title: 'Grana — Plugin Suite', slotId: 'case-grana', caption: 'Grana v2, 2025', rot: '0.8deg', discs: ['tools'],
+        placeholder: it ? 'Trascina uno screenshot' : 'Drop a UI screenshot',
+        brief: it ? 'Una suite di plugin per texture e grana pensata per designer che lavorano su identità e stampa.' : 'A texture-and-grain plugin suite for designers working on identity and print.',
+        approach: it ? 'Un\u2019interfaccia essenziale, preset curati e documentazione trattata come parte del prodotto.' : 'A minimal interface, curated presets, and documentation treated as part of the product.',
+        result: it ? '3.000+ installazioni nel primo anno; ora finanzia la ricerca dello studio.' : '3,000+ installs in year one; it now funds the studio\u2019s research.' },
+      { index: 'No. 03', year: '2024', client: 'Ferrovia Torrefazione', title: 'Ferrovia — Rebrand', slotId: 'case-ferrovia', caption: 'Bag System, 2024', rot: '-0.5deg', discs: ['identity', 'print'],
+        placeholder: it ? 'Trascina il packaging' : 'Drop packaging image',
+        brief: it ? 'Una torrefazione di terza generazione doveva entrare nello specialty senza perdere il patrimonio del 1962.' : 'A third-generation roastery needed to enter specialty retail without losing its 1962 heritage.',
+        approach: it ? 'Le lettere dell\u2019insegna dipinta a mano ricostruite in un carattere; sacchetti guidati dai dati di origine.' : 'Hand-painted signage letterforms rebuilt into a typeface; bags driven by origin data.',
+        result: it ? 'In 40+ caffetterie in sei mesi; segnalato all\u2019ADI Design Index.' : 'Stocked in 40+ cafés in six months; shortlisted at ADI Design Index.' },
+      { index: 'No. 04', year: '2024', client: 'Ossario Records', title: 'Ossario — Label Identity', slotId: 'case-ossario', caption: 'Sleeve Series 001–003', rot: '0.6deg', discs: ['identity', 'print'],
+        placeholder: it ? 'Trascina una copertina' : 'Drop sleeve image',
+        brief: it ? 'Un\u2019etichetta indipendente con tirature limitate voleva rendere ogni uscita da collezione.' : 'An independent label pressing limited runs wanted every release to feel collectible.',
+        approach: it ? 'Griglia fissa, timbro con numero di serie, un solo inchiostro su tutte le copertine.' : 'A fixed grid, a serial-number stamp, one ink across all sleeves.',
+        result: it ? 'Prime tre stampe esaurite in pre-order; la griglia è la firma dell\u2019etichetta.' : 'First three pressings sold out on pre-order; the grid is now the label\u2019s signature.' },
+    ];
+    const fY = this.state.fYear, fD = this.state.fDisc;
+    const filtered = caseData.filter((c) => (fY === 'all' || c.year === fY) && (fD === 'all' || c.discs.includes(fD)));
+    const cases = filtered.map((c, i) => ({
+      ...c,
+      tags: c.discs.map((d) => discLabels[d]),
+      discLabel: c.discs.map((d) => discLabels[d]).join(' · '),
+      imgOrder: i % 2 === 0 ? 1 : 2, txtOrder: i % 2 === 0 ? 2 : 1,
+      cardStyle: `position:relative;background:#F5EACC;border:1px solid #d9c68f;border-radius:0 14px 14px 14px;box-shadow:0 16px 40px rgba(19,19,19,0.1);padding:clamp(20px,3vw,36px);transform:rotate(${c.rot});transition:transform .35s ease, box-shadow .35s ease`,
+    }));
+    const noResults = filtered.length === 0;
+
+    // filter chips
+    // filters look like little post-its pinned in a row
+    const chip = (on, i) => `border:none;cursor:pointer;font-family:'Patrick Hand',cursive;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:9px 15px 10px;transition:transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease;background:${on ? ax : ['#f4e9d8', '#efd9d6', '#e8e6d9'][i % 3]};color:${on ? '#FAF6EC' : '#131313'};box-shadow:0 ${on ? 8 : 5}px ${on ? 18 : 13}px rgba(19,19,19,${on ? 0.2 : 0.13});transform:rotate(${[-2, 1.6, -1, 2, -1.6][i % 5]}deg)`;
+    const yearChips = [
+      { v: 'all', label: t.all }, { v: '2025', label: '2025' }, { v: '2024', label: '2024' },
+    ].map((y, i) => ({ ...y, active: fY === y.v, style: chip(fY === y.v, i), set: () => this.setState({ fYear: y.v }) }));
+    const discChips = [
+      { v: 'all', label: t.allF },
+      { v: 'identity', label: discLabels.identity },
+      { v: 'fashion', label: discLabels.fashion },
+      { v: 'tools', label: discLabels.tools },
+      { v: 'print', label: discLabels.print },
+    ].map((d, i) => ({ ...d, active: fD === d.v, style: chip(fD === d.v, i), set: () => this.setState({ fDisc: d.v }) }));
+
+    // ---- services / facts ----
+    const svcData = [
+      { num: '01', bg: '#f4e9d8', rot: '-1.2deg', title: it ? 'Sistemi di identità' : 'Brand Identity Systems', price: it ? 'Da €6.500' : 'From €6,500', timeline: it ? '6–8 settimane' : '6–8 weeks',
+        desc: it ? 'Sistemi di marca, non progetti una tantum: naming, marchio, tipografia, colore e regole d\u2019uso consegnati come strumento di lavoro.' : 'Brand systems, not one-off projects: naming, mark, typography, color and usage rules delivered as a working tool.' },
+      { num: '02', bg: '#efd9d6', rot: '1deg', title: it ? 'Risorse creative' : 'Creative Resources', price: it ? 'Da €19' : 'From €19', timeline: it ? 'Sempre disponibili' : 'Always available',
+        desc: it ? 'Strumenti digitali, plugin e processi di design per altri creativi — costruiti nello studio, usati ogni giorno, poi rilasciati.' : 'Digital tools, plugins and design processes for other creators — built in the studio, used daily, then released.' },
+      { num: '03', bg: '#e8e6d9', rot: '-0.8deg', title: it ? 'Webdesign' : 'Web Design', price: it ? 'Da €599' : 'From €599', timeline: it ? '2–4 settimane' : '2–4 weeks',
+        desc: it ? 'Siti portfolio, drop page e landing progettati con la stessa disciplina tipografica dell\u2019identità.' : 'Portfolio sites, drop pages and landings designed with the same type discipline as the identity itself.' },
+      { num: '04', bg: '#f4e9d8', rot: '1.4deg', title: 'Fashion Design', price: it ? 'Da €3.000' : 'From €3,000', timeline: it ? '4–6 settimane' : '4–6 weeks',
+        desc: it ? 'Capsule, grafiche, etichette e file di produzione. Parliamo direttamente con il produttore.' : 'Capsules, graphics, labeling and production files. We speak directly with the manufacturer.' },
+    ];
+    const services = svcData.map((s) => ({
+      ...s,
+      noteStyle: `position:relative;display:flex;flex-direction:column;background:${s.bg};padding:26px 24px 20px;box-shadow:0 14px 32px rgba(19,19,19,0.12);transform:rotate(${s.rot});transition:transform .35s ease, box-shadow .35s ease`,
+    }));
+
+    const factData = it ? [
+      { stat: '2020', label: 'Fondato a Trieste', note: 'via Alessandro Manzoni — una stanza, due scrivanie.', bg: '#f4e9d8', rot: '-2deg' },
+      { stat: '4', label: 'Discipline', note: 'Identità di marca, strumenti digitali, moda, webdesign.', bg: '#efd9d6', rot: '1.5deg' },
+      { stat: '14', label: 'Marchi costruiti', note: 'Quasi tutti usano ancora il sistema originale — e oltre 300 marchi aiutati.', bg: '#e8e6d9', rot: '-1deg' },
+      { stat: '6', label: 'Progetti l\u2019anno, massimo', note: 'La scarsità è uno strumento di qualità.', bg: '#f4e9d8', rot: '2deg' },
+    ] : [
+      { stat: '2020', label: 'Founded in Trieste', note: 'via Alessandro Manzoni — one room, two desks.', bg: '#f4e9d8', rot: '-2deg' },
+      { stat: '4', label: 'Disciplines', note: 'Brand identity, digital tools, fashion, web design.', bg: '#efd9d6', rot: '1.5deg' },
+      { stat: '14', label: 'Brands built to date', note: 'Most still running the original system — and 300+ brands helped.', bg: '#e8e6d9', rot: '-1deg' },
+      { stat: '6', label: 'Projects per year, max', note: 'Scarcity is a quality-control tool.', bg: '#f4e9d8', rot: '2deg' },
+    ];
+    const facts = factData.map((f) => ({
+      ...f,
+      style: `background:${f.bg};padding:20px 18px;box-shadow:0 10px 26px rgba(19,19,19,0.12);transform:rotate(${f.rot});transition:transform .3s ease`,
+    }));
+
+    // ---- menu post-it rows ----
+    // menu hierarchy: Home on top, numbered sections below
+    const row = (active, isHome) => `display:flex;justify-content:space-between;align-items:baseline;gap:10px;background:none;border:none;cursor:pointer;font-family:'Patrick Hand',cursive;font-size:${phone ? (isHome ? '24px' : '22px') : (isHome ? '13.5px' : '12.5px')};letter-spacing:0.08em;padding:${phone ? (isHome ? '15px 2px 17px' : '15px 2px') : (isHome ? '6px 2px 9px' : '5px 2px')};text-align:left;transition:color .2s ease, transform .2s ease;color:${active ? ax : '#131313'};font-weight:${active || isHome ? '700' : '400'};${isHome ? 'border-bottom:1px dashed rgba(19,19,19,0.25);margin-bottom:5px;' : ''}width:100%`;
+    const navDefs = [
+      { v: 'home', label: 'Home', arrow: '⌂', num: '' },
+      { v: 'work', label: t.navWork, arrow: '→', num: '01' },
+      { v: 'services', label: t.navServices, arrow: '↓', num: '02' },
+      { v: 'studio', label: t.navStudio, arrow: '↘', num: '03' },
+      { v: 'contact', label: t.navContact, arrow: '⇒', num: '04' },
+      { v: 'nadir', label: 'Nadir', arrow: '↓', num: '05' },
+      { v: 'trieste', label: '[04]-STUDIOS™', arrow: '↘', num: '06' },
+    ];
+    const navSheets = navDefs.map((n) => ({
+      ...n,
+      go: go(n.v), active: view === n.v,
+      style: row(view === n.v, n.v === 'home'),
+      numStyle: n.v === 'home' ? 'display:none' : `font-family:'Permanent Marker',cursive;font-size:9px;width:16px;flex:none;color:${view === n.v ? ax : '#b3a273'}`,
+    }));
+
+    // scattered sketch icons on the cover (folder, tag, house, envelope)
+    const iconBase = (css, rot, active) => `position:absolute;${css};display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:${active ? ax : '#131313'};transform:rotate(${rot});transition:transform .25s ease, color .2s ease;padding:8px`;
+    const iconDefs = [
+      { v: 'work', label: t.navWork, arrow: '→', rot: '-1.5deg',
+        css: 'right:4%;top:23%;width:104px',
+        d: 'M5 16c0-2 1.4-3.2 3-3.2 3-.3 8-.4 10-.1l4.4 5c6-.2 14-.3 17 .2 1.8.3 2.8 1.4 2.6 3l-1.4 15c-.2 2-1.2 3-3 3-8 .4-20 .4-27 0-1.8-.1-2.8-1-3-3z',
+        d2: 'M9 23c10-.6 20-.6 30 0' },
+      { v: 'services', label: t.navServices, arrow: '↓', rot: '1.5deg',
+        css: 'right:4%;top:38%;width:104px',
+        d: 'M8 26 25 9c4-.6 8-.2 11.5 1.5C38 14 38.5 18 38 22L21 39c-1.2 1.2-2.6 1.3-3.8.2l-9-9c-1.1-1.2-1-2.7-.2-4.2z',
+        d2: 'M31 15a2.5 2.5 0 1 0 .1 0' },
+      { v: 'studio', label: t.navStudio, arrow: '↘', rot: '-1.5deg',
+        css: 'right:4%;top:53%;width:104px',
+        d: 'M7 25C13 19 18 14 24 9c6 5 11 10 17 16',
+        d2: 'M12 23c-.3 5-.3 10 0 14 8 .5 16 .5 24 0 .4-4 .4-9 0-14' },
+      { v: 'contact', label: t.navContact, arrow: '⇒', rot: '1.5deg',
+        css: 'right:4%;top:68%;width:104px',
+        d: 'M7 14c11-.8 23-.8 34 0 .5 7 .5 14 0 21-11 .8-23 .8-34 0-.5-7-.5-14 0-21z',
+        d2: 'M8 16c5.5 4.4 11 8.7 16 12 5-3.3 10.5-7.6 16-12' },
+    ];
+    const boardIcons = [].map((n) => {
+      const id = `ic-${n.v}`;
+      const p = this.state.pos[id] || { x: 0, y: 0 };
+      return {
+        ...n, id, go: go(n.v),
+        down: (e) => this.dragStart(id, e),
+        style: `${iconBase(n.css, n.rot, view === n.v)};transform:translate(${p.x}px,${p.y}px) rotate(${n.rot});touch-action:none`,
+      };
+    });
+
+    const btn = (on) => `border:1px solid #ddd4bc;cursor:pointer;font-family:'Patrick Hand',cursive;font-size:${phone ? 15 : 10}px;font-weight:700;letter-spacing:0.12em;padding:${phone ? '9px 16px' : '6px 10px'};box-shadow:0 4px 10px rgba(19,19,19,0.1);transition:background .25s ease,color .25s ease;background:${on ? ax : '#fff'};color:${on ? '#FAF6EC' : '#4a4a46'}`;
+
+    return {
+      rings: Array.from({ length: 11 }, (_, i) => i),
+      stories,
+      dragMasthead: (e) => { if (!phone) this.dragStart('masthead', e); },
+      dragMotto: (e) => this.dragStart('motto', e),
+      dragMenu: (e) => { if (!phone) this.dragStart('menu', e); },
+      sayingOuterStyle: `position:absolute;${phone ? 'left:10px;right:10px;top:148px;transform-origin:top left;scale:1;' : 'left:var(--menu-clear-x,240px);top:26%;'}transform:translate(${(this.state.pos.motto || {}).x || 0}px,${(this.state.pos.motto || {}).y || 0}px) rotate(-2deg);touch-action:none;cursor:grab;z-index:4`,
+      showIntro: !!this.state.intro,
+      openCover: () => this.setState({ intro: true, menuOpen: false }),
+      closeIntro: () => { this.setState({ intro: false }); this.gust(); },
+      t, cases, noResults, yearChips, discChips, services, facts, studioShots, brandStory, boardNotes, boardPhotos, navSheets, boardIcons,
+      goHome: go('home'), goWork: go('work'),
+      // the repeated back arrow is gone — the menu post-it is the only navigation
+      backChipStyle: `display:none;align-items:center;gap:8px;background:#fff;border:1px solid #e5ddc6;border-radius:999px;cursor:pointer;font-family:'Patrick Hand',cursive;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#4a4a46;padding:8px 16px;box-shadow:0 6px 16px rgba(19,19,19,0.08);transition:color .25s ease,border-color .25s ease;margin-left:${phone ? '0' : '172px'}`,
+      // phone: closed = small clip chip; open = a big post-it sheet over everything
+      menuStyle: phone && !collapsed
+        ? `position:fixed;top:5vh;left:5vw;right:5vw;z-index:120;width:auto;max-height:86vh;overflow:auto;background:#f4e9d8;padding:26px 26px 22px;box-shadow:0 30px 70px rgba(19,19,19,0.45);transform:rotate(-1.2deg)`
+        : `position:fixed;top:12px;left:12px;z-index:80;${phone ? '' : 'touch-action:none;cursor:grab;'}width:${collapsed ? 'auto' : '158px'};background:#f4e9d8;padding:${collapsed ? (phone ? '12px 16px' : '8px 12px') : phone ? '18px 20px 16px' : '16px 16px 12px'};box-shadow:0 14px 34px rgba(19,19,19,0.2);transform:translate(${(this.state.pos.menu || {}).x || 0}px,${(this.state.pos.menu || {}).y || 0}px) rotate(-2deg)`,
+      menuBtnStyle: `display:flex;align-items:center;gap:${phone ? 9 : 7}px;background:none;border:none;cursor:pointer;font-family:'Patrick Hand',cursive;font-size:${phone ? (collapsed ? 15 : 17) : 10}px;font-weight:700;letter-spacing:0.24em;text-transform:uppercase;color:#4a4a46;padding:0`,
+      clipW: phone ? 21 : 15, clipH: phone ? 29 : 21,
+      // on the phone the sketchbook thumb moves out of the header and into the menu list
+      headThumbStyle: phone
+        ? 'display:none'
+        : 'display:flex;align-items:center;justify-content:center;width:38px;height:30px;background:none;border:none;padding:0;cursor:pointer;transform:rotate(-2deg);transition:transform .25s ease',
+      coverRowStyle: `display:flex;justify-content:space-between;align-items:center;gap:10px;background:none;border:none;cursor:pointer;font-family:'Patrick Hand',cursive;font-size:${phone ? '22px' : '12.5px'};letter-spacing:0.08em;padding:${phone ? '15px 2px' : '5px 2px'};text-align:left;color:#131313;border-top:1px dashed rgba(19,19,19,0.25);margin-top:${phone ? '8px' : '5px'};transition:color .2s ease, transform .2s ease;width:100%`,
+      coverRowThumbStyle: `width:${phone ? 34 : 22}px;height:${phone ? 27 : 18}px;object-fit:contain;transform:rotate(-3deg);filter:drop-shadow(0 2px 4px rgba(19,19,19,0.3))`,
+      menuScrim: phone && !collapsed,
+      menuHeadStyle: `display:flex;align-items:center;gap:10px;${collapsed ? '' : 'border-bottom:1px solid rgba(19,19,19,0.25);padding-bottom:9px;margin-bottom:6px'}`,
+      navBodyStyle: collapsed ? 'display:none' : 'display:flex;flex-direction:column',
+      // language picker sits right under the "Menu" heading
+      langTopStyle: collapsed
+        ? 'display:none'
+        : `display:flex;gap:${phone ? 8 : 5}px;padding-bottom:${phone ? 14 : 9}px;margin-bottom:${phone ? 6 : 4}px;border-bottom:1px dashed rgba(19,19,19,0.25)`,
+      langBodyStyle: collapsed ? 'display:none' : 'display:flex;gap:5px;border-top:1px solid rgba(19,19,19,0.25);padding-top:10px;margin-top:6px',
+      toggleMenu: () => this.setState((s) => ({ menuOpen: !s.menuOpen })),
+      menuOpenFlag: !collapsed,
+      menuChevron: collapsed ? '▸' : (view === 'home' && !phone) ? '' : '▾',
+      // translate/scale live in their own CSS properties so a drag (which writes `transform`) can't wipe the centring
+      mastheadInnerStyle: phone ? 'position:relative' : 'position:relative;cursor:grab',
+      // on the phone the in-stage copy is replaced by the fixed one above (hidden on the cover)
+      // wordmark post-it: pinned top-right on every page, hidden on the cover (both breakpoints)
+      // desktop home already carries the big wordmark in the stage — no small duplicate there
+      phoneMasthead: !this.state.intro && !(!phone && view === 'home'),
+      fixedMastheadStyle: `position:fixed;${phone ? 'right:10px;top:14px;scale:0.42' : 'right:18px;top:16px;scale:0.3'};z-index:70;transform-origin:top right;background:none;border:none;padding:0;cursor:pointer`,
+      // phone: the torn sheet is pinned flush to the right edge (no drag offset, no centring)
+      coverHeadStyle: phone
+        ? 'display:none'
+        : `position:absolute;left:50%;top:20px;margin-left:${(this.state.pos.masthead || {}).x || 0}px;margin-top:${(this.state.pos.masthead || {}).y || 0}px;transform-origin:top center;translate:-50% 0;scale:1;transform:translate(0px,0px)`,
+      spreadCols: phone ? '1fr' : '1fr 1fr',
+      spreadGap: phone ? '14px' : '18px',
+      spineStyle: phone
+        ? 'display:none'
+        : 'position:absolute;left:50%;top:20px;bottom:20px;transform:translateX(-50%);display:flex;flex-direction:column;justify-content:space-between;z-index:2',
+      sayingWrapStyle: `position:relative;width:${phone ? 'auto' : '540px'};box-sizing:border-box;background:#f4e9d8;padding:${phone ? '20px 22px' : '28px 34px'};box-shadow:0 16px 34px rgba(19,19,19,0.18)`,
+      // sits on the same baseline as the burn bin (bin: bottom:6%)
+      emailStyle: `position:absolute;left:${phone ? '10px' : 'var(--menu-clear-x,240px)'};bottom:${phone ? '13%' : '4.5%'};margin:0;display:flex;flex-direction:column;gap:5px;z-index:5`,
+      hintStyle: (phone ? 'display:none;' : '') + 'margin:0;background:rgba(250,246,236,0.92);border:1px solid #e5ddc6;border-radius:999px;padding:6px 16px;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#8a8574;white-space:nowrap;box-shadow:0 4px 14px rgba(19,19,19,0.06)',
+      stickerWrapStyle: phone
+        ? 'display:none'
+        : 'position:absolute;top:12px;right:12px;display:flex;flex-direction:column;align-items:center;gap:6px',
+      stickerStyle: `transform:rotate(9deg);border:2px solid ${ax};border-radius:50%;padding:9px 10px;font-family:'Caveat',cursive;font-size:14px;font-weight:700;line-height:1;color:${ax};display:inline-block`,
+      isIt: it, isEn: !it,
+      itBtnStyle: btn(it), enBtnStyle: btn(!it),
+      setIt: () => this.setLang('it'), setEn: () => this.setLang('en'),
+      resetBoard: () => {
+        // drags wrote inline transforms straight onto the nodes — clear them or React won't
+        document.querySelectorAll('[data-board-id]').forEach((el) => {
+          if (el.getAttribute('data-board-id') === 'menu') return; // the menu is chrome, not board furniture
+          el.style.transform = '';
+          el.style.zIndex = '';
+          el.style.transition = '';
+          if (el.id === 'cover-head') { el.style.marginLeft = ''; el.style.marginTop = ''; }
+        });
+        this.setState({ pos: {} }, () => this.fitStage());
+        try { localStorage.setItem('av-nav-pos', '{}'); } catch (e) {}
+      },
+      contactGridStyle: `display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,64px);align-items:center;margin:${phone ? '2vh' : 'clamp(12px,2.5vh,28px)'} 0 clamp(40px,7vw,80px)`,
+      formName: this.state.formName, formEmail: this.state.formEmail, formMsg: this.state.formMsg,
+      setFormName: (e) => this.setState({ formName: e.target.value }),
+      setFormEmail: (e) => this.setState({ formEmail: e.target.value }),
+      setFormMsg: (e) => this.setState({ formMsg: e.target.value }),
+      sendForm: () => {
+        const { formName, formEmail, formMsg } = this.state;
+        const subj = encodeURIComponent(`Nuovo progetto — ${formName || 'sketchbook'}`);
+        const body = encodeURIComponent(`${formMsg}\n\n— ${formName}\n${formEmail}`);
+        window.location.href = `mailto:hello@altered-venganza.com?subject=${subj}&body=${body}`;
+      },
+    };
+  }
+}
+</script>
+
+
+</body></html>
