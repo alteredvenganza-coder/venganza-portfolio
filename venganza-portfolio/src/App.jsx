@@ -1639,7 +1639,14 @@ const GalleryPage = () => {
       <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors">
         <Menu size={24} />
       </button>
-      <h1 className="heading-font text-5xl md:text-[6rem] text-white mb-4 leading-none mt-20">Venganza's Art Gallery</h1>
+      <div className="flex items-center justify-center gap-3 mt-20 mb-5">
+        <span className="w-10 h-px bg-white/20" />
+        <span className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em]">Members Only</span>
+        <span className="w-10 h-px bg-white/20" />
+      </div>
+      <h1 className="heading-font text-6xl md:text-[7rem] text-white mb-4 leading-[0.85] tracking-[0.02em]">
+        Venganza's <span className="text-[color:var(--primary)]">Art Gallery</span>
+      </h1>
       <p className="text-white/30 font-mono text-[10px] uppercase tracking-[0.3em] mb-12">
         Curated by Rare
       </p>
@@ -1669,7 +1676,14 @@ const ContactPage = () => {
       </button>
       
       <div className="max-w-2xl w-full flex flex-col items-center">
-         <h1 className="heading-font text-5xl md:text-[6rem] text-white mb-4 leading-none text-center">Contact</h1>
+         <div className="flex items-center justify-center gap-3 mb-5">
+           <span className="w-10 h-px bg-white/20" />
+           <span className="font-mono text-[10px] text-[color:var(--primary)] uppercase tracking-[0.4em]">Let's build it</span>
+           <span className="w-10 h-px bg-white/20" />
+         </div>
+         <h1 className="heading-font text-6xl md:text-[7rem] text-white mb-4 leading-[0.85] tracking-[0.02em] text-center">
+           Get in <span className="text-[color:var(--primary)]">touch</span>
+         </h1>
          <p className="text-white/60 font-mono text-sm uppercase tracking-widest text-center mb-12">Schedule a Google Meet</p>
          
          <form className="w-full flex flex-col gap-6 bg-white/5 p-8 md:p-10 rounded-3xl border border-white/10 backdrop-blur-sm shadow-xl" onSubmit={(e) => { e.preventDefault(); alert("Meeting request sent! (Mock)"); }}>
