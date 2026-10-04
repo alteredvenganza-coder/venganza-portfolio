@@ -1647,115 +1647,169 @@ const ContactPage = () => {
 };
 
 // ==========================================
-// ARCHIVE PAGE (LIGHT THEME RESTORED)
+// ARCHIVE PAGE — ALTERED VENGANZA INDEX
 // ==========================================
 
 const ArchivePage = () => {
-  const [path, setPath] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
-  
-  const years = ['2026', '2025', '2024', '2023', '2022', '2021', '2020'];
-  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const [filter, setFilter] = useState('All');
+  const { items: dbCases } = useSiteCaseStudies();
 
-  const FolderIcon = ({ label, onClick }) => (
-    <button onClick={onClick} className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-black/5 hover:bg-[color:var(--primary)] text-black/70 hover:text-white border border-black/10 backdrop-blur-lg transition-all group outline-none shadow-sm min-w-[120px]">
-      <Folder size={48} className="text-black/40 group-hover:text-white transition-colors stroke-1" fill="currentColor" fillOpacity="0.2" />
-      <span className="font-mono text-xs font-semibold uppercase tracking-wider">{label}</span>
-    </button>
-  );
+  const categories = ['All', 'Brand', 'Digital', 'Apparel', 'Campaigns', 'Experiments'];
+  const sourceItems = dbCases.length ? dbCases : DEFAULT_CASES;
 
-  const FileIcon = ({ type, label }) => (
-    <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-black/5 hover:bg-black/10 border border-black/10 transition-all group cursor-pointer min-w-[120px]">
-      {type === 'image' ? (
-        <FileImage size={48} className="text-black/40 group-hover:text-black transition-colors stroke-1" />
-      ) : (
-        <FileVideo size={48} className="text-black/40 group-hover:text-black transition-colors stroke-1" />
-      )}
-      <span className="font-mono text-xs text-center text-black/60 group-hover:text-black break-all">{label}</span>
-    </div>
-  );
+  const getCategory = (item) => {
+    const haystack = [
+      item?.title,
+      item?.subtitle,
+      item?.type_label,
+      ...(Array.isArray(item?.tags) ? item.tags : []),
+    ].filter(Boolean).join(' ').toLowerCase();
+
+    if (/shopify|website|web|e-commerce|ecommerce|digital|app|saas|ui|ux/.test(haystack)) return 'Digital';
+    if (/apparel|fashion|clothing|streetwear|garment|production/.test(haystack)) return 'Apparel';
+    if (/campaign|art direction|creative direction|editorial|shoot|content/.test(haystack)) return 'Campaigns';
+    if (/experiment|research|study|concept|prototype/.test(haystack)) return 'Experiments';
+    return 'Brand';
+  };
+
+  const items = sourceItems
+    .map((item, index) => ({ ...item, _archiveCategory: getCategory(item), _archiveIndex: index + 1 }))
+    .filter(item => filter === 'All' || item._archiveCategory === filter);
 
   return (
-    <div className="min-h-screen relative z-10 flex flex-col py-12 px-6 lg:px-20 max-w-screen-2xl mx-auto">
-      <button onClick={() => setMenuOpen(true)} className="fixed top-6 right-6 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black/70 hover:text-black transition-colors">
-        <Menu size={24} />
+    <div className="min-h-screen relative z-10 bg-[#f3f3ef] text-black">
+      <button
+        onClick={() => setMenuOpen(true)}
+        className="fixed top-5 right-5 z-[100] md:hidden w-10 h-10 flex items-center justify-center text-black"
+        aria-label="Open menu"
+      >
+        <Menu size={22} />
       </button>
-      <div className="mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 border-b border-black/10 pb-10 w-full">
-         <div className="flex flex-col items-start gap-8 w-full">
-           <div className="flex justify-between items-start w-full">
-             <Link to="/" className="heading-font text-5xl md:text-7xl text-black tracking-widest leading-none block hover:opacity-80 transition-opacity">
-               Altered Venganza
-             </Link>
-             <Link to="/" className="hidden md:inline-flex items-center gap-2 text-black/50 hover:text-black transition-colors text-xs font-mono uppercase tracking-widest mt-2">
-                Back to Home <ArrowRight size={14} />
-             </Link>
-           </div>
-           <h2 className="font-mono text-sm text-black/60 uppercase tracking-[0.2em] mt-4">Client Archive</h2>
-         </div>
-      </div>
 
-      <div className="flex-1 flex flex-col bg-white border border-black/10 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden mt-4">
-        {/* Browser Top Bar */}
-        <div className="bg-[#f5f5f5] border-b border-black/10 px-4 py-3 flex items-center gap-4">
-          <button 
-            onClick={() => setPath(p => p.slice(0, -1))}
-            disabled={path.length === 0}
-            className="p-1.5 rounded text-black/50 hover:text-black hover:bg-black/10 transition-colors disabled:opacity-20"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          
-          <div className="flex items-center gap-2 font-mono text-[10px] text-black/60 uppercase tracking-widest overflow-hidden text-ellipsis whitespace-nowrap">
-            <span className="cursor-pointer hover:text-black transition-colors" onClick={() => setPath([])}>C: \ Archive</span>
-            {path.map((segment, idx) => (
-              <React.Fragment key={idx}>
-                <span className="text-black/30">\</span>
-                <span className="cursor-pointer hover:text-black transition-colors" onClick={() => setPath(path.slice(0, idx+1))}>
-                  {segment}
-                </span>
-              </React.Fragment>
-            ))}
-          </div>
-          
-          <div className="ml-auto">
-             <div className="flex items-center gap-2 text-black/50 cursor-pointer bg-black/5 p-2 rounded-full hover:bg-black/10 transition-colors">
-                <User size={18} className="stroke-1" />
-             </div>
+      <header className="border-b border-black/15">
+        <div className="max-w-[1800px] mx-auto px-5 md:px-8 lg:px-10 py-5 flex items-start justify-between gap-8">
+          <Link to="/" className="heading-font text-[20px] md:text-[24px] leading-none uppercase hover:opacity-55 transition-opacity">
+            Altered Venganza
+          </Link>
+          <div className="hidden md:flex items-center gap-8 text-[10px] uppercase tracking-[0.18em]">
+            <span className="text-black/45">Archive / Index</span>
+            <Link to="/" className="hover:opacity-50 transition-opacity">Home</Link>
+            <Link to="/contact" className="hover:opacity-50 transition-opacity">Contact</Link>
           </div>
         </div>
+      </header>
 
-        {/* Content Explorer */}
-        <div className="flex-1 p-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 content-start auto-rows-min bg-white">
-          
-          {path.length === 0 && years.map(y => (
-            <FolderIcon key={y} label={y} onClick={() => setPath([y])} />
+      <main className="max-w-[1800px] mx-auto px-5 md:px-8 lg:px-10">
+        <section className="pt-16 md:pt-24 pb-14 md:pb-20 border-b border-black/15">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-6 items-end">
+            <div className="lg:col-span-8">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-black/45 mb-5">
+                Altered Venganza / Selected & ongoing work
+              </p>
+              <h1 className="heading-font text-[clamp(3.6rem,10vw,10.5rem)] leading-[0.82] tracking-[-0.055em] uppercase max-w-[1200px]">
+                Archive
+              </h1>
+            </div>
+
+            <div className="lg:col-span-4 lg:pb-2">
+              <p className="text-[13px] md:text-[15px] leading-[1.45] max-w-md lg:ml-auto">
+                Brand identities, clothing, websites, Shopify builds, campaigns and internal studies.
+                The public index stays simple; the full project structure lives inside Studio OS.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-black/15">
+          <div className="flex flex-wrap items-center gap-x-6 md:gap-x-9 gap-y-2 py-4">
+            {categories.map(category => {
+              const active = filter === category;
+              return (
+                <button
+                  key={category}
+                  onClick={() => setFilter(category)}
+                  className={`text-[10px] md:text-[11px] uppercase tracking-[0.18em] py-1 transition-opacity ${active ? 'opacity-100 underline underline-offset-4' : 'opacity-40 hover:opacity-100'}`}
+                >
+                  {category}
+                </button>
+              );
+            })}
+            <span className="ml-auto text-[10px] uppercase tracking-[0.18em] text-black/35">
+              {String(items.length).padStart(2, '0')} projects
+            </span>
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 border-l border-black/15">
+          {items.map((item) => (
+            <article
+              key={item.id || `${item.title}-${item._archiveIndex}`}
+              className="group border-r border-b border-black/15 min-h-[420px] flex flex-col"
+            >
+              <div className="aspect-[4/3] bg-[#e8e8e2] overflow-hidden relative border-b border-black/15">
+                {item.hero_image ? (
+                  <img
+                    src={item.hero_image}
+                    alt={item.title || 'Altered Venganza project'}
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-[1.01] transition-all duration-700"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="heading-font text-[clamp(3rem,7vw,7rem)] tracking-[-0.06em] text-black/[0.08] uppercase">
+                      {String(item._archiveIndex).padStart(2, '0')}
+                    </span>
+                  </div>
+                )}
+                <div className="absolute top-3 left-3 text-[9px] uppercase tracking-[0.16em] bg-[#f3f3ef]/90 px-2 py-1">
+                  AV-{String(item._archiveIndex).padStart(3, '0')}
+                </div>
+              </div>
+
+              <div className="p-4 md:p-5 flex-1 flex flex-col">
+                <div className="flex items-start justify-between gap-6 mb-10">
+                  <div>
+                    <h2 className="heading-font text-[24px] md:text-[28px] leading-[0.95] tracking-[-0.035em] uppercase">
+                      {item.title}
+                    </h2>
+                    {item.subtitle && (
+                      <p className="mt-2 text-[11px] leading-[1.4] text-black/55 max-w-sm">
+                        {item.subtitle}
+                      </p>
+                    )}
+                  </div>
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-black/45 shrink-0">
+                    {item.year || '—'}
+                  </span>
+                </div>
+
+                <div className="mt-auto pt-4 border-t border-black/10 flex items-end justify-between gap-5">
+                  <div className="flex flex-wrap gap-x-3 gap-y-1">
+                    {(Array.isArray(item.tags) ? item.tags.slice(0, 3) : []).map(tag => (
+                      <span key={tag} className="text-[9px] uppercase tracking-[0.14em] text-black/45">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="text-[9px] uppercase tracking-[0.14em] text-black/70">
+                    {item._archiveCategory}
+                  </span>
+                </div>
+              </div>
+            </article>
           ))}
 
-          {path.length === 1 && months.map(m => (
-            <FolderIcon key={m} label={m} onClick={() => setPath([...path, m])} />
-          ))}
-
-          {path.length === 2 && (
-            <>
-              <FileIcon type="image" label={`${path[1]}_Look_1.jpg`} />
-              <FileIcon type="image" label={`${path[1]}_Look_2.jpg`} />
-              <FileIcon type="video" label={`Campaign_${path[0]}.mp4`} />
-              <FolderIcon label="Drafts" onClick={() => setPath([...path, 'Drafts'])} />
-            </>
+          {items.length === 0 && (
+            <div className="col-span-full border-r border-b border-black/15 min-h-[360px] flex items-center justify-center">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-black/35">No projects in this index yet</p>
+            </div>
           )}
+        </section>
 
-          {path.length > 2 && (
-             <div className="col-span-full py-20 text-center font-mono text-black/30 text-xs">
-                -- Directory is empty --
-             </div>
-          )}
-
+        <div className="py-10">
+          <SiteFooter light={true} />
         </div>
-      </div>
-      
-      <div className="mt-8 w-full">
-        <SiteFooter light={true} />
-      </div>
+      </main>
 
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
     </div>
