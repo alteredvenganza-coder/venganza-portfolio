@@ -7,9 +7,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        serif: ['Playfair Display', 'serif'],
-        mono: ['Space Mono', 'monospace'],
+        sans: ['Suisse International', 'Suisse Intl', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        serif: ['Suisse International', 'Suisse Intl', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        mono: ['Suisse International', 'Suisse Intl', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
       },
       colors: {
         background: '#131313',
