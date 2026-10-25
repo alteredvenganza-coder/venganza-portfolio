@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, FilePlus2, MessageCircle, Minus, Send, ShieldCheck, X } from 'lucide-react';
 
@@ -17,6 +17,14 @@ export default function InquiriesCheckout({ items, removeItem, clearItems }) {
   const [fileError, setFileError] = useState('');
   const [status, setStatus] = useState({ type: 'idle', message: '' });
   const [receipt, setReceipt] = useState(null);
+  const [deliveryReady, setDeliveryReady] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/inquiries').then(r => r.json()).then(data => {
+      if (alive) setDeliveryReady(Boolean(data.available));
+    }).catch(() => { if (alive) setDeliveryReady(false); });
+    return () => { alive = false; };
+  }, []);
   const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
   const emailFallback = 'mailto:studio@alteredvenganza.com?subject=' + encodeURIComponent('Studio inquiry — ' + (form.name || 'New project')) + '&body=' + encodeURIComponent(
     'Name: ' + form.name + '\nEmail: ' + form.email + '\nPhone: ' + (form.phone || 'Not provided') +
@@ -154,9 +162,19 @@ export default function InquiriesCheckout({ items, removeItem, clearItems }) {
               </div>}
               <div className="border-t border-dashed border-[#bcc7cd] mt-8 pt-6">
                 <div className="flex justify-between text-[12px] text-[#53656c] mb-4"><span>Amount due today</span><strong className="text-[#18242c] text-base">€0.00</strong></div>
-                <button type="submit" disabled={status.type === 'sending'} className="w-full flex items-center justify-center gap-3 py-4 bg-[#7b1f24] text-white hover:bg-[#54191d] disabled:opacity-55 rounded-md font-mono uppercase tracking-[0.17em] text-[11px] transition-colors">
-                  {status.type === 'sending' ? 'Sending inquiry…' : 'Send inquiry'} <Send size={15}/>
-                </button>
+                {deliveryReady === false ? (
+                  <div className="space-y-3">
+                    <p className="text-[11px] text-[#75565a]">Automatic email delivery is temporarily unavailable. You can still send your brief using your email app.</p>
+                    <a href={emailFallback} className="w-full flex items-center justify-center gap-3 py-4 bg-[#7b1f24] text-white hover:bg-[#54191d] rounded-md font-mono uppercase tracking-[0.12em] text-[11px] transition-colors">
+                      Open email to inquire <Send size={15}/>
+                    </a>
+                    <p className="text-[10px] text-[#829197]">Review and send the prepared email yourself. Attach reference files manually.</p>
+                  </div>
+                ) : (
+                  <button type="submit" disabled={status.type === 'sending' || deliveryReady === null} className="w-full flex items-center justify-center gap-3 py-4 bg-[#7b1f24] text-white hover:bg-[#54191d] disabled:opacity-55 rounded-md font-mono uppercase tracking-[0.17em] text-[11px] transition-colors">
+                    {status.type === 'sending' ? 'Sending inquiry…' : deliveryReady === null ? 'Checking delivery…' : 'Send inquiry'} <Send size={15}/>
+                  </button>
+                )}
                 <p className="flex justify-center items-center gap-2 font-mono text-[9px] uppercase tracking-wide text-[#8a989b] mt-4"><ShieldCheck size={12}/> No account · No charge · Manual review by the studio</p>
               </div>
             </form>
