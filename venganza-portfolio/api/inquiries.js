@@ -22,6 +22,9 @@ const deliver = async (key, message) => {
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
+  if (req.method === 'GET') {
+    return res.status(200).json({ available: Boolean(process.env.RESEND_API_KEY && process.env.INQUIRY_FROM_EMAIL) });
+  }
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed.' });
   const apiKey = process.env.RESEND_API_KEY;
   const sender = process.env.INQUIRY_FROM_EMAIL;
