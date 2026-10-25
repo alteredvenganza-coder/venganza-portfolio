@@ -18,6 +18,13 @@ export default function InquiriesCheckout({ items, removeItem, clearItems }) {
   const [status, setStatus] = useState({ type: 'idle', message: '' });
   const [receipt, setReceipt] = useState(null);
   const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
+  const emailFallback = 'mailto:studio@alteredvenganza.com?subject=' + encodeURIComponent('Studio inquiry — ' + (form.name || 'New project')) + '&body=' + encodeURIComponent(
+    'Name: ' + form.name + '\nEmail: ' + form.email + '\nPhone: ' + (form.phone || 'Not provided') +
+    '\nBudget: ' + form.budget + '\n\nServices:\n' +
+    (items.map(s => '- ' + s.title + (s.tier ? ' (' + s.tier + ')' : '')).join('\n') || '- General inquiry') +
+    '\n\nProject brief:\n' + form.message +
+    (files.length ? '\n\nPlease manually attach these reference files: ' + files.map(f => f.name).join(', ') : '')
+  );
 
   const addFiles = event => {
     const next = [...files, ...Array.from(event.target.files || [])];
@@ -140,7 +147,11 @@ export default function InquiriesCheckout({ items, removeItem, clearItems }) {
                 {fileError && <p role="alert" className="text-red-700 text-[11px] mt-2">{fileError}</p>}
               </div>
 
-              {status.type === 'error' && <p role="alert" className="mt-5 border border-red-200 bg-red-50 text-red-800 text-[12px] p-3 rounded-md">{status.message}</p>}
+              {status.type === 'error' && <div role="alert" className="mt-5 border border-red-200 bg-red-50 text-red-800 text-[12px] p-4 rounded-md">
+                <p>{status.message}</p>
+                <a href={emailFallback} className="inline-flex items-center gap-2 mt-3 font-semibold underline underline-offset-4">Open your email app to send manually <ArrowRight size={13}/></a>
+                <p className="text-[11px] mt-2">Your email app will open with your brief. Review and send it there; reference files need to be attached manually.</p>
+              </div>}
               <div className="border-t border-dashed border-[#bcc7cd] mt-8 pt-6">
                 <div className="flex justify-between text-[12px] text-[#53656c] mb-4"><span>Amount due today</span><strong className="text-[#18242c] text-base">€0.00</strong></div>
                 <button type="submit" disabled={status.type === 'sending'} className="w-full flex items-center justify-center gap-3 py-4 bg-[#7b1f24] text-white hover:bg-[#54191d] disabled:opacity-55 rounded-md font-mono uppercase tracking-[0.17em] text-[11px] transition-colors">
