@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, createContext, useContext } from 'react';
-import { BrowserRouter, Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { Instagram, ArrowLeft, ArrowRight, Folder, FileImage, FileVideo, User, X, ExternalLink, MessageCircle, ShoppingBag, Plus, Minus, Trash2, ChevronDown, Menu } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -7,6 +7,8 @@ import { INSTAGRAM_DM_URL, INSTAGRAM_HANDLE, PREMADE_PRICE_PREMIUM, PREMADE_PRIC
 import { useTheme } from './hooks/useTheme';
 import { useSiteSettings } from './hooks/useSiteSettings';
 import { useSiteCaseStudies, useSiteServices } from './hooks/useSiteCollections';
+import ServicesMarketplace from './components/ServicesMarketplace';
+import InquiriesCheckout from './components/InquiriesCheckout';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,6 +21,18 @@ const CartContext = createContext(null);
 const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [inquiries, setInquiries] = useState(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('av-inquiries') || '[]');
+      return Array.isArray(saved) ? saved.filter(x => x && typeof x.title === 'string').slice(0, 12) : [];
+    } catch { return []; }
+  });
+  useEffect(() => { try { sessionStorage.setItem('av-inquiries', JSON.stringify(inquiries)); } catch { /* storage disabled */ } }, [inquiries]);
+
+  const addToInquire = item => setInquiries(prev => prev.some(i => i.title === item.title && (i.tier || '') === (item.tier || ''))
+    ? prev : [...prev, { title: item.title, tier: item.tier || '', priceDisplay: item.priceDisplay || item.price || 'Quote on request' }].slice(0, 12));
+  const removeInquireItem = index => setInquiries(prev => prev.filter((_, i) => i !== index));
+  const clearInquiries = () => setInquiries([]);
 
   const addToCart = (item) => {
     setCart(prev => {
@@ -32,7 +46,7 @@ const CartProvider = ({ children }) => {
   const clearCart = () => setCart([]);
 
   return (
-    <CartContext.Provider value={{ cart, cartOpen, setCartOpen, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ cart, cartOpen, setCartOpen, addToCart, removeFromCart, clearCart, inquiries, addToInquire, removeInquireItem, clearInquiries }}>
       {children}
     </CartContext.Provider>
   );
@@ -225,7 +239,7 @@ const AnimatedBackground = () => {
 
   const path = location.pathname;
   const decoded = decodeURIComponent(path);
-  const isLightMode = path === '/' || path === '/archive';
+  const isLightMode = ['/', '/archive', '/services', '/inquiries'].includes(path);
   const isTailored = decoded.includes('Tailored');
 
   return (
@@ -271,7 +285,7 @@ const ThemeController = () => {
 
     if (path === '/mat-renders') {
       document.body.classList.add('theme-dark');
-    } else if (path === '/' || path === '/archive' || path === '/about' || path === '/premades' || path === '/materializing-ideas') {
+    } else if (path === '/' || path === '/archive' || path === '/about' || path === '/premades' || path === '/materializing-ideas' || path === '/services' || path === '/inquiries') {
       document.body.classList.add('theme-light');
     } else if (decoded.includes('Tailored') || path === '/designs' || decoded.includes('E-commerce') || decoded.includes('Techpack')) {
       document.body.classList.add('theme-tailored');
@@ -305,7 +319,7 @@ const MobileMenu = ({ onClose }) => {
       </button>
       <nav className="flex flex-col items-center gap-6">
         <Link to="/" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Home</Link>
-        <Link to="/brand-identity" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Brand Identity</Link>
+        <Link to="/services" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Services</Link>
         <Link to="/designs" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Clothing Designs</Link>
         <Link to="/vag" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">VAG</Link>
         <Link to="/premades" onClick={onClose} className="mobile-menu-link heading-font text-3xl text-black tracking-widest uppercase hover:text-[color:var(--primary)] transition-colors">Premades</Link>
@@ -490,6 +504,8 @@ function deepMerge(a, b) {
 
 const Home = () => {
   const containerRef = useRef();
+  const navigate = useNavigate();
+  const { addToInquire } = useCart();
   const { slides, loading: slidesLoading } = useHeroSlides(6);
   const theme = useTheme();
   const { settings: site } = useSiteSettings();
@@ -561,17 +577,8 @@ const Home = () => {
             Altered Venganza
           </Link>
           <nav className="hidden md:flex items-center gap-8">
-            <div className="relative pb-2 -mb-2" onMouseEnter={() => setServicesOpen(true)} onMouseLeave={() => setServicesOpen(false)}>
-              <button onClick={() => setServicesOpen(o => !o)} className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors flex items-center gap-1">
-                Services <ChevronDown size={12} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {servicesOpen && (
-                <div className="absolute top-full left-0 bg-white border border-black/10 rounded-lg shadow-xl py-2 min-w-[200px] z-50">
-                  <Link to="/brand-identity" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.2em] transition-colors">Brand Identity</Link>
-                  <Link to="/designs" onClick={() => setServicesOpen(false)} className="block px-5 py-2.5 font-mono text-[10px] text-black/70 hover:text-black hover:bg-black/5 uppercase tracking-[0.2em] transition-colors">Clothing Designs</Link>
-                </div>
-              )}
-            </div>
+            <Link to="/services" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Services</Link>
+            <Link to="/inquiries" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Inquiries</Link>
             <a href="#work" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Work</a>
             <Link to="/premades" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Premades</Link>
             <a href="#apps" className="nav-item font-mono text-[11px] text-black/70 hover:text-black uppercase tracking-[0.2em] transition-colors">Apps</a>
@@ -654,20 +661,8 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="reveal divide-y divide-black/5 border-t border-black/5">
-            {strategicServices.map((s, i) => (
-              <Link key={s.id || s.num || i} to={s.link_to || '#'} className="group grid grid-cols-12 gap-4 md:gap-8 py-8 md:py-10 items-baseline hover:bg-black/[0.02] transition-colors px-2 -mx-2">
-                <div className="col-span-2 md:col-span-1 font-mono text-[11px] text-black/30 uppercase tracking-widest pt-2">{s.num || String(i + 1).padStart(2, '0')}</div>
-                <div className="col-span-10 md:col-span-5">
-                  <h3 className="serif-heading text-2xl md:text-3xl text-black group-hover:text-[color:var(--primary)] transition-colors">{s.title}</h3>
-                </div>
-                <div className="col-span-12 md:col-span-4 text-black/60 text-sm md:text-[15px] leading-relaxed font-light">{s.description}</div>
-                <div className="col-span-12 md:col-span-2 md:text-right">
-                  <div className="font-mono text-[11px] text-[color:var(--primary)] uppercase tracking-[0.2em]">{s.price_label}</div>
-                  <div className="font-mono text-[9px] text-black/40 uppercase tracking-[0.2em] mt-1">{s.delivery}</div>
-                </div>
-              </Link>
-            ))}
+          <div className="reveal">
+            <ServicesMarketplace services={allData} onAdd={service => { addToInquire(service); navigate('/inquiries'); }} compact />
           </div>
         </div>
       </section>
@@ -857,6 +852,28 @@ const Home = () => {
 // SERVICE PAGES (DARK THEMES & EDITORIAL LAYOUT)
 // ==========================================
 
+
+// Services catalogue: shared across homepage and dedicated page.
+const ServicesLanding = () => {
+  const navigate = useNavigate();
+  const { addToInquire } = useCart();
+  return (
+    <div className="relative z-10 min-h-screen bg-[#fafafa] px-5 md:px-12 lg:px-20 pt-10 pb-24">
+      <header className="max-w-7xl mx-auto flex items-center justify-between gap-4 mb-16">
+        <Link to="/" className="heading-font text-lg sm:text-2xl text-black">Altered Venganza</Link>
+        <Link to="/inquiries" className="font-mono text-[10px] tracking-wider uppercase border border-black/20 text-black px-4 py-3 hover:bg-black hover:text-white transition-colors">Your Inquiries</Link>
+      </header>
+      <div className="max-w-7xl mx-auto">
+        <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#7b1f24] mb-3">Services / Studio index</p>
+        <h1 className="serif-heading text-5xl sm:text-7xl text-black">Explore our services.</h1>
+        <p className="max-w-xl text-black/55 text-sm sm:text-base mt-5 mb-12 leading-relaxed">Choose the services you need, add them to your inquiry and send us a brief. Prices are indicative, not a payable checkout.</p>
+        <ServicesMarketplace services={allData} onAdd={service => { addToInquire(service); navigate('/inquiries'); }}/>
+      </div>
+      <div className="max-w-7xl mx-auto pt-16"><SiteFooter light /></div>
+    </div>
+  );
+};
+
 const ServiceItem = ({ title, subtitle, price, delivery, linkTo }) => {
   return (
     <Link
@@ -964,7 +981,8 @@ const ServiceDetail = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartTier, setCartTier] = useState(null);
   const [cartAdded, setCartAdded] = useState(false);
-  const { addToCart, setCartOpen } = useCart();
+  const { addToInquire } = useCart();
+  const navigate = useNavigate();
   const theme = useTheme();
   const location = useLocation();
   const _p = decodeURIComponent(location.pathname);
@@ -1068,30 +1086,18 @@ const ServiceDetail = () => {
            </div>
          )}
 
-         <button
+         <button type="button"
            onClick={() => {
-             const tier = service.layout === 'options' ? (cartTier !== null ? service.options[cartTier]?.price : null) : null;
+             const tier = service.layout === 'options' ? service.options[cartTier]?.price : '';
              if (service.layout === 'options' && cartTier === null) return;
-             const priceDef = SERVICE_PRICES[service.title];
-             let priceCents = typeof priceDef === 'number' ? priceDef : 0;
-             if (priceDef?.options && cartTier !== null) {
-               const key = Object.keys(priceDef.options).find(k => service.options[cartTier]?.price?.includes(k));
-               if (key) priceCents = priceDef.options[key];
-             }
-             addToCart({ kind: 'service', id: `${service.title}__${tier || ''}`, title: service.title, tier, priceDisplay: tier || service.price, priceCents });
-             setCartAdded(true);
-             setTimeout(() => setCartAdded(false), 2000);
+             addToInquire({ title: service.title, tier, priceDisplay: tier || service.price });
+             navigate('/inquiries');
            }}
            disabled={service.layout === 'options' && cartTier === null}
-           className="w-full py-4 border border-white/20 text-white/70 hover:border-white/50 hover:text-white transition-all duration-500 font-mono text-[10px] justify-center tracking-widest uppercase flex items-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed"
+           className="w-full py-5 bg-[color:var(--primary)] text-[color:var(--btn-tx)] hover:opacity-80 transition-all duration-500 font-mono text-[10px] justify-center tracking-widest uppercase flex items-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed"
          >
-           <ShoppingBag size={13} /> {cartAdded ? 'Added!' : 'Add to Cart'}
+           <MessageCircle size={14}/> Add to Inquire <ArrowRight size={14}/>
          </button>
-
-         <Link to={`/service/${encodeURIComponent(service.title)}/order`}
-            className="w-full py-5 bg-[color:var(--primary)] text-[color:var(--btn-tx)] hover:bg-white hover:text-black transition-all duration-500 font-mono text-[10px] justify-center tracking-widest uppercase flex items-center gap-3">
-             Order &amp; Send Brief <ArrowRight size={14} />
-          </Link>
       </div>
       <div className="w-full max-w-[480px]"><SiteFooter light={isTailored} /></div>
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
@@ -2459,6 +2465,20 @@ const PremadesPage = () => {
 };
 
 // Global cart button — visible when cart has items, on any page
+const GlobalInquireButton = () => {
+  const { inquiries } = useCart();
+  const location = useLocation();
+  if (!inquiries.length || location.pathname === '/inquiries') return null;
+  return <Link to="/inquiries" className="fixed bottom-6 left-6 z-[90] flex items-center gap-2 bg-[#1d2b32] text-white font-mono text-[10px] uppercase tracking-widest px-5 py-3 shadow-2xl hover:bg-[#7b1f24] transition-colors">
+    <MessageCircle size={14}/> Inquire ({inquiries.length})
+  </Link>;
+};
+
+const InquiriesPage = () => {
+  const { inquiries, removeInquireItem, clearInquiries } = useCart();
+  return <InquiriesCheckout items={inquiries} removeItem={removeInquireItem} clearItems={clearInquiries}/>;
+};
+
 const GlobalCartButton = () => {
   const { cart, setCartOpen, cartOpen } = useCart();
   if (cart.length === 0) return null;
@@ -2487,6 +2507,7 @@ export default function App() {
         <ThemeController />
         <AnimatedBackground />
         <GlobalCartButton />
+        <GlobalInquireButton />
         <GlobalCartSidebar />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -2494,13 +2515,15 @@ export default function App() {
           <Route path="/materializing-ideas" element={<MaterializingIdeasPage />} />
           <Route path="/vag" element={<GalleryPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/inquiries" element={<InquiriesPage />} />
+          <Route path="/services" element={<ServicesLanding />} />
           <Route path="/archive" element={<ArchivePage />} />
           <Route path="/premades" element={<PremadesPage />} />
           <Route path="/mat-renders" element={<MatRendersPage />} />
           <Route path="/service/:id" element={<ServiceDetail />} />
-          <Route path="/service/:id/order" element={<ServiceOrderPage />} />
-          <Route path="/brand-identity" element={<ServicePage title="Brand Identity Service" services={brandIdentityData} />} />
-          <Route path="/designs" element={<ServicePage title="Clothing Design Service" services={designsData} />} />
+          <Route path="/service/:id/order" element={<Navigate to="/inquiries" replace />} />
+          <Route path="/brand-identity" element={<Navigate to="/services" replace />} />
+          <Route path="/designs" element={<Navigate to="/services" replace />} />
         </Routes>
       </CartProvider>
     </BrowserRouter>
