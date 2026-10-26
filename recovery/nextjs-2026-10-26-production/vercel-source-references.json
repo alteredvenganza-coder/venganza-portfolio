@@ -1,0 +1,168 @@
+{
+  "sourceDeployment": "dpl_LGzGXV1TVBDSL9BsMCExJ8Tq5J5A",
+  "previewDeployment": "dpl_GBWS6ZeNuepH3ZmVZtb35Rhu1cag",
+  "productionDeployment": "dpl_346wv2SGTtLfs1AhLcrx29WbrC5K",
+  "projectId": "prj_GfLRNaXDZEVVi8Y2vywc29CKFHRb",
+  "originalSourceRefs": [
+    {
+      "file": ".gitignore",
+      "sha": "d7e06dabd05cbd3d74f83b2eed2913cf0bf83b29"
+    },
+    {
+      "file": "app/globals.css",
+      "sha": "62b7fd9551cecf9f4c3c885a193fc87ecc138d94"
+    },
+    {
+      "file": "app/highlight.css",
+      "sha": "86a6453b9fcec3b47dc6cc27a6f9b0bf51d9dbf2"
+    },
+    {
+      "file": "app/inquiry-aero.css",
+      "sha": "806f3816d491bba96b95445b1285aab83dca3916"
+    },
+    {
+      "file": "app/inquiry-services.css",
+      "sha": "d372d0d51bad616e173656dba8e45bfa70d32037"
+    },
+    {
+      "file": "app/layout.tsx",
+      "sha": "bd1ba28f6a11e08f2b5cf0ec62809f23e7e21163"
+    },
+    {
+      "file": "app/page.tsx",
+      "sha": "0dd3a2fba84d541cbfe122e8cd082154fff76487"
+    },
+    {
+      "file": "app/project-profiles.css",
+      "sha": "6975fa76c7d680c7f7dc05615b9f80de5c7d3c6c"
+    },
+    {
+      "file": "app/software-menu.css",
+      "sha": "72e0aa2b200d2f8f6644519445b7144f14b03c66"
+    },
+    {
+      "file": "app/sound-gate.css",
+      "sha": "524da173721b550de4a58ae60f1a26bb99d70ad9"
+    },
+    {
+      "file": "components/DodgePhoto.tsx",
+      "sha": "a1ebdfe3e9ae2c9e8ec05493deb2fd2c4229bb75"
+    },
+    {
+      "file": "components/EditorialAbout.tsx",
+      "sha": "d0c97b7ed109d2b52c30a65cdf47026a2be1f780"
+    },
+    {
+      "file": "components/Header.tsx",
+      "sha": "9af5d2f331705ef6420a6c644cbe33d89fce588d"
+    },
+    {
+      "file": "components/Highlighter.tsx",
+      "sha": "2246360e393739acda20ab6f9a4b4fccab61fb2f"
+    },
+    {
+      "file": "components/InquiryProvider.tsx",
+      "sha": "c16e1196357cacb1c57f6fed5c0323897585b2b9"
+    },
+    {
+      "file": "components/ProjectProfile.tsx",
+      "sha": "20c1628722e0230b2d20a331d11fe7cae41b4cbd"
+    },
+    {
+      "file": "components/ProjectsBoard.tsx",
+      "sha": "2b1db547e08bef395224161584272226fd0c49f3"
+    },
+    {
+      "file": "components/Receipt.tsx",
+      "sha": "d40c5a709f9c21303bf115b3e5df8db3e23030b9"
+    },
+    {
+      "file": "components/Scramble.tsx",
+      "sha": "5a52d767b9238ede20be8aa6dcfbabac63731505"
+    },
+    {
+      "file": "components/SolitaireIntro.tsx",
+      "sha": "2520139f48f4b672c410abb9bb971f6a67774592"
+    },
+    {
+      "file": "components/SoundGate.tsx",
+      "sha": "5d190f98474fa26a1e04c8aee4a7bab14378508b"
+    },
+    {
+      "file": "components/Tile.tsx",
+      "sha": "44fc957723bf2eabdcc24452a5a613fafb87feec"
+    },
+    {
+      "file": "components/projects-table.css",
+      "sha": "72a2742465df8a46ec69a4483d710f15469eba12"
+    },
+    {
+      "file": "components/sfx.ts",
+      "sha": "99ff3ed7f69abd63e1175411c6f6edbdbba14c06"
+    },
+    {
+      "file": "content/images.json",
+      "sha": "5f36b2ea290645ee34d943220a14b54ee5ea5be5"
+    },
+    {
+      "file": "content/project-profiles.ts",
+      "sha": "be666220f476c4c8c3d678870991d72149553663"
+    },
+    {
+      "file": "content/services.ts",
+      "sha": "9b6dd2fe02eaa67ab11ec2406a10bdf9462ca0aa"
+    },
+    {
+      "file": "content/site.ts",
+      "sha": "fd9378ff41a836484c587ac489ea66b0e12d04a3"
+    },
+    {
+      "file": "content/store.ts",
+      "sha": "930faaacef8130175a52329c8c2821426746b6f7"
+    },
+    {
+      "file": "package.json",
+      "sha": "b4bd7985deba23dc7a78904fa8b01771ddd0df87"
+    },
+    {
+      "file": "scripts/download-images.mjs",
+      "sha": "97b51ecc20ff0ab379da4d603246a697c3d4bcc8"
+    },
+    {
+      "file": "scripts/download-sounds.mjs",
+      "sha": "e7d0aad298ce21d0feacb93d1b263d0e6983a0d2"
+    },
+    {
+      "file": "scripts/sounds.json",
+      "sha": "3db716860d22403fcab7585400d1529e8c9e0869"
+    },
+    {
+      "file": "tsconfig.json",
+      "sha": "f3c35d5387e0fcf11d2298d06431fae73a6b22d2"
+    },
+    {
+      "file": "vercel.json",
+      "sha": "283d8b4efe0748bac06a200cf8d52380988c95b0"
+    }
+  ],
+  "additionalSourceFiles": [
+    "app/[slug]/page.tsx",
+    "app/api/inquiries/route.ts",
+    "app/inquire/page.tsx",
+    "app/inquiry-services.css",
+    "app/layout.tsx",
+    "app/project-profiles.css",
+    "app/ser-vices/[slug]/page.tsx",
+    "app/ser-vices/page.tsx",
+    "app/software-menu.css",
+    "app/software/page.tsx",
+    "components/Header.tsx",
+    "components/InquiryProvider.tsx",
+    "components/ProjectProfile.tsx",
+    "content/project-profiles.ts",
+    "content/services.ts",
+    "app/altered-venganza/page.tsx",
+    "app/pro-jectz/page.tsx",
+    "app/inquiry-aero.css"
+  ]
+}
