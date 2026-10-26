@@ -10,7 +10,7 @@ This contains the recovered source patch from the conversation "Menu home sempre
 
 ## Missing from this recovery
 - The original full Next.js source that produced the October 24 production deployment.
-- The later "Proposta Inquiries Frutiger Aero" patch code itself (its ZIP exists in the user's Library but raw source is not available to this tool context). The approved direction is a liquid-glass, Windows Live Messenger-inspired Inquiries page with original portfolio background; "Sign in to your next idea" is purely visual and should never request authentication.
+- The later "Proposta Inquiries Frutiger Aero" Next.js patch source itself (its ZIP exists in the user's Library but the ZIP's bytes were not accessible in this tool context). Its full standalone HTML preview is preserved in `previews/altered-live-messenger-inquiries-preview.html`. The approved direction is a liquid-glass, Windows Live Messenger-inspired Inquiries page with original portfolio background; "Sign in to your next idea" is purely visual and should never request authentication.
 - A verified email provider sender and RESEND_API_KEY / INQUIRY_FROM_EMAIL for real email delivery.
 
 ## Deployment safety
